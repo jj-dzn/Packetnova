@@ -48,8 +48,8 @@ Dark-first (Wireshark/dev-tool energy) vs light-first (Cisco/enterprise energy) 
 
 ## Decisions log
 
-| Date | Decision | Rationale |
-| ---- | -------- | --------- |
-| —    | —        | —         |
+| Date       | Decision                                                                            | Rationale                                                                                                                                                                                                                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-07-30 | Dark-first default theme. Light mode supported via a toggle, not system preference. | DESIGN_SYSTEM.md's whole visual direction (deep space background, glow accents) is written as the dark experience; light mode is explicitly the secondary/available mode, not co-equal. Defaulting to dark regardless of OS preference keeps the first impression consistent with that direction. |
 
 Fill this in as choices are actually made, so future-you remembers why.

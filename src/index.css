@@ -1,1 +1,56 @@
 @import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-bg: var(--pn-bg);
+  --color-surface: var(--pn-surface);
+  --color-border: var(--pn-border);
+  --color-fg: var(--pn-fg);
+  --color-fg-muted: var(--pn-fg-muted);
+  --color-fg-subtle: var(--pn-fg-subtle);
+  --color-accent: var(--pn-accent);
+  --color-accent-alt: var(--pn-accent-alt);
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:
+    ui-monospace, 'SFMono-Regular', 'JetBrains Mono', Consolas, 'Liberation Mono', monospace;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 28px;
+}
+
+:root {
+  --pn-bg: #f8f9fc;
+  --pn-surface: #ffffff;
+  --pn-border: rgba(15, 23, 42, 0.1);
+  --pn-fg: #0b0d14;
+  --pn-fg-muted: #475569;
+  --pn-fg-subtle: #64748b;
+  --pn-accent: #7c3aed;
+  --pn-accent-alt: #0d9488;
+}
+
+.dark {
+  --pn-bg: #0a0a12;
+  --pn-surface: #14141f;
+  --pn-border: rgba(148, 163, 184, 0.14);
+  --pn-fg: #f4f4f6;
+  --pn-fg-muted: #9ca3b0;
+  --pn-fg-subtle: #7c8598;
+  --pn-accent: #8b7cff;
+  --pn-accent-alt: #22d3ee;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+}
