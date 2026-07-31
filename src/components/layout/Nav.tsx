@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import { Button } from '../ui/Button'
+import { SearchBar } from '../ui/SearchBar'
 import { useDarkMode } from '../../hooks/useDarkMode'
 
 const navLinks = [
@@ -37,7 +38,7 @@ export function Nav() {
 
   return (
     <header className="border-b border-border">
-      <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
           <img src="/logo.svg" alt="" width={28} height={28} />
           <span className="text-lg font-semibold">PacketNova</span>
@@ -59,7 +60,8 @@ export function Nav() {
           ))}
         </nav>
 
-        <div className="hidden md:flex">
+        <div className="hidden items-center gap-3 md:flex">
+          <SearchBar className="w-48 lg:w-64" />
           <Button variant="secondary" onClick={toggleTheme} aria-label="Toggle color theme">
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </Button>
@@ -77,30 +79,33 @@ export function Nav() {
       </div>
 
       {mobileOpen && (
-        <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 md:hidden">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              onClick={() => setMobileOpen(false)}
-              className={({ isActive }) =>
-                `rounded-md px-3 py-2 text-sm font-medium ${
-                  isActive
-                    ? 'bg-accent/10 text-accent'
-                    : 'text-fg-muted hover:bg-surface hover:text-fg'
-                }`
-              }
+        <nav className="flex flex-col gap-3 border-t border-border px-4 py-3 md:hidden">
+          <SearchBar onNavigate={() => setMobileOpen(false)} />
+          <div className="flex flex-col gap-1">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  `rounded-md px-3 py-2 text-sm font-medium ${
+                    isActive
+                      ? 'bg-accent/10 text-accent'
+                      : 'text-fg-muted hover:bg-surface hover:text-fg'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="rounded-md px-3 py-2 text-left text-sm font-medium text-fg-muted hover:bg-surface hover:text-fg"
             >
-              {link.label}
-            </NavLink>
-          ))}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="rounded-md px-3 py-2 text-left text-sm font-medium text-fg-muted hover:bg-surface hover:text-fg"
-          >
-            Switch to {theme === 'dark' ? 'light' : 'dark'} mode
-          </button>
+              Switch to {theme === 'dark' ? 'light' : 'dark'} mode
+            </button>
+          </div>
         </nav>
       )}
     </header>

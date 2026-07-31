@@ -3,6 +3,7 @@ import { PageShell } from './components/layout/PageShell'
 import { HomePage } from './pages/HomePage'
 import { ToolsPage } from './pages/ToolsPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
+import { SearchPage } from './pages/SearchPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { CidrCalculator } from './features/tools/ip/CidrCalculator'
 import { SubnetCalculator } from './features/tools/ip/SubnetCalculator'
@@ -24,6 +25,7 @@ function App() {
           <Route path="/tools/network-address-calculator" element={<NetworkAddressCalculator />} />
           <Route path="/visualizers" element={<ComingSoonPage title="Visualizers" />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </PageShell>
