@@ -59,30 +59,37 @@ export const toolCategories: ToolCategory[] = [
         name: 'VPN tunnel overhead calculator',
         description:
           "See how much throughput a VPN tunnel's encapsulation overhead actually costs you.",
+        slug: 'vpn-tunnel-overhead-calculator',
       },
       {
         name: 'MTU calculator',
         description: "Find the right MTU for a link and see what happens when packets don't fit.",
+        slug: 'mtu-calculator',
       },
       {
         name: 'MSS calculator',
         description: 'Work out the maximum TCP segment size for a given MTU and overhead.',
+        slug: 'mss-calculator',
       },
       {
         name: 'Bandwidth estimator',
         description: 'Estimate real-world throughput after protocol and tunnel overhead.',
+        slug: 'bandwidth-estimator',
       },
       {
         name: 'Latency calculator',
         description: 'Estimate one-way and round-trip latency across a given distance and medium.',
+        slug: 'latency-calculator',
       },
       {
         name: 'Transfer time calculator',
         description: 'Estimate how long a file transfer will take at a given bandwidth.',
+        slug: 'transfer-time-calculator',
       },
       {
         name: 'Packet fragmentation calculator',
         description: 'See when and how a packet gets fragmented for a given MTU.',
+        slug: 'packet-fragmentation-calculator',
       },
     ],
   },
