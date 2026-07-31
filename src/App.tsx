@@ -1,10 +1,10 @@
-import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import { PageShell } from './components/layout/PageShell'
 import { HomePage } from './pages/HomePage'
 import { ToolsPage } from './pages/ToolsPage'
 import { VisualizersPage } from './pages/VisualizersPage'
 import { BlogPage } from './pages/BlogPage'
+import { BlogPostPage } from './pages/BlogPostPage'
 import { SearchPage } from './pages/SearchPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { CidrCalculator } from './features/tools/ip/CidrCalculator'
@@ -65,13 +65,6 @@ import { TcpIpStackExplorer } from './features/visualizers/TcpIpStackExplorer'
 import { RoutingDecisionVisualizer } from './features/visualizers/RoutingDecisionVisualizer'
 import { BgpBestPathVisualizer } from './features/visualizers/BgpBestPathVisualizer'
 import { OspfSpfVisualizer } from './features/visualizers/OspfSpfVisualizer'
-
-// Lazy-loaded: the only consumer of the remark/rehype/unified markdown
-// pipeline, which is a meaningful chunk of code that tool/visualizer pages
-// (the vast majority of traffic) never need to download.
-const BlogPostPage = lazy(() =>
-  import('./pages/BlogPostPage').then((module) => ({ default: module.BlogPostPage })),
-)
 
 function App() {
   return (
@@ -155,14 +148,7 @@ function App() {
           <Route path="/visualizers/bgp-best-path-selection" element={<BgpBestPathVisualizer />} />
           <Route path="/visualizers/ospf-spf-animation" element={<OspfSpfVisualizer />} />
           <Route path="/blog" element={<BlogPage />} />
-          <Route
-            path="/blog/:slug"
-            element={
-              <Suspense fallback={<div className="py-16 text-center text-fg-muted">Loading…</div>}>
-                <BlogPostPage />
-              </Suspense>
-            }
-          />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

@@ -1,12 +1,15 @@
 import type { ReactNode } from 'react'
 import { Nav } from './Nav'
 import { Footer } from './Footer'
+import { useSyncDocumentMeta } from '../../hooks/useSyncDocumentMeta'
 
 interface PageShellProps {
   children: ReactNode
 }
 
 export function PageShell({ children }: PageShellProps) {
+  useSyncDocumentMeta()
+
   return (
     <div className="flex min-h-screen flex-col bg-bg text-fg">
       <Nav />
