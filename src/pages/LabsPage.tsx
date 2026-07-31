@@ -37,6 +37,10 @@ export function LabsPage() {
           />
         ))}
       </div>
+
+      <p className="text-center text-xs text-fg-subtle">
+        The retro terminal also answers to the classic cheat code, if you know it.
+      </p>
     </div>
   )
 }
