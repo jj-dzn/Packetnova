@@ -27,6 +27,7 @@ describe('getPageMeta', () => {
       '/labs/blue-screen',
       '/labs/traceroute-ghost',
       '/labs/ping-pet-duel',
+      '/labs/signal-decoder',
       '/terminal',
     ]) {
       const meta = getPageMeta(path)

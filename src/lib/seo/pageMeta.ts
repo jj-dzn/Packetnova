@@ -72,6 +72,10 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `Ping pet duel - ${SITE_TITLE}`,
     description: 'Two pets, two hosts, one latency duel. Fastest round trip wins.',
   },
+  '/labs/signal-decoder': {
+    title: `Signal decoder - ${SITE_TITLE}`,
+    description: 'Watch any text ripple through Morse, binary, hex, and Base64.',
+  },
   '/terminal': {
     title: `Terminal - ${SITE_TITLE}`,
     description: DEFAULT_DESCRIPTION,

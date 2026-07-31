@@ -76,6 +76,7 @@ import { DialUpSimulator } from './features/labs/DialUpSimulator'
 import { BlueScreenButton } from './features/labs/BlueScreenButton'
 import { TracerouteGhost } from './features/labs/TracerouteGhost'
 import { PingPetDuel } from './features/labs/PingPetDuel'
+import { SignalDecoder } from './features/labs/SignalDecoder'
 
 function App() {
   return (
@@ -170,6 +171,7 @@ function App() {
           <Route path="/labs/blue-screen" element={<BlueScreenButton />} />
           <Route path="/labs/traceroute-ghost" element={<TracerouteGhost />} />
           <Route path="/labs/ping-pet-duel" element={<PingPetDuel />} />
+          <Route path="/labs/signal-decoder" element={<SignalDecoder />} />
           <Route path="/terminal" element={<RetroTerminal />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

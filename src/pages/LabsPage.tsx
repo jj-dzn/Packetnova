@@ -52,6 +52,11 @@ const labs = [
     description: 'Two pets, two hosts, one latency duel. Fastest round trip wins.',
     href: '/labs/ping-pet-duel',
   },
+  {
+    title: 'Signal decoder',
+    description: 'Watch any text ripple through Morse, binary, hex, and Base64.',
+    href: '/labs/signal-decoder',
+  },
 ]
 
 export function LabsPage() {
