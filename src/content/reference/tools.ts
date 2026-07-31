@@ -1,0 +1,249 @@
+export interface ToolListing {
+  name: string
+  description: string
+}
+
+export interface ToolCategory {
+  slug: string
+  label: string
+  tools: ToolListing[]
+}
+
+// Mirrors docs/CONTENT_PLAN.md's tool inventory. Update both together.
+export const toolCategories: ToolCategory[] = [
+  {
+    slug: 'ip',
+    label: 'IP tools',
+    tools: [
+      {
+        name: 'CIDR calculator',
+        description: 'Break down any CIDR block into network, broadcast, and usable host range.',
+      },
+      {
+        name: 'Subnet calculator',
+        description: 'Split a network into subnets and see the resulting masks at a glance.',
+      },
+      {
+        name: 'IPv6 calculator',
+        description: 'Expand, compress, and inspect IPv6 addresses and prefixes.',
+      },
+      {
+        name: 'Wildcard mask calculator',
+        description: 'Convert a subnet mask to its wildcard mask for ACLs and OSPF.',
+      },
+      {
+        name: 'IP range calculator',
+        description: 'Convert between IP ranges and CIDR notation instantly.',
+      },
+      {
+        name: 'Broadcast calculator',
+        description: 'Find the broadcast address for any IP and subnet mask.',
+      },
+      {
+        name: 'Network address calculator',
+        description: 'Find the network address for any IP and subnet mask.',
+      },
+    ],
+  },
+  {
+    slug: 'vpn',
+    label: 'VPN tools',
+    tools: [
+      {
+        name: 'VPN tunnel overhead calculator',
+        description:
+          "See how much throughput a VPN tunnel's encapsulation overhead actually costs you.",
+      },
+      {
+        name: 'MTU calculator',
+        description: "Find the right MTU for a link and see what happens when packets don't fit.",
+      },
+      {
+        name: 'MSS calculator',
+        description: 'Work out the maximum TCP segment size for a given MTU and overhead.',
+      },
+      {
+        name: 'Bandwidth estimator',
+        description: 'Estimate real-world throughput after protocol and tunnel overhead.',
+      },
+      {
+        name: 'Latency calculator',
+        description: 'Estimate one-way and round-trip latency across a given distance and medium.',
+      },
+      {
+        name: 'Transfer time calculator',
+        description: 'Estimate how long a file transfer will take at a given bandwidth.',
+      },
+      {
+        name: 'Packet fragmentation calculator',
+        description: 'See when and how a packet gets fragmented for a given MTU.',
+      },
+    ],
+  },
+  {
+    slug: 'routing',
+    label: 'Routing',
+    tools: [
+      {
+        name: 'BGP route visualizer',
+        description: 'Watch how BGP path attributes decide the route between two networks.',
+      },
+      {
+        name: 'Longest prefix match simulator',
+        description: 'See which route wins when multiple entries in a routing table overlap.',
+      },
+      {
+        name: 'Route lookup simulator',
+        description: 'Step through how a router picks the next hop for a destination address.',
+      },
+      {
+        name: 'Administrative distance reference',
+        description: 'Look up the default administrative distance for every routing source.',
+      },
+      {
+        name: 'Metric comparison tool',
+        description: 'Compare routing metrics across protocols on equal footing.',
+      },
+    ],
+  },
+  {
+    slug: 'switching',
+    label: 'Switching',
+    tools: [
+      {
+        name: 'VLAN calculator',
+        description: 'Work out VLAN ranges, trunking math, and tagging details.',
+      },
+      {
+        name: '802.1Q tag explorer',
+        description: 'Break down an 802.1Q tag into its TPID, PCP, DEI, and VLAN ID fields.',
+      },
+      {
+        name: 'MAC address lookup',
+        description: "Look up the vendor behind a MAC address's OUI.",
+      },
+      {
+        name: 'MAC formatter',
+        description: 'Convert a MAC address between colon, hyphen, and dot notation.',
+      },
+      {
+        name: 'STP overview',
+        description: 'See how Spanning Tree Protocol picks a root bridge and blocks loops.',
+      },
+    ],
+  },
+  {
+    slug: 'protocols',
+    label: 'Protocols',
+    tools: [
+      {
+        name: 'TCP header explorer',
+        description: 'Break down every field in a TCP header, byte by byte.',
+      },
+      {
+        name: 'UDP header explorer',
+        description: 'Break down every field in a UDP header, byte by byte.',
+      },
+      {
+        name: 'IP header explorer',
+        description: 'Break down every field in an IPv4 header, byte by byte.',
+      },
+      {
+        name: 'ICMP explorer',
+        description: 'Look up ICMP types and codes and what they actually mean.',
+      },
+      {
+        name: 'DNS record reference',
+        description: "Look up every DNS record type and what it's used for.",
+      },
+      {
+        name: 'HTTP status reference',
+        description: 'Look up any HTTP status code and what it means.',
+      },
+      {
+        name: 'TLS version explorer',
+        description: 'Compare TLS versions and see what changed between them.',
+      },
+      {
+        name: 'DHCP options reference',
+        description: 'Look up DHCP option numbers and their meaning.',
+      },
+    ],
+  },
+  {
+    slug: 'security',
+    label: 'Security',
+    tools: [
+      {
+        name: 'Hash generator',
+        description: 'Generate MD5, SHA-1, SHA-256, and other hashes from text or files.',
+      },
+      {
+        name: 'Hash verifier',
+        description: 'Check a file or string against an expected hash.',
+      },
+      {
+        name: 'JWT decoder',
+        description: "Decode a JWT's header and payload without verifying it server-side.",
+      },
+      {
+        name: 'JWT inspector',
+        description: "Inspect a JWT's claims, algorithm, and expiration at a glance.",
+      },
+      {
+        name: 'Base64 encode/decode',
+        description: 'Encode or decode Base64 text instantly.',
+      },
+      {
+        name: 'URL encode/decode',
+        description: 'Encode or decode URL-safe text instantly.',
+      },
+      {
+        name: 'Certificate viewer',
+        description: "Inspect an X.509 certificate's fields, SANs, and validity dates.",
+      },
+      {
+        name: 'Password generator',
+        description: 'Generate strong, random passwords with configurable rules.',
+      },
+    ],
+  },
+  {
+    slug: 'utilities',
+    label: 'Utilities',
+    tools: [
+      {
+        name: 'Regex tester',
+        description: 'Test a regular expression against sample text with live match highlighting.',
+      },
+      {
+        name: 'JSON formatter',
+        description: 'Format, validate, and minify JSON.',
+      },
+      {
+        name: 'YAML formatter',
+        description: 'Format and validate YAML.',
+      },
+      {
+        name: 'XML formatter',
+        description: 'Format and validate XML.',
+      },
+      {
+        name: 'Epoch converter',
+        description: 'Convert between Unix epoch time and human-readable dates.',
+      },
+      {
+        name: 'Binary/decimal/hex converter',
+        description: 'Convert numbers between binary, decimal, and hexadecimal.',
+      },
+      {
+        name: 'ASCII converter',
+        description: 'Convert between text, ASCII codes, and binary.',
+      },
+      {
+        name: 'Text diff viewer',
+        description: 'Compare two blocks of text and highlight the differences.',
+      },
+    ],
+  },
+]

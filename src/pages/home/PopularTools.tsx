@@ -1,5 +1,5 @@
 import { SectionHeader } from './SectionHeader'
-import { PreviewCard } from './PreviewCard'
+import { PreviewCard } from '../../components/ui/PreviewCard'
 
 const tools = [
   {
