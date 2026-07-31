@@ -68,6 +68,14 @@ function runCommand(raw: string): string[] {
       return [new Date().toString()]
     case 'sudo':
       return ['Nice try. This incident will not be reported.']
+    case 'coffee.exe':
+    case './coffee.exe':
+      return [
+        'Brewing...',
+        '[##########] 100%',
+        'ERROR: no coffee maker detected on this machine.',
+        '(this terminal runs on vibes and JavaScript, not caffeine)',
+      ]
     case 'ping': {
       const host = args[0] ?? 'packetnova.ca'
       return [
