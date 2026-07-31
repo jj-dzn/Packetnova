@@ -10,6 +10,18 @@ describe('searchItems', () => {
     const cidr = searchItems.find((item) => item.title === 'CIDR calculator')
     expect(cidr?.href).toBe('/tools/cidr-calculator')
   })
+
+  it('includes every visualizer from the content data', () => {
+    const visualizerItems = searchItems.filter((item) => item.type === 'visualizer')
+    expect(visualizerItems.length).toBeGreaterThanOrEqual(10)
+  })
+
+  it('gives the built visualizer a real href and an unbuilt one null', () => {
+    const tcp = searchItems.find((item) => item.title === 'TCP three-way handshake')
+    const tls = searchItems.find((item) => item.title === 'TLS handshake')
+    expect(tcp?.href).toBe('/visualizers/tcp-three-way-handshake')
+    expect(tls?.href).toBeNull()
+  })
 })
 
 describe('searchIndex', () => {

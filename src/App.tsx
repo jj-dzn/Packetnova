@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router'
 import { PageShell } from './components/layout/PageShell'
 import { HomePage } from './pages/HomePage'
 import { ToolsPage } from './pages/ToolsPage'
+import { VisualizersPage } from './pages/VisualizersPage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
 import { SearchPage } from './pages/SearchPage'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -53,6 +54,7 @@ import { EpochConverter } from './features/tools/utilities/EpochConverter'
 import { BaseConverterTool } from './features/tools/utilities/BaseConverterTool'
 import { AsciiConverterTool } from './features/tools/utilities/AsciiConverterTool'
 import { TextDiffViewer } from './features/tools/utilities/TextDiffViewer'
+import { TcpHandshakeVisualizer } from './features/visualizers/TcpHandshakeVisualizer'
 
 function App() {
   return (
@@ -118,7 +120,8 @@ function App() {
           <Route path="/tools/binary-decimal-hex-converter" element={<BaseConverterTool />} />
           <Route path="/tools/ascii-converter" element={<AsciiConverterTool />} />
           <Route path="/tools/text-diff-viewer" element={<TextDiffViewer />} />
-          <Route path="/visualizers" element={<ComingSoonPage title="Visualizers" />} />
+          <Route path="/visualizers" element={<VisualizersPage />} />
+          <Route path="/visualizers/tcp-three-way-handshake" element={<TcpHandshakeVisualizer />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

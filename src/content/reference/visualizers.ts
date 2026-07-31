@@ -1,0 +1,55 @@
+export interface VisualizerListing {
+  name: string
+  description: string
+  slug?: string
+}
+
+// Mirrors docs/CONTENT_PLAN.md's "Interactive visualizers" list and
+// ARCHITECTURE.md's features/visualizers/ folder. Update all three together.
+export const visualizers: VisualizerListing[] = [
+  {
+    name: 'TCP three-way handshake',
+    description: 'Watch SYN, SYN-ACK, and ACK establish a connection step by step.',
+    slug: 'tcp-three-way-handshake',
+  },
+  {
+    name: 'TLS handshake',
+    description: 'See exactly how a TLS session gets negotiated and encrypted.',
+  },
+  {
+    name: 'Packet encapsulation',
+    description: "Follow a packet as it's wrapped from application data down to frames.",
+  },
+  {
+    name: 'OSI model explorer',
+    description: 'Click through each OSI layer and see what happens to data at each one.',
+  },
+  {
+    name: 'TCP/IP stack explorer',
+    description:
+      'Compare the TCP/IP model against OSI and see how real protocols map to each layer.',
+  },
+  {
+    name: 'NAT flow simulator',
+    description:
+      'Watch how NAT translates a private address and port as a packet leaves the network.',
+  },
+  {
+    name: 'Routing decision simulator',
+    description: 'Step through how a router picks the next hop for a packet, table entry by entry.',
+  },
+  {
+    name: 'BGP best path selection',
+    description:
+      "Walk through BGP's path-selection algorithm step by step, attribute by attribute.",
+  },
+  {
+    name: 'OSPF SPF animation',
+    description: "Watch Dijkstra's shortest-path-first algorithm build an OSPF routing tree.",
+  },
+  {
+    name: 'VPN packet flow',
+    description:
+      'Follow a packet through VPN encapsulation, encryption, and tunneling to the far end.',
+  },
+]

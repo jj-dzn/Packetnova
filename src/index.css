@@ -25,6 +25,31 @@
   --text-lg: 16px;
   --text-xl: 20px;
   --text-2xl: 28px;
+
+  /* Shared "packet traveling along a line" animation for step visualizers
+     (TCP handshake, and future ones per ARCHITECTURE.md's visualizer list) --
+     defined once here so every visualizer's traveling-packet marker uses the
+     same motion. */
+  --animate-pn-slide-right: pn-packet-slide-right 700ms ease-in-out forwards;
+  --animate-pn-slide-left: pn-packet-slide-left 700ms ease-in-out forwards;
+}
+
+@keyframes pn-packet-slide-right {
+  from {
+    left: 0%;
+  }
+  to {
+    left: 100%;
+  }
+}
+
+@keyframes pn-packet-slide-left {
+  from {
+    left: 100%;
+  }
+  to {
+    left: 0%;
+  }
 }
 
 :root {

@@ -1,8 +1,9 @@
 import Fuse from 'fuse.js'
 import { toolCategories } from '../../content/reference/tools'
+import { visualizers } from '../../content/reference/visualizers'
 
 export interface SearchItem {
-  type: 'tool'
+  type: 'tool' | 'visualizer'
   title: string
   description: string
   category: string
@@ -21,9 +22,22 @@ function buildToolSearchItems(): SearchItem[] {
   )
 }
 
+function buildVisualizerSearchItems(): SearchItem[] {
+  return visualizers.map((visualizer) => ({
+    type: 'visualizer' as const,
+    title: visualizer.name,
+    description: visualizer.description,
+    category: 'Visualizer',
+    href: visualizer.slug ? `/visualizers/${visualizer.slug}` : null,
+  }))
+}
+
 // "Content that exists so far" per ROADMAP.md's Milestone 7 -- extend this
-// as visualizers and blog posts get real content of their own.
-export const searchItems: SearchItem[] = [...buildToolSearchItems()]
+// as blog posts get real content of their own.
+export const searchItems: SearchItem[] = [
+  ...buildToolSearchItems(),
+  ...buildVisualizerSearchItems(),
+]
 
 export const searchIndex = new Fuse<SearchItem>(searchItems, {
   keys: ['title', 'description', 'category'],

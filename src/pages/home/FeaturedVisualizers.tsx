@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { SectionHeader } from './SectionHeader'
+import { PreviewCard } from '../../components/ui/PreviewCard'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
 
@@ -12,17 +13,23 @@ export function FeaturedVisualizers() {
         viewAllHref="/visualizers"
         viewAllLabel="View all visualizers"
       />
-      <Link to="/visualizers" className="block">
-        <Card interactive className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Badge tone="accent">Visualizer</Badge>
-            <span className="text-xs text-fg-subtle">Coming soon</span>
-          </div>
-          <p className="text-sm text-fg-muted">
-            First up: TCP three-way handshake, TLS handshake, and packet encapsulation.
-          </p>
-        </Card>
-      </Link>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <PreviewCard
+          category="Visualizer"
+          title="TCP three-way handshake"
+          description="Watch SYN, SYN-ACK, and ACK establish a connection step by step."
+          href="/visualizers/tcp-three-way-handshake"
+          comingSoon={false}
+        />
+        <Link to="/visualizers" className="block">
+          <Card interactive className="flex h-full flex-col items-start justify-center gap-2">
+            <Badge tone="accent">9 more</Badge>
+            <p className="text-sm text-fg-muted">
+              TLS handshake, packet encapsulation, and more on the way.
+            </p>
+          </Card>
+        </Link>
+      </div>
     </section>
   )
 }
