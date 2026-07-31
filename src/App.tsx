@@ -22,6 +22,11 @@ import { MetricComparisonTool } from './features/tools/routing/MetricComparisonT
 import { LpmSimulator } from './features/tools/routing/LpmSimulator'
 import { RouteLookupSimulator } from './features/tools/routing/RouteLookupSimulator'
 import { BgpBestPathSelector } from './features/tools/routing/BgpBestPathSelector'
+import { VlanCalculator } from './features/tools/switching/VlanCalculator'
+import { Dot1qExplorer } from './features/tools/switching/Dot1qExplorer'
+import { MacAddressLookup } from './features/tools/switching/MacAddressLookup'
+import { MacFormatter } from './features/tools/switching/MacFormatter'
+import { StpOverview } from './features/tools/switching/StpOverview'
 
 function App() {
   return (
@@ -56,6 +61,11 @@ function App() {
           <Route path="/tools/longest-prefix-match-simulator" element={<LpmSimulator />} />
           <Route path="/tools/route-lookup-simulator" element={<RouteLookupSimulator />} />
           <Route path="/tools/bgp-route-visualizer" element={<BgpBestPathSelector />} />
+          <Route path="/tools/vlan-calculator" element={<VlanCalculator />} />
+          <Route path="/tools/802-1q-tag-explorer" element={<Dot1qExplorer />} />
+          <Route path="/tools/mac-address-lookup" element={<MacAddressLookup />} />
+          <Route path="/tools/mac-formatter" element={<MacFormatter />} />
+          <Route path="/tools/stp-overview" element={<StpOverview />} />
           <Route path="/visualizers" element={<ComingSoonPage title="Visualizers" />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />

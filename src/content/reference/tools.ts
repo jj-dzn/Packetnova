@@ -131,22 +131,27 @@ export const toolCategories: ToolCategory[] = [
       {
         name: 'VLAN calculator',
         description: 'Work out VLAN ranges, trunking math, and tagging details.',
+        slug: 'vlan-calculator',
       },
       {
         name: '802.1Q tag explorer',
         description: 'Break down an 802.1Q tag into its TPID, PCP, DEI, and VLAN ID fields.',
+        slug: '802-1q-tag-explorer',
       },
       {
         name: 'MAC address lookup',
         description: "Look up the vendor behind a MAC address's OUI.",
+        slug: 'mac-address-lookup',
       },
       {
         name: 'MAC formatter',
         description: 'Convert a MAC address between colon, hyphen, and dot notation.',
+        slug: 'mac-formatter',
       },
       {
         name: 'STP overview',
         description: 'See how Spanning Tree Protocol picks a root bridge and blocks loops.',
+        slug: 'stp-overview',
       },
     ],
   },
