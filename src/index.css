@@ -44,9 +44,13 @@
      terminal, so the same blink appears everywhere it shows up. */
   --animate-pn-cursor-blink: pn-cursor-blink 1.1s step-end infinite;
 
-  /* Route-change transition: page content fades/settles in while a soft
-     purple shimmer sweeps across it once. */
-  --animate-pn-page-fade: pn-fade-in 480ms ease-out forwards;
+  /* Route-change transition: page content fades in while a soft purple
+     shimmer sweeps across it once. Deliberately opacity-only, no transform
+     -- a transform left on this ancestor (even a completed one held via
+     animation-fill-mode) would hijack the containing block for any
+     position:fixed descendant, like the Blue Screen Button's full-viewport
+     overlay, shrinking it down to this element's own box instead. */
+  --animate-pn-page-fade: pn-page-fade-in 480ms ease-out forwards;
   --animate-pn-page-shimmer: pn-page-shimmer 850ms ease-out forwards;
 
   /* A once-per-hover icon "pop" -- plays for the duration of the hover via
@@ -86,6 +90,15 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes pn-page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
