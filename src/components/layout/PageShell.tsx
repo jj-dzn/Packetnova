@@ -19,7 +19,7 @@ function PageTransition({ pathname, children }: { pathname: string; children: Re
       {children}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[length:200%_100%] bg-[linear-gradient(100deg,transparent_35%,rgba(139,124,255,0.16)_50%,transparent_65%)] motion-safe:animate-pn-page-shimmer"
+        className="pointer-events-none absolute inset-0 bg-[length:200%_100%] bg-[linear-gradient(100deg,transparent_40%,rgba(139,124,255,0.07)_50%,transparent_60%)] motion-safe:animate-pn-page-shimmer"
       />
     </div>
   )

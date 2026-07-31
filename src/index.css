@@ -47,11 +47,11 @@
   /* Route-change transition: page content fades/settles in while a soft
      purple shimmer sweeps across it once. */
   --animate-pn-page-fade: pn-fade-in 320ms ease-out forwards;
-  --animate-pn-page-shimmer: pn-page-shimmer 700ms ease-out forwards;
+  --animate-pn-page-shimmer: pn-page-shimmer 550ms ease-out forwards;
 
   /* A once-per-hover icon "pop" -- plays for the duration of the hover via
      :hover, so it naturally resets when the pointer leaves. */
-  --animate-pn-icon-pop: pn-icon-pop 320ms ease-out;
+  --animate-pn-icon-pop: pn-icon-pop 280ms ease-out;
 
   /* Ambient once-per-second pulse for the hero's latency orb. */
   --animate-pn-orb-pulse: pn-orb-pulse 1s ease-in-out infinite;
@@ -133,7 +133,7 @@
     transform: scale(1) rotate(0deg);
   }
   40% {
-    transform: scale(1.15) rotate(-6deg);
+    transform: scale(1.08) rotate(-3deg);
   }
   100% {
     transform: scale(1) rotate(0deg);
