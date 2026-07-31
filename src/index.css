@@ -98,3 +98,106 @@ body {
   background-color: var(--color-bg);
   color: var(--color-fg);
 }
+
+/* Hand-written prose styling for rendered blog-post markdown, matching
+   DESIGN_SYSTEM.md's typography rules (monospace for code/data, sans for
+   prose) with the site's existing color tokens -- deliberately not
+   @tailwindcss/typography, since that plugin's defaults would need as much
+   overriding as writing this by hand for a handful of posts. */
+.pn-prose {
+  color: var(--color-fg);
+  line-height: 1.7;
+}
+.pn-prose h2 {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+.pn-prose h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.pn-prose p {
+  margin-top: 0.9rem;
+  margin-bottom: 0.9rem;
+  color: var(--color-fg-muted);
+}
+.pn-prose ul,
+.pn-prose ol {
+  margin-top: 0.9rem;
+  margin-bottom: 0.9rem;
+  padding-left: 1.5rem;
+  color: var(--color-fg-muted);
+}
+.pn-prose ul {
+  list-style: disc;
+}
+.pn-prose ol {
+  list-style: decimal;
+}
+.pn-prose li {
+  margin-top: 0.35rem;
+}
+.pn-prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.pn-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+.pn-prose pre {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  padding: 1rem;
+}
+.pn-prose pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+.pn-prose blockquote {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1rem;
+  color: var(--color-fg-muted);
+  font-style: italic;
+}
+.pn-prose table {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.pn-prose th,
+.pn-prose td {
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+.pn-prose th {
+  background: var(--color-surface);
+  font-weight: 600;
+}
+.pn-prose strong {
+  color: var(--color-fg);
+  font-weight: 600;
+}
+.pn-prose hr {
+  border-color: var(--color-border);
+  margin: 2rem 0;
+}

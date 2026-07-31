@@ -20,6 +20,14 @@ describe('searchItems', () => {
     const tcp = searchItems.find((item) => item.title === 'TCP three-way handshake')
     expect(tcp?.href).toBe('/visualizers/tcp-three-way-handshake')
   })
+
+  it('includes every blog post, each with a real href', () => {
+    const blogItems = searchItems.filter((item) => item.type === 'blog')
+    expect(blogItems.length).toBeGreaterThanOrEqual(3)
+    for (const item of blogItems) {
+      expect(item.href).toMatch(/^\/blog\/.+/)
+    }
+  })
 })
 
 describe('searchIndex', () => {
