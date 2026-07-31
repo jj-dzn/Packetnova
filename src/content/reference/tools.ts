@@ -208,34 +208,42 @@ export const toolCategories: ToolCategory[] = [
       {
         name: 'Hash generator',
         description: 'Generate MD5, SHA-1, SHA-256, and other hashes from text or files.',
+        slug: 'hash-generator',
       },
       {
         name: 'Hash verifier',
         description: 'Check a file or string against an expected hash.',
+        slug: 'hash-verifier',
       },
       {
         name: 'JWT decoder',
         description: "Decode a JWT's header and payload without verifying it server-side.",
+        slug: 'jwt-decoder',
       },
       {
         name: 'JWT inspector',
         description: "Inspect a JWT's claims, algorithm, and expiration at a glance.",
+        slug: 'jwt-inspector',
       },
       {
         name: 'Base64 encode/decode',
         description: 'Encode or decode Base64 text instantly.',
+        slug: 'base64-encode-decode',
       },
       {
         name: 'URL encode/decode',
         description: 'Encode or decode URL-safe text instantly.',
+        slug: 'url-encode-decode',
       },
       {
         name: 'Certificate viewer',
         description: "Inspect an X.509 certificate's fields, SANs, and validity dates.",
+        slug: 'certificate-viewer',
       },
       {
         name: 'Password generator',
         description: 'Generate strong, random passwords with configurable rules.',
+        slug: 'password-generator',
       },
     ],
   },

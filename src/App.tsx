@@ -35,6 +35,14 @@ import { DnsRecordReference } from './features/tools/protocols/DnsRecordReferenc
 import { HttpStatusReference } from './features/tools/protocols/HttpStatusReference'
 import { TlsVersionExplorer } from './features/tools/protocols/TlsVersionExplorer'
 import { DhcpOptionsReference } from './features/tools/protocols/DhcpOptionsReference'
+import { HashGenerator } from './features/tools/security/HashGenerator'
+import { HashVerifier } from './features/tools/security/HashVerifier'
+import { JwtDecoder } from './features/tools/security/JwtDecoder'
+import { JwtInspector } from './features/tools/security/JwtInspector'
+import { Base64Tool } from './features/tools/security/Base64Tool'
+import { UrlEncodingTool } from './features/tools/security/UrlEncodingTool'
+import { CertificateViewer } from './features/tools/security/CertificateViewer'
+import { PasswordGenerator } from './features/tools/security/PasswordGenerator'
 
 function App() {
   return (
@@ -82,6 +90,14 @@ function App() {
           <Route path="/tools/http-status-reference" element={<HttpStatusReference />} />
           <Route path="/tools/tls-version-explorer" element={<TlsVersionExplorer />} />
           <Route path="/tools/dhcp-options-reference" element={<DhcpOptionsReference />} />
+          <Route path="/tools/hash-generator" element={<HashGenerator />} />
+          <Route path="/tools/hash-verifier" element={<HashVerifier />} />
+          <Route path="/tools/jwt-decoder" element={<JwtDecoder />} />
+          <Route path="/tools/jwt-inspector" element={<JwtInspector />} />
+          <Route path="/tools/base64-encode-decode" element={<Base64Tool />} />
+          <Route path="/tools/url-encode-decode" element={<UrlEncodingTool />} />
+          <Route path="/tools/certificate-viewer" element={<CertificateViewer />} />
+          <Route path="/tools/password-generator" element={<PasswordGenerator />} />
           <Route path="/visualizers" element={<ComingSoonPage title="Visualizers" />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
