@@ -72,6 +72,8 @@ import { IpZodiac } from './features/labs/IpZodiac'
 import { HandleGenerator } from './features/labs/HandleGenerator'
 import { CursedConfigGenerator } from './features/labs/CursedConfigGenerator'
 import { HackerTyper } from './features/labs/HackerTyper'
+import { DialUpSimulator } from './features/labs/DialUpSimulator'
+import { BlueScreenButton } from './features/labs/BlueScreenButton'
 
 function App() {
   return (
@@ -162,6 +164,8 @@ function App() {
           <Route path="/labs/handle-generator" element={<HandleGenerator />} />
           <Route path="/labs/cursed-config" element={<CursedConfigGenerator />} />
           <Route path="/labs/hacker-typer" element={<HackerTyper />} />
+          <Route path="/labs/dial-up" element={<DialUpSimulator />} />
+          <Route path="/labs/blue-screen" element={<BlueScreenButton />} />
           <Route path="/terminal" element={<RetroTerminal />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

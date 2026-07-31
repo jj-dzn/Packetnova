@@ -32,6 +32,16 @@ const labs = [
     description: "Mash any key. Look like you know exactly what you're doing.",
     href: '/labs/hacker-typer',
   },
+  {
+    title: 'Dial-up simulator',
+    description: 'Relive the screech of a 56k modem connecting to the internet.',
+    href: '/labs/dial-up',
+  },
+  {
+    title: 'Blue screen button',
+    description: 'Push it. Watch PacketNova "crash" into a fake blue screen.',
+    href: '/labs/blue-screen',
+  },
 ]
 
 export function LabsPage() {

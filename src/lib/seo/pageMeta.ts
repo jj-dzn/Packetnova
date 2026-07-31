@@ -56,6 +56,14 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `Hacker typer - ${SITE_TITLE}`,
     description: "Mash any key. Look like you know exactly what you're doing.",
   },
+  '/labs/dial-up': {
+    title: `Dial-up simulator - ${SITE_TITLE}`,
+    description: 'Relive the screech of a 56k modem connecting to the internet.',
+  },
+  '/labs/blue-screen': {
+    title: `Blue screen button - ${SITE_TITLE}`,
+    description: 'Push it. Watch PacketNova "crash" into a fake blue screen.',
+  },
   '/terminal': {
     title: `Terminal - ${SITE_TITLE}`,
     description: DEFAULT_DESCRIPTION,

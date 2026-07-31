@@ -23,6 +23,8 @@ describe('getPageMeta', () => {
       '/labs/handle-generator',
       '/labs/cursed-config',
       '/labs/hacker-typer',
+      '/labs/dial-up',
+      '/labs/blue-screen',
       '/terminal',
     ]) {
       const meta = getPageMeta(path)
