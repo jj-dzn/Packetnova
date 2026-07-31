@@ -34,21 +34,24 @@
   --animate-pn-slide-left: pn-packet-slide-left 700ms ease-in-out forwards;
 }
 
+/* Rest a few percent short of the true 0%/100% edge -- a label's own text
+   is centered on this point, so at the literal edge, a long label's other
+   half can extend past the visualizer card (or the viewport) and clip. */
 @keyframes pn-packet-slide-right {
   from {
-    left: 0%;
+    left: 4%;
   }
   to {
-    left: 100%;
+    left: 96%;
   }
 }
 
 @keyframes pn-packet-slide-left {
   from {
-    left: 100%;
+    left: 96%;
   }
   to {
-    left: 0%;
+    left: 4%;
   }
 }
 

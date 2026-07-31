@@ -15,6 +15,7 @@ export const visualizers: VisualizerListing[] = [
   {
     name: 'TLS handshake',
     description: 'See exactly how a TLS session gets negotiated and encrypted.',
+    slug: 'tls-handshake',
   },
   {
     name: 'Packet encapsulation',
@@ -33,6 +34,7 @@ export const visualizers: VisualizerListing[] = [
     name: 'NAT flow simulator',
     description:
       'Watch how NAT translates a private address and port as a packet leaves the network.',
+    slug: 'nat-flow-simulator',
   },
   {
     name: 'Routing decision simulator',
@@ -51,5 +53,6 @@ export const visualizers: VisualizerListing[] = [
     name: 'VPN packet flow',
     description:
       'Follow a packet through VPN encapsulation, encryption, and tunneling to the far end.',
+    slug: 'vpn-packet-flow',
   },
 ]

@@ -55,6 +55,9 @@ import { BaseConverterTool } from './features/tools/utilities/BaseConverterTool'
 import { AsciiConverterTool } from './features/tools/utilities/AsciiConverterTool'
 import { TextDiffViewer } from './features/tools/utilities/TextDiffViewer'
 import { TcpHandshakeVisualizer } from './features/visualizers/TcpHandshakeVisualizer'
+import { TlsHandshakeVisualizer } from './features/visualizers/TlsHandshakeVisualizer'
+import { NatFlowVisualizer } from './features/visualizers/NatFlowVisualizer'
+import { VpnPacketFlowVisualizer } from './features/visualizers/VpnPacketFlowVisualizer'
 
 function App() {
   return (
@@ -122,6 +125,9 @@ function App() {
           <Route path="/tools/text-diff-viewer" element={<TextDiffViewer />} />
           <Route path="/visualizers" element={<VisualizersPage />} />
           <Route path="/visualizers/tcp-three-way-handshake" element={<TcpHandshakeVisualizer />} />
+          <Route path="/visualizers/tls-handshake" element={<TlsHandshakeVisualizer />} />
+          <Route path="/visualizers/nat-flow-simulator" element={<NatFlowVisualizer />} />
+          <Route path="/visualizers/vpn-packet-flow" element={<VpnPacketFlowVisualizer />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

@@ -16,11 +16,9 @@ describe('searchItems', () => {
     expect(visualizerItems.length).toBeGreaterThanOrEqual(10)
   })
 
-  it('gives the built visualizer a real href and an unbuilt one null', () => {
+  it('gives a built visualizer a real href', () => {
     const tcp = searchItems.find((item) => item.title === 'TCP three-way handshake')
-    const tls = searchItems.find((item) => item.title === 'TLS handshake')
     expect(tcp?.href).toBe('/visualizers/tcp-three-way-handshake')
-    expect(tls?.href).toBeNull()
   })
 })
 
