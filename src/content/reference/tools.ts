@@ -29,10 +29,12 @@ export const toolCategories: ToolCategory[] = [
       {
         name: 'IPv6 calculator',
         description: 'Expand, compress, and inspect IPv6 addresses and prefixes.',
+        slug: 'ipv6-calculator',
       },
       {
         name: 'Wildcard mask calculator',
         description: 'Convert a subnet mask to its wildcard mask for ACLs and OSPF.',
+        slug: 'wildcard-mask-calculator',
       },
       {
         name: 'IP range calculator',
