@@ -42,6 +42,16 @@ const labs = [
     description: 'Push it. Watch PacketNova "crash" into a fake blue screen.',
     href: '/labs/blue-screen',
   },
+  {
+    title: 'Traceroute ghost',
+    description: 'A ghost travels hop by hop, getting more tired as latency climbs.',
+    href: '/labs/traceroute-ghost',
+  },
+  {
+    title: 'Ping pet duel',
+    description: 'Two pets, two hosts, one latency duel. Fastest round trip wins.',
+    href: '/labs/ping-pet-duel',
+  },
 ]
 
 export function LabsPage() {

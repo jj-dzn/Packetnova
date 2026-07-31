@@ -74,6 +74,8 @@ import { CursedConfigGenerator } from './features/labs/CursedConfigGenerator'
 import { HackerTyper } from './features/labs/HackerTyper'
 import { DialUpSimulator } from './features/labs/DialUpSimulator'
 import { BlueScreenButton } from './features/labs/BlueScreenButton'
+import { TracerouteGhost } from './features/labs/TracerouteGhost'
+import { PingPetDuel } from './features/labs/PingPetDuel'
 
 function App() {
   return (
@@ -166,6 +168,8 @@ function App() {
           <Route path="/labs/hacker-typer" element={<HackerTyper />} />
           <Route path="/labs/dial-up" element={<DialUpSimulator />} />
           <Route path="/labs/blue-screen" element={<BlueScreenButton />} />
+          <Route path="/labs/traceroute-ghost" element={<TracerouteGhost />} />
+          <Route path="/labs/ping-pet-duel" element={<PingPetDuel />} />
           <Route path="/terminal" element={<RetroTerminal />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

@@ -64,6 +64,14 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `Blue screen button - ${SITE_TITLE}`,
     description: 'Push it. Watch PacketNova "crash" into a fake blue screen.',
   },
+  '/labs/traceroute-ghost': {
+    title: `Traceroute ghost - ${SITE_TITLE}`,
+    description: 'A ghost travels hop by hop, getting more tired as latency climbs.',
+  },
+  '/labs/ping-pet-duel': {
+    title: `Ping pet duel - ${SITE_TITLE}`,
+    description: 'Two pets, two hosts, one latency duel. Fastest round trip wins.',
+  },
   '/terminal': {
     title: `Terminal - ${SITE_TITLE}`,
     description: DEFAULT_DESCRIPTION,

@@ -43,6 +43,8 @@ const staticPaths = [
   '/labs/hacker-typer',
   '/labs/dial-up',
   '/labs/blue-screen',
+  '/labs/traceroute-ghost',
+  '/labs/ping-pet-duel',
   '/terminal',
 ]
 
