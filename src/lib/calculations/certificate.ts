@@ -85,7 +85,10 @@ function extractSubjectAltNames(
   return []
 }
 
-export function parseCertificate(pem: string): CalculationResult<CertificateInfo> {
+export function parseCertificate(
+  pem: string,
+  now: Date = new Date(),
+): CalculationResult<CertificateInfo> {
   const der = pemToDer(pem)
   if (!der) return { ok: false, error: 'Could not decode this as a PEM certificate.' }
 
@@ -134,7 +137,6 @@ export function parseCertificate(pem: string): CalculationResult<CertificateInfo
     const notAfter = decodeAsn1Time(notAfterNode.tagNumber, decodeAscii(der, notAfterNode))
 
     const subjectAltNames = extractSubjectAltNames(der, tbsChildren, index)
-    const now = new Date()
 
     return {
       ok: true,

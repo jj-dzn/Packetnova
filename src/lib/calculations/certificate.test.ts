@@ -83,11 +83,36 @@ describe('parseCertificate', () => {
     expect(result.result.subjectAltNames).toEqual(['packetnova.test', 'www.packetnova.test'])
   })
 
-  it('is not expired (valid for the year following generation) and is currently valid', () => {
-    const result = parseCertificate(TEST_CERT)
+  it('is neither expired nor not-yet-valid partway through its validity window', () => {
+    // Fixed reference time rather than the real clock: the cert is valid
+    // Jul 31 2026 -- Jul 31 2027, and comparing against `new Date()` made
+    // this test's outcome depend on whatever day it happened to run,
+    // which is fine on a machine whose clock matches that window but
+    // silently flips to isNotYetValid once run somewhere (e.g. CI) whose
+    // clock doesn't.
+    const midWindow = new Date(Date.UTC(2027, 0, 1))
+    const result = parseCertificate(TEST_CERT, midWindow)
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.result.isExpired).toBe(false)
+    expect(result.result.isNotYetValid).toBe(false)
+  })
+
+  it('reports isNotYetValid before the validity window starts', () => {
+    const beforeWindow = new Date(Date.UTC(2020, 0, 1))
+    const result = parseCertificate(TEST_CERT, beforeWindow)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.isNotYetValid).toBe(true)
+    expect(result.result.isExpired).toBe(false)
+  })
+
+  it('reports isExpired after the validity window ends', () => {
+    const afterWindow = new Date(Date.UTC(2028, 0, 1))
+    const result = parseCertificate(TEST_CERT, afterWindow)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.isExpired).toBe(true)
     expect(result.result.isNotYetValid).toBe(false)
   })
 
