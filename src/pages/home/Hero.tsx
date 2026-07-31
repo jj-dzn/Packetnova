@@ -1,10 +1,11 @@
 import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
+import { TrafficStarfield } from './TrafficStarfield'
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden py-20 text-center sm:py-28">
+    <section className="relative overflow-hidden py-16 text-center sm:py-24">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-accent/20 blur-3xl"
@@ -13,6 +14,7 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute right-1/4 top-1/3 h-64 w-64 rounded-full bg-accent-alt/20 blur-3xl"
       />
+      <TrafficStarfield />
 
       <div className="relative flex flex-col items-center gap-6">
         <Badge tone="accent">Free & client-side -- no account needed</Badge>
