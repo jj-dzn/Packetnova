@@ -254,34 +254,42 @@ export const toolCategories: ToolCategory[] = [
       {
         name: 'Regex tester',
         description: 'Test a regular expression against sample text with live match highlighting.',
+        slug: 'regex-tester',
       },
       {
         name: 'JSON formatter',
         description: 'Format, validate, and minify JSON.',
+        slug: 'json-formatter',
       },
       {
         name: 'YAML formatter',
         description: 'Format and validate YAML.',
+        slug: 'yaml-formatter',
       },
       {
         name: 'XML formatter',
         description: 'Format and validate XML.',
+        slug: 'xml-formatter',
       },
       {
         name: 'Epoch converter',
         description: 'Convert between Unix epoch time and human-readable dates.',
+        slug: 'epoch-converter',
       },
       {
         name: 'Binary/decimal/hex converter',
         description: 'Convert numbers between binary, decimal, and hexadecimal.',
+        slug: 'binary-decimal-hex-converter',
       },
       {
         name: 'ASCII converter',
         description: 'Convert between text, ASCII codes, and binary.',
+        slug: 'ascii-converter',
       },
       {
         name: 'Text diff viewer',
         description: 'Compare two blocks of text and highlight the differences.',
+        slug: 'text-diff-viewer',
       },
     ],
   },

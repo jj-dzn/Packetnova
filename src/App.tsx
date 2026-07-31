@@ -43,6 +43,14 @@ import { Base64Tool } from './features/tools/security/Base64Tool'
 import { UrlEncodingTool } from './features/tools/security/UrlEncodingTool'
 import { CertificateViewer } from './features/tools/security/CertificateViewer'
 import { PasswordGenerator } from './features/tools/security/PasswordGenerator'
+import { RegexTester } from './features/tools/utilities/RegexTester'
+import { JsonFormatterTool } from './features/tools/utilities/JsonFormatterTool'
+import { YamlFormatterTool } from './features/tools/utilities/YamlFormatterTool'
+import { XmlFormatterTool } from './features/tools/utilities/XmlFormatterTool'
+import { EpochConverter } from './features/tools/utilities/EpochConverter'
+import { BaseConverterTool } from './features/tools/utilities/BaseConverterTool'
+import { AsciiConverterTool } from './features/tools/utilities/AsciiConverterTool'
+import { TextDiffViewer } from './features/tools/utilities/TextDiffViewer'
 
 function App() {
   return (
@@ -98,6 +106,14 @@ function App() {
           <Route path="/tools/url-encode-decode" element={<UrlEncodingTool />} />
           <Route path="/tools/certificate-viewer" element={<CertificateViewer />} />
           <Route path="/tools/password-generator" element={<PasswordGenerator />} />
+          <Route path="/tools/regex-tester" element={<RegexTester />} />
+          <Route path="/tools/json-formatter" element={<JsonFormatterTool />} />
+          <Route path="/tools/yaml-formatter" element={<YamlFormatterTool />} />
+          <Route path="/tools/xml-formatter" element={<XmlFormatterTool />} />
+          <Route path="/tools/epoch-converter" element={<EpochConverter />} />
+          <Route path="/tools/binary-decimal-hex-converter" element={<BaseConverterTool />} />
+          <Route path="/tools/ascii-converter" element={<AsciiConverterTool />} />
+          <Route path="/tools/text-diff-viewer" element={<TextDiffViewer />} />
           <Route path="/visualizers" element={<ComingSoonPage title="Visualizers" />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
