@@ -40,7 +40,7 @@ export function Card({
     ? 'transition-all duration-150 hover:border-accent hover:shadow-[0_0_24px_-10px_var(--color-accent)]'
     : ''
   const tiltStyles = tilt
-    ? 'transition-transform duration-200 ease-out [transform:perspective(1400px)_rotateX(var(--pn-tilt-x,0deg))_rotateY(var(--pn-tilt-y,0deg))]'
+    ? 'transition-transform duration-500 ease-out [transform:perspective(1400px)_rotateX(var(--pn-tilt-x,0deg))_rotateY(var(--pn-tilt-y,0deg))]'
     : ''
 
   return (

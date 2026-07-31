@@ -3,7 +3,7 @@ import { TerminalCursor } from '../../components/ui/TerminalCursor'
 import { LatencyOrb } from './LatencyOrb'
 
 const STATUS_TEXT = 'nova core online -- all systems nominal'
-const TYPE_INTERVAL_MS = 35
+const TYPE_INTERVAL_MS = 55
 
 // Types itself out on load so the hero already feels "in progress" within
 // the first couple seconds, with no click required. Reduced-motion visitors
