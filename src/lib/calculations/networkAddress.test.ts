@@ -1,0 +1,38 @@
+import { describe, expect, it } from 'vitest'
+import { calculateNetworkAddress } from './networkAddress'
+
+describe('calculateNetworkAddress', () => {
+  it('192.168.1.130/24', () => {
+    const result = calculateNetworkAddress('192.168.1.130/24')
+    expect(result).toEqual({
+      ok: true,
+      result: {
+        ip: '192.168.1.130',
+        prefixLength: 24,
+        subnetMask: '255.255.255.0',
+        networkAddress: '192.168.1.0',
+        broadcastAddress: '192.168.1.255',
+      },
+    })
+  })
+
+  it('10.42.7.9/8 (RFC 1918)', () => {
+    const result = calculateNetworkAddress('10.42.7.9/8')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.networkAddress).toBe('10.0.0.0')
+  })
+
+  it('a /32 network address is the host itself', () => {
+    const result = calculateNetworkAddress('192.168.1.5/32')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.networkAddress).toBe('192.168.1.5')
+    expect(result.result.broadcastAddress).toBe('192.168.1.5')
+  })
+
+  it('rejects invalid input', () => {
+    expect(calculateNetworkAddress('192.168.1.1.1/24').ok).toBe(false)
+    expect(calculateNetworkAddress('192.168.1.1/-1').ok).toBe(false)
+  })
+})

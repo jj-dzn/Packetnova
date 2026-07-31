@@ -1,6 +1,7 @@
 export interface ToolListing {
   name: string
   description: string
+  slug?: string
 }
 
 export interface ToolCategory {
@@ -18,10 +19,12 @@ export const toolCategories: ToolCategory[] = [
       {
         name: 'CIDR calculator',
         description: 'Break down any CIDR block into network, broadcast, and usable host range.',
+        slug: 'cidr-calculator',
       },
       {
         name: 'Subnet calculator',
         description: 'Split a network into subnets and see the resulting masks at a glance.',
+        slug: 'subnet-calculator',
       },
       {
         name: 'IPv6 calculator',
@@ -34,14 +37,17 @@ export const toolCategories: ToolCategory[] = [
       {
         name: 'IP range calculator',
         description: 'Convert between IP ranges and CIDR notation instantly.',
+        slug: 'ip-range-calculator',
       },
       {
         name: 'Broadcast calculator',
         description: 'Find the broadcast address for any IP and subnet mask.',
+        slug: 'broadcast-calculator',
       },
       {
         name: 'Network address calculator',
         description: 'Find the network address for any IP and subnet mask.',
+        slug: 'network-address-calculator',
       },
     ],
   },
