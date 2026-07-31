@@ -79,6 +79,7 @@ import { PingPetDuel } from './features/labs/PingPetDuel'
 import { SignalDecoder } from './features/labs/SignalDecoder'
 import { Maze404 } from './features/labs/Maze404'
 import { PacketSnake } from './features/labs/PacketSnake'
+import { PacketRunner } from './features/labs/PacketRunner'
 
 function App() {
   return (
@@ -176,6 +177,7 @@ function App() {
           <Route path="/labs/signal-decoder" element={<SignalDecoder />} />
           <Route path="/labs/404-maze" element={<Maze404 />} />
           <Route path="/labs/packet-snake" element={<PacketSnake />} />
+          <Route path="/labs/packet-runner" element={<PacketRunner />} />
           <Route path="/terminal" element={<RetroTerminal />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

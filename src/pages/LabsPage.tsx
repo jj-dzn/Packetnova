@@ -67,6 +67,11 @@ const labs = [
     description: 'Classic Snake, reskinned as a data stream eating loose packets.',
     href: '/labs/packet-snake',
   },
+  {
+    title: 'Packet runner',
+    description: 'Dodge firewalls and congestion, collect routers, on a scrolling track.',
+    href: '/labs/packet-runner',
+  },
 ]
 
 export function LabsPage() {

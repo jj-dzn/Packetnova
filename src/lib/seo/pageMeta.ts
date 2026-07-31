@@ -84,6 +84,10 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `Packet snake - ${SITE_TITLE}`,
     description: 'Classic Snake, reskinned as a data stream eating loose packets.',
   },
+  '/labs/packet-runner': {
+    title: `Packet runner - ${SITE_TITLE}`,
+    description: 'Dodge firewalls and congestion, collect routers, on a scrolling track.',
+  },
   '/terminal': {
     title: `Terminal - ${SITE_TITLE}`,
     description: DEFAULT_DESCRIPTION,

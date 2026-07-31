@@ -30,6 +30,7 @@ describe('getPageMeta', () => {
       '/labs/signal-decoder',
       '/labs/404-maze',
       '/labs/packet-snake',
+      '/labs/packet-runner',
       '/terminal',
     ]) {
       const meta = getPageMeta(path)
