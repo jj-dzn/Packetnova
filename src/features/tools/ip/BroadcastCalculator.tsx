@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
+import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { calculateBroadcast } from '../../../lib/calculations/broadcast'
 
@@ -46,6 +47,13 @@ export function BroadcastCalculator() {
             <p className="text-xs text-fg-subtle">
               A packet sent to this address is delivered to every host in the network.
             </p>
+            <Aside>
+              {calc.result.broadcastAddress} is a <strong>directed</strong> broadcast -- scoped to
+              this one network, and routers can choose whether to forward it. There's also a{' '}
+              <strong>limited</strong> broadcast address, 255.255.255.255, which every host treats
+              as "this local link only" -- routers never forward it onward, regardless of what
+              network they're on.
+            </Aside>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

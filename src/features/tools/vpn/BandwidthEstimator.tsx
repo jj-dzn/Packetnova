@@ -59,16 +59,33 @@ export function BandwidthEstimator() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow
-              label="Overhead"
-              value={`${(calc.result.overheadFraction * 100).toFixed(2)}%`}
-            />
-            <ResultRow
-              label="Effective bandwidth"
-              value={`${calc.result.effectiveBandwidthMbps.toFixed(2)} Mbps`}
-            />
-          </dl>
+          <div className="flex flex-col gap-4">
+            <dl>
+              <ResultRow
+                label="Overhead"
+                value={`${(calc.result.overheadFraction * 100).toFixed(2)}%`}
+              />
+              <ResultRow
+                label="Effective bandwidth"
+                value={`${calc.result.effectiveBandwidthMbps.toFixed(2)} Mbps`}
+              />
+            </dl>
+            <p className="text-xs text-fg-subtle">
+              Overhead is a fixed number of bytes per packet, so it eats a bigger share of small
+              packets than large ones. Here, {calc.result.overheadBytes} bytes of overhead on a{' '}
+              {calc.result.packetSizeBytes}-byte packet is{' '}
+              {(calc.result.overheadFraction * 100).toFixed(2)}%
+              {calc.result.overheadBytes < 64 && (
+                <>
+                  {' '}
+                  -- the same {calc.result.overheadBytes} bytes on a 64-byte packet would be{' '}
+                  {((calc.result.overheadBytes / 64) * 100).toFixed(2)}%
+                </>
+              )}
+              . Bundling more data into fewer, larger packets is one of the simplest ways to recover
+              throughput lost to tunnel or protocol overhead.
+            </p>
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

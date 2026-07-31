@@ -43,4 +43,26 @@ describe('classifyIPv4', () => {
     expect(classify('8.8.8.8').label).toBe('Public (global unicast)')
     expect(classify('1.1.1.1').label).toBe('Public (global unicast)')
   })
+
+  it('every classification includes a non-empty practical explanation', () => {
+    const samples = [
+      '10.0.0.1',
+      '127.0.0.1',
+      '169.254.1.1',
+      '224.0.0.1',
+      '8.8.8.8',
+      '255.255.255.255',
+    ]
+    for (const ip of samples) {
+      expect(classify(ip).explanation.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('explains private addresses as not routable without NAT', () => {
+    expect(classify('192.168.1.1').explanation).toContain('NAT')
+  })
+
+  it('explains public addresses as routable without NAT', () => {
+    expect(classify('8.8.8.8').explanation).toContain('without NAT')
+  })
 })

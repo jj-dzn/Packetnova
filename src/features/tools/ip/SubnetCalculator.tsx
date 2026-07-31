@@ -217,25 +217,34 @@ export function SubnetCalculator() {
                     <th className="px-3 py-2 font-medium text-fg-muted">Name</th>
                     <th className="px-3 py-2 font-medium text-fg-muted">CIDR</th>
                     <th className="px-3 py-2 font-medium text-fg-muted">Usable range</th>
-                    <th className="px-3 py-2 font-medium text-fg-muted">Hosts</th>
+                    <th className="px-3 py-2 font-medium text-fg-muted">
+                      Hosts (requested / available)
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {vlsmCalc.result.allocations.map((allocation) => (
-                    <tr
-                      key={allocation.id}
-                      className="border-b border-border font-mono last:border-b-0"
-                    >
-                      <td className="px-3 py-2 font-sans">{allocation.label || 'Unnamed'}</td>
-                      <td className="px-3 py-2">{allocation.cidr}</td>
-                      <td className="px-3 py-2">
-                        {allocation.firstUsable && allocation.lastUsable
-                          ? `${allocation.firstUsable} - ${allocation.lastUsable}`
-                          : 'None'}
-                      </td>
-                      <td className="px-3 py-2">{allocation.usableHosts.toLocaleString()}</td>
-                    </tr>
-                  ))}
+                  {vlsmCalc.result.allocations.map((allocation) => {
+                    const spare = allocation.usableHosts - allocation.hostsNeeded
+                    return (
+                      <tr
+                        key={allocation.id}
+                        className="border-b border-border font-mono last:border-b-0"
+                      >
+                        <td className="px-3 py-2 font-sans">{allocation.label || 'Unnamed'}</td>
+                        <td className="px-3 py-2">{allocation.cidr}</td>
+                        <td className="px-3 py-2">
+                          {allocation.firstUsable && allocation.lastUsable
+                            ? `${allocation.firstUsable} - ${allocation.lastUsable}`
+                            : 'None'}
+                        </td>
+                        <td className="px-3 py-2">
+                          {allocation.hostsNeeded.toLocaleString()} /{' '}
+                          {allocation.usableHosts.toLocaleString()}
+                          <span className="text-fg-subtle"> ({spare.toLocaleString()} spare)</span>
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

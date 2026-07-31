@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { electRootBridge, type BridgeCandidate } from '../../../lib/calculations/stp'
@@ -99,6 +100,16 @@ export function StpOverview() {
           traffic-forwarding-wise inactive, but still listening for topology changes. That's how STP
           keeps a physically redundant, loop-having topology loop-free logically.
         </p>
+        <div className="mt-4 max-w-2xl">
+          <Aside>
+            Classic STP (802.1D) can take 30-50 seconds to converge after a topology change -- each
+            port has to sit through listening and learning states before it forwards again. RSTP
+            (802.1w) replaced it in practice by having switches actively negotiate port roles with
+            their neighbors instead of just waiting out timers, bringing convergence down to a few
+            seconds in most topologies. Almost every switch shipped today runs RSTP (or MSTP) even
+            when it's still labeled "spanning tree."
+          </Aside>
+        </div>
       </div>
     </>
   )

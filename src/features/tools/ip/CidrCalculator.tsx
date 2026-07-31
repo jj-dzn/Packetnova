@@ -57,6 +57,7 @@ export function CidrCalculator() {
               value={calc.result.ipValue}
               prefixLength={calc.result.prefixLength}
             />
+            <p className="text-xs text-fg-subtle">{calc.result.classification.explanation}</p>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

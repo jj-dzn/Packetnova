@@ -55,11 +55,21 @@ export function MtuCalculator() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow label="Effective MTU" value={`${calc.result.effectiveMtu} bytes`} />
-            <ResultRow label="Fits?" value={calc.result.fits ? 'Yes' : 'No -- will fragment'} />
-            <ResultRow label="Excess" value={`${calc.result.excessBytes} bytes`} />
-          </dl>
+          <div className="flex flex-col gap-4">
+            <dl>
+              <ResultRow label="Effective MTU" value={`${calc.result.effectiveMtu} bytes`} />
+              <ResultRow label="Fits?" value={calc.result.fits ? 'Yes' : 'No -- will fragment'} />
+              <ResultRow label="Excess" value={`${calc.result.excessBytes} bytes`} />
+            </dl>
+            {!calc.result.fits && (
+              <p className="text-xs text-fg-subtle">
+                A payload this size gets fragmented into multiple packets to cross this link, which
+                adds latency and per-packet overhead. For TCP traffic this is usually avoided
+                instead of fixed after the fact -- see the MSS calculator to work out the segment
+                size that fits in one packet from the start.
+              </p>
+            )}
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

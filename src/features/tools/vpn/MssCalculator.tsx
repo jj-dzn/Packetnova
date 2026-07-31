@@ -76,11 +76,20 @@ export function MssCalculator() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow label="IP header" value={`${calc.result.ipHeaderBytes} bytes`} />
-            <ResultRow label="TCP header" value={`${calc.result.tcpHeaderBytes} bytes`} />
-            <ResultRow label="MSS" value={`${calc.result.mss} bytes`} />
-          </dl>
+          <div className="flex flex-col gap-4">
+            <dl>
+              <ResultRow label="IP header" value={`${calc.result.ipHeaderBytes} bytes`} />
+              <ResultRow label="TCP header" value={`${calc.result.tcpHeaderBytes} bytes`} />
+              <ResultRow label="MSS" value={`${calc.result.mss} bytes`} />
+            </dl>
+            <p className="text-xs text-fg-subtle">
+              This is what fits given a {calc.result.mtu}-byte MTU. If a router somewhere along the
+              path has a smaller MTU, it can clamp the MSS announced during the TCP handshake below{' '}
+              {calc.result.mss} bytes so segments never need IP fragmentation -- this is MSS
+              clamping, and it's why the value your OS reports isn't always the value a server
+              actually negotiates.
+            </p>
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { DataTable } from '../../../components/ui/DataTable'
 import { calculateOspfCost } from '../../../lib/calculations/ospfCost'
@@ -46,9 +47,23 @@ export function MetricComparisonTool() {
         }
         result={
           calc.ok ? (
-            <dl>
-              <ResultRow label="OSPF cost" value={String(calc.result.cost)} />
-            </dl>
+            <div className="flex flex-col gap-4">
+              <dl>
+                <ResultRow label="OSPF cost" value={String(calc.result.cost)} />
+              </dl>
+              {calc.result.cost === 1 &&
+                calc.result.interfaceBandwidthMbps >= calc.result.referenceBandwidthMbps && (
+                  <Aside>
+                    This interface is already floored out at the minimum cost of 1, because{' '}
+                    {calc.result.interfaceBandwidthMbps} Mbps is at or above your{' '}
+                    {calc.result.referenceBandwidthMbps} Mbps reference bandwidth. Any faster
+                    interface would get the same cost, so OSPF can no longer tell them apart -- this
+                    is exactly why real deployments raise the reference bandwidth with{' '}
+                    <code className="font-mono">auto-cost reference-bandwidth</code> once links
+                    exceed it.
+                  </Aside>
+                )}
+            </div>
           ) : (
             <p className="text-sm text-danger">{calc.error}</p>
           )
