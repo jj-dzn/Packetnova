@@ -66,27 +66,31 @@ export function TcpHandshakeVisualizer() {
           <HostBox label="Server" state={current.serverState} />
         </div>
 
-        <div className="relative mx-4 h-10">
-          <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-border" />
-          {current.segment && (
-            <div
-              key={player.step}
-              className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-accent/40 bg-bg px-3 py-1 font-mono text-xs text-accent ${
-                player.canAutoPlay
-                  ? current.segment.direction === 'right'
-                    ? 'animate-pn-slide-right'
-                    : 'animate-pn-slide-left'
-                  : ''
-              }`}
-              style={
-                player.canAutoPlay
-                  ? undefined
-                  : { left: current.segment.direction === 'right' ? '100%' : '0%' }
-              }
-            >
-              {current.segment.label}
-            </div>
-          )}
+        <div className="mx-4 flex min-h-[2.5rem] flex-col gap-4">
+          {STEPS.map((step, index) => {
+            if (index === 0 || !step.segment || player.step < index) return null
+            const { direction, label } = step.segment
+            const arrow = direction === 'right' ? '→' : '←'
+            return (
+              <div key={index} className="relative h-9">
+                <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-border" />
+                <div
+                  className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-accent/40 bg-bg px-3 py-1 font-mono text-xs text-accent ${
+                    player.canAutoPlay
+                      ? direction === 'right'
+                        ? 'animate-pn-slide-right'
+                        : 'animate-pn-slide-left'
+                      : ''
+                  }`}
+                  style={
+                    player.canAutoPlay ? undefined : { left: direction === 'right' ? '100%' : '0%' }
+                  }
+                >
+                  {arrow} {label}
+                </div>
+              </div>
+            )
+          })}
         </div>
 
         <div aria-live="polite">
