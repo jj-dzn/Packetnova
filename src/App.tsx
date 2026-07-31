@@ -63,6 +63,7 @@ import { OsiModelExplorer } from './features/visualizers/OsiModelExplorer'
 import { TcpIpStackExplorer } from './features/visualizers/TcpIpStackExplorer'
 import { RoutingDecisionVisualizer } from './features/visualizers/RoutingDecisionVisualizer'
 import { BgpBestPathVisualizer } from './features/visualizers/BgpBestPathVisualizer'
+import { OspfSpfVisualizer } from './features/visualizers/OspfSpfVisualizer'
 
 function App() {
   return (
@@ -144,6 +145,7 @@ function App() {
             element={<RoutingDecisionVisualizer />}
           />
           <Route path="/visualizers/bgp-best-path-selection" element={<BgpBestPathVisualizer />} />
+          <Route path="/visualizers/ospf-spf-animation" element={<OspfSpfVisualizer />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

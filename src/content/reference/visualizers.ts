@@ -53,6 +53,7 @@ export const visualizers: VisualizerListing[] = [
   {
     name: 'OSPF SPF animation',
     description: "Watch Dijkstra's shortest-path-first algorithm build an OSPF routing tree.",
+    slug: 'ospf-spf-animation',
   },
   {
     name: 'VPN packet flow',

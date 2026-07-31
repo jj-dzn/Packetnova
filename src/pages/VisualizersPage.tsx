@@ -3,6 +3,7 @@ import { PreviewCard } from '../components/ui/PreviewCard'
 import { visualizers } from '../content/reference/visualizers'
 
 const liveVisualizers = visualizers.filter((visualizer) => visualizer.slug).length
+const allLive = liveVisualizers === visualizers.length
 
 export function VisualizersPage() {
   return (
@@ -14,7 +15,8 @@ export function VisualizersPage() {
         <h1 className="mt-4 text-2xl font-semibold">Visualizers</h1>
         <p className="mx-auto mt-2 max-w-xl text-fg-muted">
           Step-by-step animations of how protocols actually work, built for keyboard use and
-          reduced-motion friendly. The rest ship incrementally in later milestones.
+          reduced-motion friendly.
+          {!allLive && ' The rest ship incrementally in later milestones.'}
         </p>
       </div>
 

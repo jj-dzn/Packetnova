@@ -7,6 +7,7 @@ const liveTools = toolCategories.reduce(
   (count, category) => count + category.tools.filter((tool) => tool.slug).length,
   0,
 )
+const allLive = liveTools === totalTools
 
 export function ToolsPage() {
   return (
@@ -17,8 +18,8 @@ export function ToolsPage() {
         </Badge>
         <h1 className="mt-4 text-2xl font-semibold">Tools</h1>
         <p className="mx-auto mt-2 max-w-xl text-fg-muted">
-          Every calculator and reference tool on the roadmap, organized by category. The rest ship
-          incrementally in later milestones.
+          Every calculator and reference tool on the roadmap, organized by category.
+          {!allLive && ' The rest ship incrementally in later milestones.'}
         </p>
       </div>
 
