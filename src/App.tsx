@@ -68,6 +68,10 @@ import { OspfSpfVisualizer } from './features/visualizers/OspfSpfVisualizer'
 import { LabsPage } from './pages/LabsPage'
 import { PingPet } from './features/labs/PingPet'
 import { RetroTerminal } from './features/labs/RetroTerminal'
+import { IpZodiac } from './features/labs/IpZodiac'
+import { HandleGenerator } from './features/labs/HandleGenerator'
+import { CursedConfigGenerator } from './features/labs/CursedConfigGenerator'
+import { HackerTyper } from './features/labs/HackerTyper'
 
 function App() {
   return (
@@ -154,6 +158,10 @@ function App() {
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/labs" element={<LabsPage />} />
           <Route path="/labs/ping-pet" element={<PingPet />} />
+          <Route path="/labs/ip-zodiac" element={<IpZodiac />} />
+          <Route path="/labs/handle-generator" element={<HandleGenerator />} />
+          <Route path="/labs/cursed-config" element={<CursedConfigGenerator />} />
+          <Route path="/labs/hacker-typer" element={<HackerTyper />} />
           <Route path="/terminal" element={<RetroTerminal />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

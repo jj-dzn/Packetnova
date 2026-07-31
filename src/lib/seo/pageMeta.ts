@@ -34,11 +34,27 @@ const STATIC_PAGES: Record<string, PageMeta> = {
   },
   '/labs': {
     title: `Labs - ${SITE_TITLE}`,
-    description: 'Small, just-for-fun corners of PacketNova -- not part of the core toolkit.',
+    description: 'A small, playful corner of PacketNova -- built for fun, not diagnostics.',
   },
   '/labs/ping-pet': {
     title: `Ping pet - ${SITE_TITLE}`,
     description: 'A small creature whose mood tracks live latency to a host you pick.',
+  },
+  '/labs/ip-zodiac': {
+    title: `IP address zodiac - ${SITE_TITLE}`,
+    description: 'Enter an IP and find out what its octets say about its personality.',
+  },
+  '/labs/handle-generator': {
+    title: `Handle generator - ${SITE_TITLE}`,
+    description: 'Generate a cyberpunk hacker alias and clearance level, movie-style.',
+  },
+  '/labs/cursed-config': {
+    title: `Cursed config generator - ${SITE_TITLE}`,
+    description: 'Authentic-looking router CLI syntax, completely fake settings.',
+  },
+  '/labs/hacker-typer': {
+    title: `Hacker typer - ${SITE_TITLE}`,
+    description: "Mash any key. Look like you know exactly what you're doing.",
   },
   '/terminal': {
     title: `Terminal - ${SITE_TITLE}`,

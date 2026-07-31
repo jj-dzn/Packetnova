@@ -19,6 +19,10 @@ describe('getPageMeta', () => {
       '/search',
       '/labs',
       '/labs/ping-pet',
+      '/labs/ip-zodiac',
+      '/labs/handle-generator',
+      '/labs/cursed-config',
+      '/labs/hacker-typer',
       '/terminal',
     ]) {
       const meta = getPageMeta(path)

@@ -12,6 +12,26 @@ const labs = [
     description: 'A fake boot sequence and a handful of commands, dressed up as a hacking console.',
     href: '/terminal',
   },
+  {
+    title: 'IP address zodiac',
+    description: 'Enter an IP and find out what its octets say about its personality.',
+    href: '/labs/ip-zodiac',
+  },
+  {
+    title: 'Handle generator',
+    description: 'Generate a cyberpunk hacker alias and clearance level, movie-style.',
+    href: '/labs/handle-generator',
+  },
+  {
+    title: 'Cursed config generator',
+    description: 'Authentic-looking router CLI syntax, completely fake settings.',
+    href: '/labs/cursed-config',
+  },
+  {
+    title: 'Hacker typer',
+    description: "Mash any key. Look like you know exactly what you're doing.",
+    href: '/labs/hacker-typer',
+  },
 ]
 
 export function LabsPage() {
@@ -25,7 +45,7 @@ export function LabsPage() {
         </p>
       </div>
 
-      <div className="mx-auto grid w-full max-w-2xl grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {labs.map((lab) => (
           <PreviewCard
             key={lab.href}

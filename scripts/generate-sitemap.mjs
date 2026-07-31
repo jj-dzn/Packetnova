@@ -30,7 +30,19 @@ const blogSlugs = readdirSync(blogDir)
   .filter((file) => file.endsWith('.md'))
   .map((file) => file.replace(/\.md$/, ''))
 
-const staticPaths = ['/', '/tools', '/visualizers', '/blog', '/labs', '/labs/ping-pet', '/terminal']
+const staticPaths = [
+  '/',
+  '/tools',
+  '/visualizers',
+  '/blog',
+  '/labs',
+  '/labs/ping-pet',
+  '/labs/ip-zodiac',
+  '/labs/handle-generator',
+  '/labs/cursed-config',
+  '/labs/hacker-typer',
+  '/terminal',
+]
 
 const toolPaths = toolCategories.flatMap((category) =>
   category.tools.filter((tool) => tool.slug).map((tool) => `/tools/${tool.slug}`),
