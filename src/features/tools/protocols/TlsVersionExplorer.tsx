@@ -10,6 +10,7 @@ export function TlsVersionExplorer() {
       description="Compare TLS versions and see what changed between them."
     >
       <DataTable<TlsVersionEntry>
+        searchPlaceholder="Search by version or status..."
         columns={[
           { key: 'version', label: 'Version' },
           { key: 'year', label: 'Year', mono: true },

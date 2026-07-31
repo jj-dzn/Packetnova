@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Badge } from '../../../components/ui/Badge'
+import { CopyButton } from '../../../components/ui/CopyButton'
 import { parseCertificate } from '../../../lib/calculations/certificate'
 
 const EXAMPLE_CERT = `-----BEGIN CERTIFICATE-----
@@ -81,8 +82,12 @@ export function CertificateViewer() {
                 <p className="mb-2 text-sm font-medium text-fg-muted">Subject Alternative Names</p>
                 <ul className="flex flex-col gap-1 font-mono text-sm">
                   {calc.result.subjectAltNames.map((san) => (
-                    <li key={san} className="rounded-md border border-border px-3 py-1.5">
-                      {san}
+                    <li
+                      key={san}
+                      className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-1.5"
+                    >
+                      <span className="min-w-0 break-all">{san}</span>
+                      <CopyButton value={san} label="SAN" />
                     </li>
                   ))}
                 </ul>

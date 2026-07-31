@@ -10,6 +10,7 @@ export function DnsRecordReference() {
       description="Every common DNS record type and what it's used for."
     >
       <DataTable<DnsRecordEntry>
+        searchPlaceholder="Search by record type or description..."
         columns={[
           { key: 'type', label: 'Type', mono: true },
           { key: 'description', label: 'Description' },

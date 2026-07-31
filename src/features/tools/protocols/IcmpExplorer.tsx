@@ -10,6 +10,7 @@ export function IcmpExplorer() {
       description="Look up ICMP types and what they actually mean."
     >
       <DataTable<IcmpEntry>
+        searchPlaceholder="Search by type, name, or description..."
         columns={[
           { key: 'type', label: 'Type', mono: true },
           { key: 'name', label: 'Name' },

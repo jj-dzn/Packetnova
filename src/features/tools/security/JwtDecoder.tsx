@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { CopyButton } from '../../../components/ui/CopyButton'
 import { decodeJwt } from '../../../lib/calculations/jwt'
 
 const DEFAULT_TOKEN =
@@ -34,13 +35,19 @@ export function JwtDecoder() {
         calc.ok ? (
           <div className="flex flex-col gap-4">
             <div>
-              <p className="mb-2 text-sm font-medium text-fg-muted">Header</p>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-medium text-fg-muted">Header</p>
+                <CopyButton value={JSON.stringify(calc.result.header, null, 2)} label="header" />
+              </div>
               <pre className="overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
                 {JSON.stringify(calc.result.header, null, 2)}
               </pre>
             </div>
             <div>
-              <p className="mb-2 text-sm font-medium text-fg-muted">Payload</p>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-medium text-fg-muted">Payload</p>
+                <CopyButton value={JSON.stringify(calc.result.payload, null, 2)} label="payload" />
+              </div>
               <pre className="overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
                 {JSON.stringify(calc.result.payload, null, 2)}
               </pre>

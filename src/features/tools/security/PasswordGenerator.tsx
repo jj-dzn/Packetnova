@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
+import { CopyButton } from '../../../components/ui/CopyButton'
 import { generatePassword } from '../../../lib/calculations/password'
 
 export function PasswordGenerator() {
@@ -10,14 +11,23 @@ export function PasswordGenerator() {
   const [lowercase, setLowercase] = useState(true)
   const [digits, setDigits] = useState(true)
   const [symbols, setSymbols] = useState(true)
-  const [password, setPassword] = useState<string | null>(null)
+
+  // generatePassword is non-deterministic (a fresh random password every
+  // call), so it can't just be called plain during render like every other
+  // tool's calculation -- that would compute a *different* password on
+  // every unrelated re-render. Memoizing on the options plus a manual
+  // "nonce" gets both: automatic recompute when an option changes, and an
+  // explicit new password only when the button bumps the nonce.
+  const [regenerateNonce, setRegenerateNonce] = useState(0)
+  const calc = useMemo(
+    () => generatePassword({ length: Number(length), uppercase, lowercase, digits, symbols }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [length, uppercase, lowercase, digits, symbols, regenerateNonce],
+  )
 
   function regenerate() {
-    const calc = generatePassword({ length: Number(length), uppercase, lowercase, digits, symbols })
-    setPassword(calc.ok ? calc.result : null)
+    setRegenerateNonce((n) => n + 1)
   }
-
-  const calc = generatePassword({ length: Number(length), uppercase, lowercase, digits, symbols })
 
   return (
     <ToolPageLayout
@@ -78,9 +88,10 @@ export function PasswordGenerator() {
       }
       result={
         calc.ok ? (
-          <p className="break-all rounded-md border border-border bg-bg p-3 font-mono text-sm">
-            {password ?? calc.result}
-          </p>
+          <div className="flex items-center justify-between gap-2 rounded-md border border-border bg-bg p-3">
+            <p className="min-w-0 break-all font-mono text-sm">{calc.result}</p>
+            <CopyButton value={calc.result} label="password" />
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

@@ -10,6 +10,7 @@ export function DhcpOptionsReference() {
       description="Look up DHCP option numbers and their meaning."
     >
       <DataTable<DhcpOptionEntry>
+        searchPlaceholder="Search by option number or name..."
         columns={[
           { key: 'option', label: 'Option', mono: true },
           { key: 'name', label: 'Name' },

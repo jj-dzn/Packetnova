@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { CopyableTextarea } from '../CopyableTextarea'
 import { formatJson } from '../../../lib/calculations/jsonFormatter'
 
 export function JsonFormatterTool() {
@@ -42,12 +43,7 @@ export function JsonFormatterTool() {
       }
       result={
         result.ok ? (
-          <textarea
-            readOnly
-            value={result.result}
-            rows={12}
-            className="w-full rounded-md border border-border bg-bg px-3 py-2 font-mono text-sm text-fg"
-          />
+          <CopyableTextarea value={result.result} rows={12} />
         ) : (
           <p className="text-sm text-danger">{result.error}</p>
         )

@@ -108,7 +108,7 @@ Do not start a milestone until the previous one is genuinely done — not "mostl
 
 # Tool & Visualizer Excellence Roadmap
 
-A second track, separate from the core build above. Where Milestones 1-15 are about *having* every tool and visualizer, this track is about making each one best-in-class -- grounded in a full read of the actual implementation, not generic polish advice. Full findings (every strength/weakness/wow-feature call, per tool) live in `docs/TOOL_VISUALIZER_AUDIT.md`; read that first, this is where those findings become ordered work.
+A second track, separate from the core build above. Where Milestones 1-15 are about _having_ every tool and visualizer, this track is about making each one best-in-class -- grounded in a full read of the actual implementation, not generic polish advice. Full findings (every strength/weakness/wow-feature call, per tool) live in `docs/TOOL_VISUALIZER_AUDIT.md`; read that first, this is where those findings become ordered work.
 
 Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be referenced independently. Sequential and dependency-ordered, same rule as the rest of this document: don't start `T4` before `T3` is genuinely done.
 
@@ -117,6 +117,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** Close the handful of gaps that are universal across nearly every tool, before building anything new on top of them.
 
 **Features included:**
+
 - [ ] Copy-to-clipboard on every `ResultRow` and read-only output textarea -- confirmed missing across all 48 tools
 - [ ] Search/filter added to `DataTable`, fixing 7 reference tools at once (UDP header, ICMP, DNS record, HTTP status, TLS version, DHCP options, Administrative Distance)
 - [ ] Fix `PasswordGenerator`'s redundant double-computation (compute once, store in state, regenerate only on explicit action)
@@ -132,9 +133,10 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 
 ## Milestone T2 — Interactive Explanations
 
-**Goal:** Teach while calculating -- contextual explanation snippets keyed to a tool's *actual computed result*, not generic prose. (Grounded lookup-table snippets, not free-generated text, so nothing can explain an edge case incorrectly.)
+**Goal:** Teach while calculating -- contextual explanation snippets keyed to a tool's _actual computed result_, not generic prose. (Grounded lookup-table snippets, not free-generated text, so nothing can explain an edge case incorrectly.)
 
 **Features included:**
+
 - [ ] Classification-aware explanations on CIDR/Network Address calculators (e.g. "Private use (RFC 1918) -- not routable on the public internet without NAT")
 - [ ] Per-row efficiency callouts in VLSM mode ("50 requested, 62 available, 12 to spare")
 - [ ] MSS-clamping explanation on MSS calculator; wildcard-vs-subnet-mask context on Wildcard Mask calculator
@@ -153,6 +155,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** Build one reusable diagram pattern and apply it everywhere the audit found a "this should be a picture, not a table" gap -- the single highest-leverage milestone for both delight and education.
 
 **Features included:**
+
 - [ ] Byte-level header diagram component, reused across TCP/UDP/IP header explorers (labeled, proportionally-sized byte boxes instead of a plain reference table)
 - [ ] Bit-level field diagram for the 802.1Q tag (PCP/DEI/VLAN ID as colored, unequal-width bit segments), extending the `BinaryBreakdown` pattern already built for IP tools
 - [ ] Nested-box redesign of the Packet Encapsulation visualizer, so layers visually wrap the previous layer instead of appending as a flat row of chips
@@ -172,8 +175,9 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** Close the specific "what would a working network engineer expect that's missing" gaps identified per tool.
 
 **Features included:**
+
 - [ ] EUI-64 / SLAAC address generator on the IPv6 calculator (prefix + MAC -> interface ID) -- currently has no home anywhere on the site
-- [ ] Certificate *chain* parsing on Certificate viewer (multiple PEM blocks, leaf -> intermediate -> root), not single-cert only
+- [ ] Certificate _chain_ parsing on Certificate viewer (multiple PEM blocks, leaf -> intermediate -> root), not single-cert only
 - [ ] PAT/NAT-overload mode on the NAT flow simulator -- the many-to-one scenario is what "NAT" means for most real networks, and the current example only shows one-to-one
 - [ ] Tunnel-mode vs. transport-mode toggle on the VPN packet flow visualizer
 - [ ] Capture-group breakdown on Regex tester (per-group match, not just the highlighted full match)
@@ -192,6 +196,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** Let visitors bring their own scenario into visualizers that are currently fixed-example only by deliberate design (see `TOOL_VISUALIZER_AUDIT.md` cross-cutting finding #3) -- starting with the strongest candidate.
 
 **Features included:**
+
 - [ ] Full topology editing on the OSPF SPF visualizer: add/remove routers, edit link costs, re-run Dijkstra live. The best-executed visualizer on the site and the one whose SVG/algorithm logic is already closest to supporting this.
 - [ ] Packet-loss/retransmission toggle scenario on the TCP handshake visualizer (what happens when a SYN or SYN-ACK is lost) -- the practical reason engineers actually care about this handshake in production debugging
 - [ ] TLS 1.2 vs. 1.3 side-by-side toggle on the TLS handshake visualizer, with a live round-trip counter making the efficiency difference felt, not just described
@@ -210,6 +215,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** Ship the specific per-tool "wow feature" animations identified in the audit that are small, self-contained, and don't require new calculation logic -- extending the sitewide micro-interactions pass (card tilt, focus glow, page transitions) into tool-specific moments.
 
 **Features included:**
+
 - [ ] Animated packet-fragment "peeling off" on the Packet Fragmentation calculator
 - [ ] Avalanche-effect animation on Hash generator (single-character edit -> completely different hash, animated)
 - [ ] Live entropy bar on Password generator, filling as length/character-class options change before generating
@@ -229,6 +235,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** Extend the already-strong visualizer accessibility foundation (`useStepPlayer`'s keyboard nav + reduced-motion handling) to the tool category, which hasn't had the same systematic treatment.
 
 **Features included:**
+
 - [ ] Confirm T1's `DataTable` search/filter is fully keyboard-operable and screen-reader-announced
 - [ ] Focus management audit across all 48 tool input forms
 - [ ] Mobile ergonomics pass on the densest forms specifically (BGP path comparison's 11-field-per-candidate cards, STP's multi-row bridge editor, LPM/Route Lookup's route-table rows)
@@ -247,6 +254,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** Fill genuine content gaps the audit surfaced, not just polish what already exists.
 
 **Features included:**
+
 - [ ] New DHCP DORA (Discover/Offer/Request/Ack) sequence visualizer -- reuses `SequenceDiagramVisualizer` almost directly; DHCP currently has a reference table but no visualizer at all, unlike every other major protocol on the site
 - [ ] TCP connection teardown (FIN/FIN-ACK/ACK) as an extension of the TCP handshake visualizer -- the state-machine story is incomplete without it
 - [ ] "Example record" column on DNS record reference, plus an optional mini resolution-flow visualization (root -> TLD -> authoritative -> answer)
@@ -265,6 +273,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** For tools currently simplified for approachability, add an opt-in advanced layer without cluttering the default experience.
 
 **Features included:**
+
 - [ ] BGP route visualizer: collapse rarely-changed fields (router ID, neighbor IP, route age) behind a "show advanced attributes" toggle, on by default hidden
 - [ ] TCP header explorer: full header builder (ports, seq/ack, window -- not just the flags byte) as an expert extension of the existing live calculator
 - [ ] Multi-preset comparison table on the VPN Tunnel Overhead calculator (all tunnel types side by side, not one at a time)
@@ -283,6 +292,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 **Goal:** Resolve the naming and cross-linking gaps that make the site read as 58 independent pages instead of one coherent product.
 
 **Features included:**
+
 - [ ] Resolve every naming collision flagged in the audit: rename "BGP route visualizer" (tool) to disambiguate from "BGP best path selection" (visualizer); rename "Routing decision simulator" (visualizer) to disambiguate from "Route lookup simulator" (tool); merge JWT Decoder and JWT Inspector into one tool with a raw/summary toggle
 - [ ] Systematic cross-linking pass: MTU -> MSS -> Packet Fragmentation chain; TLS Version Explorer <-> TLS handshake visualizer; IP Header Explorer's Fragment Offset row -> Packet Fragmentation calculator; VPN Packet Flow visualizer -> VPN Tunnel Overhead calculator
 - [ ] Consistent per-OSI-layer color language shared across OSI Model Explorer, TCP/IP Stack Explorer, and Packet Encapsulation visualizer (currently each uses its own, unrelated styling)
@@ -303,7 +313,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 
 1. Copy-to-clipboard everywhere (T1) -- the single most universally-missing feature, affecting all 48 tools.
 2. `DataTable` search/filter (T1) -- unblocks the least interactive category on the site (6 static Protocol reference tables) with one component fix.
-3. Byte-level header diagrams for TCP/UDP/IP explorers (T3) -- replaces the driest, most table-heavy pages with something people can actually *see*.
+3. Byte-level header diagrams for TCP/UDP/IP explorers (T3) -- replaces the driest, most table-heavy pages with something people can actually _see_.
 4. OSI vs. TCP/IP side-by-side stack view (T3) -- fixes the clearest "doesn't do what it says" gap in the whole audit.
 5. VLSM per-row efficiency callouts (T2) -- turns the Subnet calculator's most powerful mode into something self-explanatory.
 6. Full topology editing on OSPF SPF (T5) -- the best visualizer on the site, currently capped at one fixed example.
@@ -320,7 +330,7 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 4. Certificate chain parsing, not single-cert (T4) -- most free cert viewers don't bother with chains.
 5. EUI-64/SLAAC generator (T4) -- a commonly-needed IPv6 calculation with no home on most competing sites either.
 6. TCP packet-loss/retransmission scenario toggle (T5) -- shows the practical, production-relevant version of the handshake, not just the textbook happy path.
-7. Avalanche-effect hash visualization (T6) -- visceral, rare, and directly demonstrates *why* hashing works as an integrity check.
+7. Avalanche-effect hash visualization (T6) -- visceral, rare, and directly demonstrates _why_ hashing works as an integrity check.
 8. TLS 1.2 vs. 1.3 timed side-by-side comparison (T5) -- makes an efficiency claim felt instead of asserted.
 9. VLSM mode itself (already shipped) combined with a live visual block-diagram allocation view (IP tools audit wow feature) -- most free subnet calculators only do equal splits.
 10. DHCP DORA visualizer (T8) -- fills a protocol-coverage gap most competing sites also leave as text-only.

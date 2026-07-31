@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { CopyableTextarea } from '../CopyableTextarea'
 import { urlDecode, urlEncode } from '../../../lib/calculations/urlEncoding'
 
 export function UrlEncodingTool() {
@@ -43,12 +44,7 @@ export function UrlEncodingTool() {
       }
       result={
         result.ok ? (
-          <textarea
-            readOnly
-            value={result.result}
-            rows={6}
-            className="w-full rounded-md border border-border bg-bg px-3 py-2 font-mono text-sm text-fg"
-          />
+          <CopyableTextarea value={result.result} />
         ) : (
           <p className="text-sm text-danger">{result.error}</p>
         )
