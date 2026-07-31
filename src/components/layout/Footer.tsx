@@ -4,6 +4,7 @@ const footerLinks = [
   { to: '/tools', label: 'Tools' },
   { to: '/visualizers', label: 'Visualizers' },
   { to: '/blog', label: 'Blog' },
+  { to: '/labs', label: 'Labs' },
 ]
 
 export function Footer() {

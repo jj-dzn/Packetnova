@@ -71,6 +71,18 @@
   }
 }
 
+/* Gentle bob for the ping pet's resting/medium/slow states -- a slower,
+   smaller-amplitude alternative to Tailwind's built-in bounce/pulse. */
+@keyframes pn-pet-idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
 :root {
   --pn-bg: #f8f9fc;
   --pn-surface: #ffffff;

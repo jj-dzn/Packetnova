@@ -32,6 +32,18 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `Search - ${SITE_TITLE}`,
     description: "Search PacketNova's tools, visualizers, and blog posts.",
   },
+  '/labs': {
+    title: `Labs - ${SITE_TITLE}`,
+    description: 'Small, just-for-fun corners of PacketNova -- not part of the core toolkit.',
+  },
+  '/labs/ping-pet': {
+    title: `Ping pet - ${SITE_TITLE}`,
+    description: 'A small creature whose mood tracks live latency to a host you pick.',
+  },
+  '/terminal': {
+    title: `Terminal - ${SITE_TITLE}`,
+    description: DEFAULT_DESCRIPTION,
+  },
 }
 
 const NOT_FOUND_META: PageMeta = {

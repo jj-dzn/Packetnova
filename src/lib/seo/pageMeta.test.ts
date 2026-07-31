@@ -12,7 +12,15 @@ describe('getPageMeta', () => {
   })
 
   it('gives each static listing page its own title', () => {
-    for (const path of ['/tools', '/visualizers', '/blog', '/search']) {
+    for (const path of [
+      '/tools',
+      '/visualizers',
+      '/blog',
+      '/search',
+      '/labs',
+      '/labs/ping-pet',
+      '/terminal',
+    ]) {
       const meta = getPageMeta(path)
       expect(meta.title).toContain('PacketNova')
       expect(meta.description.length).toBeGreaterThan(0)
