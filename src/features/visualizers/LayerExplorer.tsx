@@ -1,0 +1,71 @@
+import { VisualizerPageLayout } from './VisualizerPageLayout'
+import { StepControls } from './StepControls'
+import { useStepPlayer } from '../../hooks/useStepPlayer'
+
+export interface LayerInfo {
+  number: number
+  name: string
+  description: string
+  examples: string
+  dataUnit: string
+}
+
+interface LayerExplorerProps {
+  category: string
+  title: string
+  description: string
+  layers: LayerInfo[]
+}
+
+// Shared "click through a stack of named layers" visualizer -- backs the
+// OSI model and TCP/IP stack explorers. Layers are listed highest-first
+// (Application at the top), matching the encapsulation visualizer's
+// top-down framing. Unlike the sequence-diagram visualizers, each layer
+// here is independently reachable by clicking it directly (an "explorer"),
+// not just by stepping linearly.
+export function LayerExplorer({ category, title, description, layers }: LayerExplorerProps) {
+  const player = useStepPlayer(layers.length)
+  const current = layers[player.step]!
+
+  return (
+    <VisualizerPageLayout category={category} title={title} description={description}>
+      <div
+        tabIndex={0}
+        onKeyDown={player.onKeyDown}
+        aria-label={`${title}. Click a layer, or use the Previous and Next buttons, or the left and right arrow keys, to move between layers.`}
+        className="flex flex-col gap-8 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
+        <div className="flex flex-col gap-1.5">
+          {layers.map((layer, index) => (
+            <button
+              key={layer.number}
+              type="button"
+              onClick={() => player.goTo(index)}
+              className={`rounded-md border px-4 py-2 text-left text-sm transition-colors ${
+                index === player.step
+                  ? 'border-accent bg-accent/10 text-accent'
+                  : 'border-border bg-bg text-fg-muted hover:border-accent/40 hover:text-fg'
+              }`}
+            >
+              <span className="mr-2 font-mono text-xs">L{layer.number}</span>
+              {layer.name}
+            </button>
+          ))}
+        </div>
+
+        <div aria-live="polite">
+          <h2 className="font-medium">{current.name}</h2>
+          <p className="mt-1 text-sm text-fg-muted">{current.description}</p>
+          <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+            <dt className="text-fg-subtle">Examples</dt>
+            <dd className="font-mono text-xs text-fg">{current.examples}</dd>
+            <dt className="text-fg-subtle">Data unit</dt>
+            <dd className="font-mono text-xs text-fg">{current.dataUnit}</dd>
+          </dl>
+        </div>
+
+        <StepControls player={player} totalSteps={layers.length} />
+      </div>
+    </VisualizerPageLayout>
+  )
+}

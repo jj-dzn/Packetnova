@@ -32,6 +32,11 @@
      same motion. */
   --animate-pn-slide-right: pn-packet-slide-right 700ms ease-in-out forwards;
   --animate-pn-slide-left: pn-packet-slide-left 700ms ease-in-out forwards;
+
+  /* Shared "a layer/element appears" animation -- e.g. a header wrapping a
+     packet in the encapsulation visualizer, or a node/edge revealing itself
+     in a graph animation. */
+  --animate-pn-fade-in: pn-fade-in 350ms ease-out forwards;
 }
 
 /* Rest a few percent short of the true 0%/100% edge -- a label's own text
@@ -52,6 +57,17 @@
   }
   to {
     left: 4%;
+  }
+}
+
+@keyframes pn-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 

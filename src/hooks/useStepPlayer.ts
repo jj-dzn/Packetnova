@@ -31,6 +31,8 @@ export interface StepPlayer {
   previous: () => void
   reset: () => void
   togglePlay: () => void
+  /** Jump directly to a step -- e.g. clicking a specific layer in an explorer. */
+  goTo: (index: number) => void
   onKeyDown: (event: KeyboardEvent) => void
 }
 
@@ -51,6 +53,10 @@ export function useStepPlayer(totalSteps: number): StepPlayer {
   const reset = () => {
     setIsPlaying(false)
     setStep(0)
+  }
+  const goTo = (index: number) => {
+    setIsPlaying(false)
+    setStep(Math.min(Math.max(index, 0), totalSteps - 1))
   }
   const togglePlay = () => {
     if (!canAutoPlay) return
@@ -97,6 +103,7 @@ export function useStepPlayer(totalSteps: number): StepPlayer {
     previous,
     reset,
     togglePlay,
+    goTo,
     onKeyDown,
   }
 }

@@ -20,15 +20,18 @@ export const visualizers: VisualizerListing[] = [
   {
     name: 'Packet encapsulation',
     description: "Follow a packet as it's wrapped from application data down to frames.",
+    slug: 'packet-encapsulation',
   },
   {
     name: 'OSI model explorer',
     description: 'Click through each OSI layer and see what happens to data at each one.',
+    slug: 'osi-model-explorer',
   },
   {
     name: 'TCP/IP stack explorer',
     description:
       'Compare the TCP/IP model against OSI and see how real protocols map to each layer.',
+    slug: 'tcp-ip-stack-explorer',
   },
   {
     name: 'NAT flow simulator',

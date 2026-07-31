@@ -58,6 +58,9 @@ import { TcpHandshakeVisualizer } from './features/visualizers/TcpHandshakeVisua
 import { TlsHandshakeVisualizer } from './features/visualizers/TlsHandshakeVisualizer'
 import { NatFlowVisualizer } from './features/visualizers/NatFlowVisualizer'
 import { VpnPacketFlowVisualizer } from './features/visualizers/VpnPacketFlowVisualizer'
+import { PacketEncapsulationVisualizer } from './features/visualizers/PacketEncapsulationVisualizer'
+import { OsiModelExplorer } from './features/visualizers/OsiModelExplorer'
+import { TcpIpStackExplorer } from './features/visualizers/TcpIpStackExplorer'
 
 function App() {
   return (
@@ -128,6 +131,12 @@ function App() {
           <Route path="/visualizers/tls-handshake" element={<TlsHandshakeVisualizer />} />
           <Route path="/visualizers/nat-flow-simulator" element={<NatFlowVisualizer />} />
           <Route path="/visualizers/vpn-packet-flow" element={<VpnPacketFlowVisualizer />} />
+          <Route
+            path="/visualizers/packet-encapsulation"
+            element={<PacketEncapsulationVisualizer />}
+          />
+          <Route path="/visualizers/osi-model-explorer" element={<OsiModelExplorer />} />
+          <Route path="/visualizers/tcp-ip-stack-explorer" element={<TcpIpStackExplorer />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />
