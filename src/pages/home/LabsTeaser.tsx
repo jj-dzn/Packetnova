@@ -18,8 +18,8 @@ export function LabsTeaser() {
           <Badge tone="accent">Just for fun</Badge>
           <h2 className="mt-2 text-lg font-semibold">Meet the PacketNova Labs corner</h2>
           <p className="mt-1 text-sm text-fg-muted">
-            A ping pet whose mood follows live latency to a host you pick -- plus a few other easter
-            eggs hidden around the site for the curious.
+            A ping pet whose mood follows live latency to a host you pick, a retro hacking terminal,
+            and more playful extras to come.
           </p>
         </div>
         <span className="relative whitespace-nowrap text-sm font-medium text-accent group-hover:underline">

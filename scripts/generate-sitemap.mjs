@@ -30,9 +30,7 @@ const blogSlugs = readdirSync(blogDir)
   .filter((file) => file.endsWith('.md'))
   .map((file) => file.replace(/\.md$/, ''))
 
-// /terminal is deliberately excluded -- it's a hidden easter egg, not meant
-// to be indexed or crawled.
-const staticPaths = ['/', '/tools', '/visualizers', '/blog', '/labs', '/labs/ping-pet']
+const staticPaths = ['/', '/tools', '/visualizers', '/blog', '/labs', '/labs/ping-pet', '/terminal']
 
 const toolPaths = toolCategories.flatMap((category) =>
   category.tools.filter((tool) => tool.slug).map((tool) => `/tools/${tool.slug}`),

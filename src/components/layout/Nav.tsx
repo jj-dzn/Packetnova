@@ -8,6 +8,7 @@ const navLinks = [
   { to: '/tools', label: 'Tools' },
   { to: '/visualizers', label: 'Visualizers' },
   { to: '/blog', label: 'Blog' },
+  { to: '/labs', label: 'Labs' },
 ]
 
 function MenuIcon({ open }: { open: boolean }) {

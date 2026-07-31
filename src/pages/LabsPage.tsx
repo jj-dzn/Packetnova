@@ -7,16 +7,21 @@ const labs = [
     description: 'A small creature whose mood tracks live latency to a host you pick.',
     href: '/labs/ping-pet',
   },
+  {
+    title: 'Retro terminal',
+    description: 'A fake boot sequence and a handful of commands, dressed up as a hacking console.',
+    href: '/terminal',
+  },
 ]
 
 export function LabsPage() {
   return (
     <div className="flex flex-col gap-8 py-16">
       <div className="text-center">
-        <Badge tone="accent">Experimental</Badge>
+        <Badge tone="accent">Just for fun</Badge>
         <h1 className="mt-4 text-2xl font-semibold">Labs</h1>
         <p className="mx-auto mt-2 max-w-xl text-fg-muted">
-          Small, just-for-fun corners of PacketNova -- not part of the core toolkit.
+          A small, playful corner of PacketNova -- built for fun, not diagnostics.
         </p>
       </div>
 
