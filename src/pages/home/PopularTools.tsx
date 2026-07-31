@@ -31,10 +31,10 @@ const tools = [
 
 export function PopularTools() {
   return (
-    <section className="py-16">
+    <section className="py-14">
       <SectionHeader
         title="Popular tools"
-        subtitle="Five IP calculators, ready to use"
+        subtitle="A few favorites -- 48 tools live across the full toolkit"
         viewAllHref="/tools"
         viewAllLabel="View all tools"
       />

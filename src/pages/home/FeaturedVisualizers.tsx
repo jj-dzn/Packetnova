@@ -1,35 +1,28 @@
+import { Link } from 'react-router'
 import { SectionHeader } from './SectionHeader'
-import { PreviewCard } from '../../components/ui/PreviewCard'
-
-const visualizers = [
-  {
-    title: 'TCP three-way handshake',
-    description: 'Watch SYN, SYN-ACK, and ACK establish a connection step by step.',
-  },
-  {
-    title: 'TLS handshake',
-    description: 'See exactly how a TLS session gets negotiated and encrypted.',
-  },
-  {
-    title: 'Packet encapsulation',
-    description: "Follow a packet as it's wrapped from application data down to frames.",
-  },
-]
+import { Card } from '../../components/ui/Card'
+import { Badge } from '../../components/ui/Badge'
 
 export function FeaturedVisualizers() {
   return (
-    <section className="py-16">
+    <section className="py-14">
       <SectionHeader
         title="Interactive visualizers"
         subtitle="Step-by-step animations of how protocols actually work"
         viewAllHref="/visualizers"
         viewAllLabel="View all visualizers"
       />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {visualizers.map((item) => (
-          <PreviewCard key={item.title} category="Visualizer" href="/visualizers" {...item} />
-        ))}
-      </div>
+      <Link to="/visualizers" className="block">
+        <Card interactive className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Badge tone="accent">Visualizer</Badge>
+            <span className="text-xs text-fg-subtle">Coming soon</span>
+          </div>
+          <p className="text-sm text-fg-muted">
+            First up: TCP three-way handshake, TLS handshake, and packet encapsulation.
+          </p>
+        </Card>
+      </Link>
     </section>
   )
 }

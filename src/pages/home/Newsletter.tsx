@@ -2,7 +2,7 @@ import { Button } from '../../components/ui/Button'
 
 export function Newsletter() {
   return (
-    <section className="py-16">
+    <section className="py-14">
       <div className="rounded-lg border border-border bg-surface p-8 text-center">
         <h2 className="text-xl font-semibold">Stay in the loop</h2>
         <p className="mx-auto mt-2 max-w-sm text-sm text-fg-muted">

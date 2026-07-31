@@ -1,35 +1,28 @@
+import { Link } from 'react-router'
 import { SectionHeader } from './SectionHeader'
-import { PreviewCard } from '../../components/ui/PreviewCard'
-
-const articles = [
-  {
-    title: 'Understanding MTU',
-    description: 'Why packet size limits matter and how they cause silent failures.',
-  },
-  {
-    title: 'BGP best path explained',
-    description: 'How routers actually choose which path wins.',
-  },
-  {
-    title: 'Troubleshooting packet loss',
-    description: 'A practical walkthrough for tracking down where packets go missing.',
-  },
-]
+import { Card } from '../../components/ui/Card'
+import { Badge } from '../../components/ui/Badge'
 
 export function LatestArticles() {
   return (
-    <section className="py-16">
+    <section className="py-14">
       <SectionHeader
         title="From the blog"
         subtitle="Networking write-ups, coming soon"
         viewAllHref="/blog"
         viewAllLabel="Visit the blog"
       />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {articles.map((article) => (
-          <PreviewCard key={article.title} category="Blog" href="/blog" {...article} />
-        ))}
-      </div>
+      <Link to="/blog" className="block">
+        <Card interactive className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Badge tone="accent">Blog</Badge>
+            <span className="text-xs text-fg-subtle">Coming soon</span>
+          </div>
+          <p className="text-sm text-fg-muted">
+            First posts: understanding MTU, BGP best path, and troubleshooting packet loss.
+          </p>
+        </Card>
+      </Link>
     </section>
   )
 }

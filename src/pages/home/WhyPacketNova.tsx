@@ -22,7 +22,7 @@ const reasons = [
 
 export function WhyPacketNova() {
   return (
-    <section className="py-16">
+    <section className="py-14">
       <h2 className="mb-8 text-xl font-semibold">Why PacketNova</h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {reasons.map((reason) => (
