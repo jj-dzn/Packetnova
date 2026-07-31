@@ -18,7 +18,7 @@ export function PreviewCard({
   comingSoon = true,
 }: PreviewCardProps) {
   const card = (
-    <Card interactive={Boolean(href)} className="flex h-full flex-col gap-3">
+    <Card interactive={Boolean(href)} tilt={Boolean(href)} className="flex h-full flex-col gap-3">
       <div className="flex items-center justify-between">
         <Badge tone="accent">{category}</Badge>
         {comingSoon && <span className="text-xs text-fg-subtle">Coming soon</span>}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router'
+import { TerminalCursor } from '../../components/ui/TerminalCursor'
 
 const BANNER = `╔══════════════════════════════════╗
 ║        P A C K E T N O V A        ║
@@ -176,9 +177,7 @@ export function RetroTerminal() {
                 autoComplete="off"
                 spellCheck={false}
               />
-              <span aria-hidden="true" className="motion-safe:animate-pulse">
-                _
-              </span>
+              <TerminalCursor />
             </form>
           </div>
         )}

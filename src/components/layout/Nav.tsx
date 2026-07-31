@@ -13,7 +13,14 @@ const navLinks = [
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+      className="group-hover:motion-safe:animate-pn-icon-pop"
+    >
       {open ? (
         <path
           d="M5 5L15 15M15 5L5 15"
@@ -70,7 +77,7 @@ export function Nav() {
 
         <button
           type="button"
-          className="inline-flex items-center justify-center rounded-md border border-border p-2 text-fg md:hidden"
+          className="group inline-flex items-center justify-center rounded-md border border-border p-2 text-fg transition-colors hover:border-accent md:hidden"
           aria-label="Toggle menu"
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((open) => !open)}

@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { TrafficStarfield } from './TrafficStarfield'
+import { HeroStatusLine } from './HeroStatusLine'
 
 export function Hero() {
   return (
@@ -31,6 +32,7 @@ export function Hero() {
             <Button variant="secondary">Explore visualizers</Button>
           </Link>
         </div>
+        <HeroStatusLine />
       </div>
     </section>
   )

@@ -24,6 +24,7 @@ interface Packet {
 const STAR_COUNT = 55
 const NODE_COUNT = 7
 const PACKET_COUNT = 9
+const POINTER_RADIUS = 150
 
 function hexToRgb(hex: string): string {
   const clean = hex.replace('#', '')
@@ -46,6 +47,13 @@ function randomNextNode(current: number, count: number): number {
   return next
 }
 
+// 1 right at the pointer, fading linearly to 0 at POINTER_RADIUS away.
+function proximityBoost(x: number, y: number, pointer: { x: number; y: number; active: boolean }) {
+  if (!pointer.active) return 0
+  const distance = Math.hypot(x - pointer.x, y - pointer.y)
+  return Math.max(0, 1 - distance / POINTER_RADIUS)
+}
+
 // Purely decorative "nova" traffic animation for the homepage hero: a faint
 // constellation of nodes with packets traveling between them over a subtle
 // starfield. Simulated data only -- no real network access. Respects
@@ -62,6 +70,7 @@ export function TrafficStarfield() {
 
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     const colors = { current: readThemeColors() }
+    const pointer = { x: 0, y: 0, active: false }
 
     let width = 0
     let height = 0
@@ -124,22 +133,24 @@ export function TrafficStarfield() {
 
       for (const star of stars) {
         if (animate) star.twinklePhase += star.twinkleSpeed * dt
+        const boost = animate ? proximityBoost(star.x, star.y, pointer) : 0
         const opacity = animate
-          ? Math.max(0, star.baseOpacity + Math.sin(star.twinklePhase) * 0.15)
+          ? Math.max(0, star.baseOpacity + Math.sin(star.twinklePhase) * 0.15) + boost * 0.4
           : star.baseOpacity
         ctx!.beginPath()
-        ctx!.arc(star.x, star.y, star.radius, 0, Math.PI * 2)
-        ctx!.fillStyle = `rgba(${accent}, ${opacity})`
+        ctx!.arc(star.x, star.y, star.radius + boost * 0.6, 0, Math.PI * 2)
+        ctx!.fillStyle = `rgba(${accent}, ${Math.min(1, opacity)})`
         ctx!.fill()
       }
 
-      ctx!.strokeStyle = `rgba(${accentAlt}, 0.08)`
       ctx!.lineWidth = 1
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const a = nodes[i]!
           const b = nodes[j]!
           if (Math.hypot(a.x - b.x, a.y - b.y) < width * 0.32) {
+            const midBoost = animate ? proximityBoost((a.x + b.x) / 2, (a.y + b.y) / 2, pointer) : 0
+            ctx!.strokeStyle = `rgba(${accentAlt}, ${0.08 + midBoost * 0.22})`
             ctx!.beginPath()
             ctx!.moveTo(a.x, a.y)
             ctx!.lineTo(b.x, b.y)
@@ -149,9 +160,10 @@ export function TrafficStarfield() {
       }
 
       for (const node of nodes) {
+        const boost = animate ? proximityBoost(node.x, node.y, pointer) : 0
         ctx!.beginPath()
-        ctx!.arc(node.x, node.y, 2.5, 0, Math.PI * 2)
-        ctx!.fillStyle = `rgba(${accentAlt}, 0.55)`
+        ctx!.arc(node.x, node.y, 2.5 + boost * 2, 0, Math.PI * 2)
+        ctx!.fillStyle = `rgba(${accentAlt}, ${Math.min(1, 0.55 + boost * 0.4)})`
         ctx!.fill()
       }
 
@@ -209,9 +221,26 @@ export function TrafficStarfield() {
       if (reducedMotionQuery.matches) drawFrame(0, false)
     }
 
+    // Tracked on window rather than the canvas itself -- the canvas stays
+    // pointer-events-none so it can never intercept clicks meant for the
+    // hero's buttons, which sit visually on top of it.
+    function handlePointerMove(event: PointerEvent) {
+      const rect = canvas!.getBoundingClientRect()
+      pointer.x = event.clientX - rect.left
+      pointer.y = event.clientY - rect.top
+      pointer.active =
+        pointer.x >= 0 && pointer.x <= rect.width && pointer.y >= 0 && pointer.y <= rect.height
+    }
+
+    function handlePointerLeaveWindow() {
+      pointer.active = false
+    }
+
     start()
     document.addEventListener('visibilitychange', handleVisibility)
     reducedMotionQuery.addEventListener('change', start)
+    window.addEventListener('pointermove', handlePointerMove)
+    document.addEventListener('pointerleave', handlePointerLeaveWindow)
     const themeObserver = new MutationObserver(handleThemeChange)
     themeObserver.observe(document.documentElement, {
       attributes: true,
@@ -224,6 +253,8 @@ export function TrafficStarfield() {
       themeObserver.disconnect()
       document.removeEventListener('visibilitychange', handleVisibility)
       reducedMotionQuery.removeEventListener('change', start)
+      window.removeEventListener('pointermove', handlePointerMove)
+      document.removeEventListener('pointerleave', handlePointerLeaveWindow)
     }
   }, [])
 

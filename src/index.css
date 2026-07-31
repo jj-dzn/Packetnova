@@ -37,6 +37,24 @@
      packet in the encapsulation visualizer, or a node/edge revealing itself
      in a graph animation. */
   --animate-pn-fade-in: pn-fade-in 350ms ease-out forwards;
+
+  /* Shared hard on/off terminal-style cursor blink -- deliberately a step
+     function, not a smooth fade, so it reads as a text cursor rather than a
+     generic pulsing dot. Used by the hero status line and the retro
+     terminal, so the same blink appears everywhere it shows up. */
+  --animate-pn-cursor-blink: pn-cursor-blink 1.1s step-end infinite;
+
+  /* Route-change transition: page content fades/settles in while a soft
+     purple shimmer sweeps across it once. */
+  --animate-pn-page-fade: pn-fade-in 320ms ease-out forwards;
+  --animate-pn-page-shimmer: pn-page-shimmer 700ms ease-out forwards;
+
+  /* A once-per-hover icon "pop" -- plays for the duration of the hover via
+     :hover, so it naturally resets when the pointer leaves. */
+  --animate-pn-icon-pop: pn-icon-pop 320ms ease-out;
+
+  /* Ambient once-per-second pulse for the hero's latency orb. */
+  --animate-pn-orb-pulse: pn-orb-pulse 1s ease-in-out infinite;
 }
 
 /* Rest a few percent short of the true 0%/100% edge -- a label's own text
@@ -80,6 +98,57 @@
   }
   50% {
     transform: translateY(-4px);
+  }
+}
+
+@keyframes pn-cursor-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* A soft purple band sweeps left-to-right across the page's own width, then
+   fades -- layered over the fading-in content, not the content itself. */
+@keyframes pn-page-shimmer {
+  0% {
+    background-position: -60% 0;
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 160% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes pn-icon-pop {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.15) rotate(-6deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes pn-orb-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.15;
   }
 }
 
