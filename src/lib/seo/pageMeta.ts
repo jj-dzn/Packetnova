@@ -76,6 +76,10 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `Signal decoder - ${SITE_TITLE}`,
     description: 'Watch any text ripple through Morse, binary, hex, and Base64.',
   },
+  '/labs/404-maze': {
+    title: `404 maze - ${SITE_TITLE}`,
+    description: 'Dead ends are fake HTTP errors. One lucky cell is a cached shortcut.',
+  },
   '/terminal': {
     title: `Terminal - ${SITE_TITLE}`,
     description: DEFAULT_DESCRIPTION,

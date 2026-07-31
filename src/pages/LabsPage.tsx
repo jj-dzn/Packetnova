@@ -57,6 +57,11 @@ const labs = [
     description: 'Watch any text ripple through Morse, binary, hex, and Base64.',
     href: '/labs/signal-decoder',
   },
+  {
+    title: '404 maze',
+    description: 'Dead ends are fake HTTP errors. One lucky cell is a cached shortcut.',
+    href: '/labs/404-maze',
+  },
 ]
 
 export function LabsPage() {

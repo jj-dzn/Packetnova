@@ -46,6 +46,7 @@ const staticPaths = [
   '/labs/traceroute-ghost',
   '/labs/ping-pet-duel',
   '/labs/signal-decoder',
+  '/labs/404-maze',
   '/terminal',
 ]
 
