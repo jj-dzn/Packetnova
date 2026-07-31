@@ -3,6 +3,7 @@ import { PopularTools } from './home/PopularTools'
 import { FeaturedVisualizers } from './home/FeaturedVisualizers'
 import { LatestArticles } from './home/LatestArticles'
 import { WhyPacketNova } from './home/WhyPacketNova'
+import { LabsTeaser } from './home/LabsTeaser'
 import { Newsletter } from './home/Newsletter'
 import { StructuredData } from '../components/seo/StructuredData'
 
@@ -29,6 +30,7 @@ export function HomePage() {
       <FeaturedVisualizers />
       <LatestArticles />
       <WhyPacketNova />
+      <LabsTeaser />
       <Newsletter />
     </div>
   )
