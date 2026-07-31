@@ -62,6 +62,11 @@ const labs = [
     description: 'Dead ends are fake HTTP errors. One lucky cell is a cached shortcut.',
     href: '/labs/404-maze',
   },
+  {
+    title: 'Packet snake',
+    description: 'Classic Snake, reskinned as a data stream eating loose packets.',
+    href: '/labs/packet-snake',
+  },
 ]
 
 export function LabsPage() {

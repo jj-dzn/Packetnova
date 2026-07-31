@@ -80,6 +80,10 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `404 maze - ${SITE_TITLE}`,
     description: 'Dead ends are fake HTTP errors. One lucky cell is a cached shortcut.',
   },
+  '/labs/packet-snake': {
+    title: `Packet snake - ${SITE_TITLE}`,
+    description: 'Classic Snake, reskinned as a data stream eating loose packets.',
+  },
   '/terminal': {
     title: `Terminal - ${SITE_TITLE}`,
     description: DEFAULT_DESCRIPTION,
