@@ -61,6 +61,8 @@ import { VpnPacketFlowVisualizer } from './features/visualizers/VpnPacketFlowVis
 import { PacketEncapsulationVisualizer } from './features/visualizers/PacketEncapsulationVisualizer'
 import { OsiModelExplorer } from './features/visualizers/OsiModelExplorer'
 import { TcpIpStackExplorer } from './features/visualizers/TcpIpStackExplorer'
+import { RoutingDecisionVisualizer } from './features/visualizers/RoutingDecisionVisualizer'
+import { BgpBestPathVisualizer } from './features/visualizers/BgpBestPathVisualizer'
 
 function App() {
   return (
@@ -137,6 +139,11 @@ function App() {
           />
           <Route path="/visualizers/osi-model-explorer" element={<OsiModelExplorer />} />
           <Route path="/visualizers/tcp-ip-stack-explorer" element={<TcpIpStackExplorer />} />
+          <Route
+            path="/visualizers/routing-decision-simulator"
+            element={<RoutingDecisionVisualizer />}
+          />
+          <Route path="/visualizers/bgp-best-path-selection" element={<BgpBestPathVisualizer />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />

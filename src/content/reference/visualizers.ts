@@ -42,11 +42,13 @@ export const visualizers: VisualizerListing[] = [
   {
     name: 'Routing decision simulator',
     description: 'Step through how a router picks the next hop for a packet, table entry by entry.',
+    slug: 'routing-decision-simulator',
   },
   {
     name: 'BGP best path selection',
     description:
       "Walk through BGP's path-selection algorithm step by step, attribute by attribute.",
+    slug: 'bgp-best-path-selection',
   },
   {
     name: 'OSPF SPF animation',
