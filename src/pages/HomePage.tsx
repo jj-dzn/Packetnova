@@ -26,11 +26,11 @@ export function HomePage() {
     <div className="flex flex-col divide-y divide-border">
       <StructuredData data={WEBSITE_SCHEMA} />
       <Hero />
+      <LabsTeaser />
       <PopularTools />
       <FeaturedVisualizers />
       <LatestArticles />
       <WhyPacketNova />
-      <LabsTeaser />
       <Newsletter />
     </div>
   )
