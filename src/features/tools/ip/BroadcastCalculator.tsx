@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { BinaryBreakdown } from './BinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { calculateBroadcast } from '../../../lib/calculations/broadcast'
 
@@ -12,7 +13,7 @@ export function BroadcastCalculator() {
     <ToolPageLayout
       category="IP"
       title="Broadcast calculator"
-      description="Find the broadcast address for any IP address and subnet mask."
+      description="Find the broadcast address for any IP and subnet mask, and see the broadcast domain in binary."
       input={
         <div>
           <label htmlFor="broadcast-input" className="text-sm font-medium">
@@ -30,11 +31,22 @@ export function BroadcastCalculator() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow label="Broadcast address" value={calc.result.broadcastAddress} />
-            <ResultRow label="Network address" value={calc.result.networkAddress} />
-            <ResultRow label="Subnet mask" value={calc.result.subnetMask} />
-          </dl>
+          <div className="flex flex-col gap-4">
+            <dl>
+              <ResultRow label="Broadcast address" value={calc.result.broadcastAddress} />
+              <ResultRow label="Network address" value={calc.result.networkAddress} />
+              <ResultRow label="Subnet mask" value={calc.result.subnetMask} />
+              <ResultRow label="Wildcard mask" value={calc.result.wildcardMask} />
+            </dl>
+            <BinaryBreakdown
+              label="Broadcast address in binary -- host bits are all 1s"
+              value={calc.result.broadcastAddressValue}
+              prefixLength={calc.result.prefixLength}
+            />
+            <p className="text-xs text-fg-subtle">
+              A packet sent to this address is delivered to every host in the network.
+            </p>
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { BinaryBreakdown } from './BinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { calculateNetworkAddress } from '../../../lib/calculations/networkAddress'
 
@@ -12,7 +13,7 @@ export function NetworkAddressCalculator() {
     <ToolPageLayout
       category="IP"
       title="Network address calculator"
-      description="Find the network address for any IP address and subnet mask."
+      description="Find the network address for any IP and subnet -- and what kind of address it is."
       input={
         <div>
           <label htmlFor="network-input" className="text-sm font-medium">
@@ -30,11 +31,18 @@ export function NetworkAddressCalculator() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow label="Network address" value={calc.result.networkAddress} />
-            <ResultRow label="Broadcast address" value={calc.result.broadcastAddress} />
-            <ResultRow label="Subnet mask" value={calc.result.subnetMask} />
-          </dl>
+          <div className="flex flex-col gap-4">
+            <dl>
+              <ResultRow label="Network address" value={calc.result.networkAddress} />
+              <ResultRow label="Subnet mask" value={calc.result.subnetMask} />
+              <ResultRow label="Address type" value={calc.result.classification.label} />
+            </dl>
+            <BinaryBreakdown
+              label="Network address in binary"
+              value={calc.result.networkAddressValue}
+              prefixLength={calc.result.prefixLength}
+            />
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

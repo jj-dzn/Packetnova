@@ -4,16 +4,14 @@ import { calculateBroadcast } from './broadcast'
 describe('calculateBroadcast', () => {
   it('192.168.1.10/24', () => {
     const result = calculateBroadcast('192.168.1.10/24')
-    expect(result).toEqual({
-      ok: true,
-      result: {
-        ip: '192.168.1.10',
-        prefixLength: 24,
-        subnetMask: '255.255.255.0',
-        networkAddress: '192.168.1.0',
-        broadcastAddress: '192.168.1.255',
-      },
-    })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.ip).toBe('192.168.1.10')
+    expect(result.result.prefixLength).toBe(24)
+    expect(result.result.subnetMask).toBe('255.255.255.0')
+    expect(result.result.wildcardMask).toBe('0.0.0.255')
+    expect(result.result.networkAddress).toBe('192.168.1.0')
+    expect(result.result.broadcastAddress).toBe('192.168.1.255')
   })
 
   it('172.16.0.0/12 (RFC 1918)', () => {

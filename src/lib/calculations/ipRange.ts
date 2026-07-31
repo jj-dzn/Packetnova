@@ -29,9 +29,13 @@ function trailingZeroBits(value: number): number {
  * Decomposes [start, end] into the minimal set of CIDR blocks that cover it
  * exactly, using the standard greedy alignment algorithm: at each step, take
  * the largest block that both starts at the current address and fits within
- * what's left of the range.
+ * what's left of the range. Exported so the route summarizer can reuse the
+ * same decomposition after merging overlapping/adjacent input ranges.
  */
-function rangeToBlocks(start: number, end: number): { network: number; prefixLength: number }[] {
+export function rangeToBlocks(
+  start: number,
+  end: number,
+): { network: number; prefixLength: number }[] {
   const blocks: { network: number; prefixLength: number }[] = []
   let current = start
 

@@ -14,6 +14,7 @@ import { BroadcastCalculator } from './features/tools/ip/BroadcastCalculator'
 import { NetworkAddressCalculator } from './features/tools/ip/NetworkAddressCalculator'
 import { Ipv6Calculator } from './features/tools/ip/Ipv6Calculator'
 import { WildcardMaskCalculator } from './features/tools/ip/WildcardMaskCalculator'
+import { RouteSummarizer } from './features/tools/ip/RouteSummarizer'
 import { MtuCalculator } from './features/tools/vpn/MtuCalculator'
 import { MssCalculator } from './features/tools/vpn/MssCalculator'
 import { LatencyCalculator } from './features/tools/vpn/LatencyCalculator'
@@ -95,6 +96,7 @@ function App() {
           <Route path="/tools/network-address-calculator" element={<NetworkAddressCalculator />} />
           <Route path="/tools/ipv6-calculator" element={<Ipv6Calculator />} />
           <Route path="/tools/wildcard-mask-calculator" element={<WildcardMaskCalculator />} />
+          <Route path="/tools/route-summarizer" element={<RouteSummarizer />} />
           <Route path="/tools/mtu-calculator" element={<MtuCalculator />} />
           <Route path="/tools/mss-calculator" element={<MssCalculator />} />
           <Route path="/tools/latency-calculator" element={<LatencyCalculator />} />

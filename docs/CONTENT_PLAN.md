@@ -7,12 +7,13 @@ Full inventory of tools, visualizers, learning topics, and blog posts. Use this 
 ### IP tools
 
 - [ ] CIDR calculator
-- [ ] Subnet calculator
-- [ ] IPv6 calculator
+- [ ] Subnet calculator (equal split + VLSM)
+- [ ] IPv6 calculator (expand/compress/classify + subnetting)
 - [ ] Wildcard mask calculator
 - [ ] IP range calculator
 - [ ] Broadcast calculator
 - [ ] Network address calculator
+- [ ] Route summarizer
 
 ### VPN tools
 

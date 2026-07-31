@@ -23,12 +23,13 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'Subnet calculator',
-        description: 'Split a network into subnets and see the resulting masks at a glance.',
+        description:
+          'Split a network into equal subnets, or allocate variable-length (VLSM) subnets.',
         slug: 'subnet-calculator',
       },
       {
         name: 'IPv6 calculator',
-        description: 'Expand, compress, and inspect IPv6 addresses and prefixes.',
+        description: 'Expand, compress, inspect, and subnet IPv6 addresses and prefixes.',
         slug: 'ipv6-calculator',
       },
       {
@@ -43,13 +44,18 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'Broadcast calculator',
-        description: 'Find the broadcast address for any IP and subnet mask.',
+        description: 'Find the broadcast address and broadcast domain for any IP and subnet.',
         slug: 'broadcast-calculator',
       },
       {
         name: 'Network address calculator',
-        description: 'Find the network address for any IP and subnet mask.',
+        description: 'Find the network address for any IP, and what kind of address it is.',
         slug: 'network-address-calculator',
+      },
+      {
+        name: 'Route summarizer',
+        description: 'Find the smallest set of aggregate routes that covers a list of CIDRs.',
+        slug: 'route-summarizer',
       },
     ],
   },

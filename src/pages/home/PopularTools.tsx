@@ -1,5 +1,6 @@
 import { SectionHeader } from './SectionHeader'
 import { PreviewCard } from '../../components/ui/PreviewCard'
+import { toolCategories } from '../../content/reference/tools'
 
 const tools = [
   {
@@ -9,7 +10,7 @@ const tools = [
   },
   {
     title: 'Subnet calculator',
-    description: 'Split a network into subnets and see the resulting masks at a glance.',
+    description: 'Split a network into equal subnets, or allocate variable-length (VLSM) subnets.',
     href: '/tools/subnet-calculator',
   },
   {
@@ -19,22 +20,27 @@ const tools = [
   },
   {
     title: 'Broadcast calculator',
-    description: 'Find the broadcast address for any IP and subnet mask.',
+    description: 'Find the broadcast address and broadcast domain for any IP and subnet.',
     href: '/tools/broadcast-calculator',
   },
   {
     title: 'Network address calculator',
-    description: 'Find the network address for any IP and subnet mask.',
+    description: 'Find the network address for any IP, and what kind of address it is.',
     href: '/tools/network-address-calculator',
   },
 ]
+
+const liveToolCount = toolCategories.reduce(
+  (count, category) => count + category.tools.filter((tool) => tool.slug).length,
+  0,
+)
 
 export function PopularTools() {
   return (
     <section className="py-14">
       <SectionHeader
         title="Popular tools"
-        subtitle="A few favorites -- 48 tools live across the full toolkit"
+        subtitle={`A few favorites -- ${liveToolCount} tools live across the full toolkit`}
         viewAllHref="/tools"
         viewAllLabel="View all tools"
       />

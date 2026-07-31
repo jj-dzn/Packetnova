@@ -8,10 +8,12 @@ import {
   usableHostCount,
   usableHostRange,
 } from '../validation/ip'
+import { classifyIPv4, type IPv4Classification } from './ipClassify'
 import type { CalculationResult } from './result'
 
 export interface CidrResult {
   ip: string
+  ipValue: number
   prefixLength: number
   subnetMask: string
   wildcardMask: string
@@ -21,6 +23,7 @@ export interface CidrResult {
   lastUsable: string | null
   totalAddresses: number
   usableHosts: number
+  classification: IPv4Classification
 }
 
 export function calculateCidr(input: string): CalculationResult<CidrResult> {
@@ -40,6 +43,7 @@ export function calculateCidr(input: string): CalculationResult<CidrResult> {
     ok: true,
     result: {
       ip: ipv4ToString(ip.value),
+      ipValue: ip.value,
       prefixLength,
       subnetMask: ipv4ToString(mask.value),
       wildcardMask: ipv4ToString(wildcard),
@@ -49,6 +53,7 @@ export function calculateCidr(input: string): CalculationResult<CidrResult> {
       lastUsable: range ? ipv4ToString(range.last.value) : null,
       totalAddresses: totalAddresses(prefixLength),
       usableHosts: usableHostCount(prefixLength),
+      classification: classifyIPv4(ip.value),
     },
   }
 }

@@ -11,8 +11,10 @@ export interface BroadcastResult {
   ip: string
   prefixLength: number
   subnetMask: string
+  wildcardMask: string
   networkAddress: string
   broadcastAddress: string
+  broadcastAddressValue: number
 }
 
 export function calculateBroadcast(input: string): CalculationResult<BroadcastResult> {
@@ -23,6 +25,8 @@ export function calculateBroadcast(input: string): CalculationResult<BroadcastRe
 
   const { ip, prefixLength } = parsed
   const mask = prefixLengthToSubnetMask(prefixLength)
+  const wildcard = ~mask.value >>> 0
+  const broadcast = broadcastAddress(ip, prefixLength)
 
   return {
     ok: true,
@@ -30,8 +34,10 @@ export function calculateBroadcast(input: string): CalculationResult<BroadcastRe
       ip: ipv4ToString(ip.value),
       prefixLength,
       subnetMask: ipv4ToString(mask.value),
+      wildcardMask: ipv4ToString(wildcard),
       networkAddress: ipv4ToString(networkAddress(ip, prefixLength).value),
-      broadcastAddress: ipv4ToString(broadcastAddress(ip, prefixLength).value),
+      broadcastAddress: ipv4ToString(broadcast.value),
+      broadcastAddressValue: broadcast.value,
     },
   }
 }

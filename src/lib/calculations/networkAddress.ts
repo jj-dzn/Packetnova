@@ -1,10 +1,5 @@
-import {
-  broadcastAddress,
-  ipv4ToString,
-  networkAddress,
-  parseCIDR,
-  prefixLengthToSubnetMask,
-} from '../validation/ip'
+import { ipv4ToString, networkAddress, parseCIDR, prefixLengthToSubnetMask } from '../validation/ip'
+import { classifyIPv4, type IPv4Classification } from './ipClassify'
 import type { CalculationResult } from './result'
 
 export interface NetworkAddressResult {
@@ -12,7 +7,8 @@ export interface NetworkAddressResult {
   prefixLength: number
   subnetMask: string
   networkAddress: string
-  broadcastAddress: string
+  networkAddressValue: number
+  classification: IPv4Classification
 }
 
 export function calculateNetworkAddress(input: string): CalculationResult<NetworkAddressResult> {
@@ -23,6 +19,7 @@ export function calculateNetworkAddress(input: string): CalculationResult<Networ
 
   const { ip, prefixLength } = parsed
   const mask = prefixLengthToSubnetMask(prefixLength)
+  const network = networkAddress(ip, prefixLength)
 
   return {
     ok: true,
@@ -30,8 +27,9 @@ export function calculateNetworkAddress(input: string): CalculationResult<Networ
       ip: ipv4ToString(ip.value),
       prefixLength,
       subnetMask: ipv4ToString(mask.value),
-      networkAddress: ipv4ToString(networkAddress(ip, prefixLength).value),
-      broadcastAddress: ipv4ToString(broadcastAddress(ip, prefixLength).value),
+      networkAddress: ipv4ToString(network.value),
+      networkAddressValue: network.value,
+      classification: classifyIPv4(ip.value),
     },
   }
 }

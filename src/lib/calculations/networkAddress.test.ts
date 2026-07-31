@@ -4,16 +4,13 @@ import { calculateNetworkAddress } from './networkAddress'
 describe('calculateNetworkAddress', () => {
   it('192.168.1.130/24', () => {
     const result = calculateNetworkAddress('192.168.1.130/24')
-    expect(result).toEqual({
-      ok: true,
-      result: {
-        ip: '192.168.1.130',
-        prefixLength: 24,
-        subnetMask: '255.255.255.0',
-        networkAddress: '192.168.1.0',
-        broadcastAddress: '192.168.1.255',
-      },
-    })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.ip).toBe('192.168.1.130')
+    expect(result.result.prefixLength).toBe(24)
+    expect(result.result.subnetMask).toBe('255.255.255.0')
+    expect(result.result.networkAddress).toBe('192.168.1.0')
+    expect(result.result.classification.label).toContain('Private use')
   })
 
   it('10.42.7.9/8 (RFC 1918)', () => {
@@ -21,6 +18,7 @@ describe('calculateNetworkAddress', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.result.networkAddress).toBe('10.0.0.0')
+    expect(result.result.classification.label).toContain('Private use')
   })
 
   it('a /32 network address is the host itself', () => {
@@ -28,7 +26,13 @@ describe('calculateNetworkAddress', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.result.networkAddress).toBe('192.168.1.5')
-    expect(result.result.broadcastAddress).toBe('192.168.1.5')
+  })
+
+  it('classifies a public address correctly', () => {
+    const result = calculateNetworkAddress('8.8.8.8/24')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.classification.label).toBe('Public (global unicast)')
   })
 
   it('rejects invalid input', () => {

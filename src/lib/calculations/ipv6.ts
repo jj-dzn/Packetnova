@@ -11,7 +11,7 @@ function splitGroups(part: string): string[] {
   return part === '' ? [] : part.split(':')
 }
 
-function parseGroups(addressPart: string): number[] | null {
+export function parseGroups(addressPart: string): number[] | null {
   const doubleColonCount = (addressPart.match(/::/g) ?? []).length
   if (doubleColonCount > 1) return null
 
@@ -45,7 +45,7 @@ function expand(values: number[]): string {
   return values.map((v) => v.toString(16).padStart(4, '0')).join(':')
 }
 
-function compress(values: number[]): string {
+export function compress(values: number[]): string {
   const hexGroups = values.map((v) => v.toString(16))
 
   let bestStart = -1

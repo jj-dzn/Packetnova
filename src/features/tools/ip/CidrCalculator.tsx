@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { BinaryBreakdown } from './BinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { calculateCidr } from '../../../lib/calculations/cidr'
 
@@ -30,25 +31,33 @@ export function CidrCalculator() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow label="Network address" value={calc.result.networkAddress} />
-            <ResultRow label="Broadcast address" value={calc.result.broadcastAddress} />
-            <ResultRow label="Subnet mask" value={calc.result.subnetMask} />
-            <ResultRow label="Wildcard mask" value={calc.result.wildcardMask} />
-            <ResultRow
-              label="Usable host range"
-              value={
-                calc.result.firstUsable && calc.result.lastUsable
-                  ? `${calc.result.firstUsable} - ${calc.result.lastUsable}`
-                  : 'None'
-              }
+          <div className="flex flex-col gap-4">
+            <dl>
+              <ResultRow label="Network address" value={calc.result.networkAddress} />
+              <ResultRow label="Broadcast address" value={calc.result.broadcastAddress} />
+              <ResultRow label="Subnet mask" value={calc.result.subnetMask} />
+              <ResultRow label="Wildcard mask" value={calc.result.wildcardMask} />
+              <ResultRow
+                label="Usable host range"
+                value={
+                  calc.result.firstUsable && calc.result.lastUsable
+                    ? `${calc.result.firstUsable} - ${calc.result.lastUsable}`
+                    : 'None'
+                }
+              />
+              <ResultRow
+                label="Total addresses"
+                value={calc.result.totalAddresses.toLocaleString()}
+              />
+              <ResultRow label="Usable hosts" value={calc.result.usableHosts.toLocaleString()} />
+              <ResultRow label="Address type" value={calc.result.classification.label} />
+            </dl>
+            <BinaryBreakdown
+              label="Address in binary"
+              value={calc.result.ipValue}
+              prefixLength={calc.result.prefixLength}
             />
-            <ResultRow
-              label="Total addresses"
-              value={calc.result.totalAddresses.toLocaleString()}
-            />
-            <ResultRow label="Usable hosts" value={calc.result.usableHosts.toLocaleString()} />
-          </dl>
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

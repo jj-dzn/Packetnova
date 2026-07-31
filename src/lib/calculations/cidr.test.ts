@@ -4,21 +4,19 @@ import { calculateCidr } from './cidr'
 describe('calculateCidr', () => {
   it('192.168.1.0/24 (standard private /24)', () => {
     const result = calculateCidr('192.168.1.0/24')
-    expect(result).toEqual({
-      ok: true,
-      result: {
-        ip: '192.168.1.0',
-        prefixLength: 24,
-        subnetMask: '255.255.255.0',
-        wildcardMask: '0.0.0.255',
-        networkAddress: '192.168.1.0',
-        broadcastAddress: '192.168.1.255',
-        firstUsable: '192.168.1.1',
-        lastUsable: '192.168.1.254',
-        totalAddresses: 256,
-        usableHosts: 254,
-      },
-    })
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.ip).toBe('192.168.1.0')
+    expect(result.result.prefixLength).toBe(24)
+    expect(result.result.subnetMask).toBe('255.255.255.0')
+    expect(result.result.wildcardMask).toBe('0.0.0.255')
+    expect(result.result.networkAddress).toBe('192.168.1.0')
+    expect(result.result.broadcastAddress).toBe('192.168.1.255')
+    expect(result.result.firstUsable).toBe('192.168.1.1')
+    expect(result.result.lastUsable).toBe('192.168.1.254')
+    expect(result.result.totalAddresses).toBe(256)
+    expect(result.result.usableHosts).toBe(254)
+    expect(result.result.classification.label).toContain('Private use')
   })
 
   it('10.0.0.0/8 (RFC 1918)', () => {
