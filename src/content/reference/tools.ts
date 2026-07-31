@@ -162,34 +162,42 @@ export const toolCategories: ToolCategory[] = [
       {
         name: 'TCP header explorer',
         description: 'Break down every field in a TCP header, byte by byte.',
+        slug: 'tcp-header-explorer',
       },
       {
         name: 'UDP header explorer',
         description: 'Break down every field in a UDP header, byte by byte.',
+        slug: 'udp-header-explorer',
       },
       {
         name: 'IP header explorer',
         description: 'Break down every field in an IPv4 header, byte by byte.',
+        slug: 'ip-header-explorer',
       },
       {
         name: 'ICMP explorer',
         description: 'Look up ICMP types and codes and what they actually mean.',
+        slug: 'icmp-explorer',
       },
       {
         name: 'DNS record reference',
         description: "Look up every DNS record type and what it's used for.",
+        slug: 'dns-record-reference',
       },
       {
         name: 'HTTP status reference',
         description: 'Look up any HTTP status code and what it means.',
+        slug: 'http-status-reference',
       },
       {
         name: 'TLS version explorer',
         description: 'Compare TLS versions and see what changed between them.',
+        slug: 'tls-version-explorer',
       },
       {
         name: 'DHCP options reference',
         description: 'Look up DHCP option numbers and their meaning.',
+        slug: 'dhcp-options-reference',
       },
     ],
   },

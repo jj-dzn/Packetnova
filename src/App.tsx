@@ -27,6 +27,14 @@ import { Dot1qExplorer } from './features/tools/switching/Dot1qExplorer'
 import { MacAddressLookup } from './features/tools/switching/MacAddressLookup'
 import { MacFormatter } from './features/tools/switching/MacFormatter'
 import { StpOverview } from './features/tools/switching/StpOverview'
+import { TcpHeaderExplorer } from './features/tools/protocols/TcpHeaderExplorer'
+import { UdpHeaderExplorer } from './features/tools/protocols/UdpHeaderExplorer'
+import { IpHeaderExplorer } from './features/tools/protocols/IpHeaderExplorer'
+import { IcmpExplorer } from './features/tools/protocols/IcmpExplorer'
+import { DnsRecordReference } from './features/tools/protocols/DnsRecordReference'
+import { HttpStatusReference } from './features/tools/protocols/HttpStatusReference'
+import { TlsVersionExplorer } from './features/tools/protocols/TlsVersionExplorer'
+import { DhcpOptionsReference } from './features/tools/protocols/DhcpOptionsReference'
 
 function App() {
   return (
@@ -66,6 +74,14 @@ function App() {
           <Route path="/tools/mac-address-lookup" element={<MacAddressLookup />} />
           <Route path="/tools/mac-formatter" element={<MacFormatter />} />
           <Route path="/tools/stp-overview" element={<StpOverview />} />
+          <Route path="/tools/tcp-header-explorer" element={<TcpHeaderExplorer />} />
+          <Route path="/tools/udp-header-explorer" element={<UdpHeaderExplorer />} />
+          <Route path="/tools/ip-header-explorer" element={<IpHeaderExplorer />} />
+          <Route path="/tools/icmp-explorer" element={<IcmpExplorer />} />
+          <Route path="/tools/dns-record-reference" element={<DnsRecordReference />} />
+          <Route path="/tools/http-status-reference" element={<HttpStatusReference />} />
+          <Route path="/tools/tls-version-explorer" element={<TlsVersionExplorer />} />
+          <Route path="/tools/dhcp-options-reference" element={<DhcpOptionsReference />} />
           <Route path="/visualizers" element={<ComingSoonPage title="Visualizers" />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
