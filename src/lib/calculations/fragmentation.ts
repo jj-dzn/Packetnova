@@ -1,6 +1,9 @@
 import type { CalculationResult } from './result'
 
 const IP_HEADER_BYTES = 20
+// IPv4's Total Length header field is 16 bits, so a real packet can never
+// exceed this -- also keeps the fragment loop below bounded.
+const MAX_IPV4_PACKET_BYTES = 65_535
 
 export interface Fragment {
   index: number
@@ -35,10 +38,22 @@ export function calculateFragmentation(
       error: `Packet size must be greater than the IP header size (${IP_HEADER_BYTES} bytes).`,
     }
   }
+  if (packetSizeBytes > MAX_IPV4_PACKET_BYTES) {
+    return {
+      ok: false,
+      error: `Packet size can't exceed ${MAX_IPV4_PACKET_BYTES.toLocaleString()} bytes -- IPv4's Total Length header field is only 16 bits.`,
+    }
+  }
   if (!Number.isFinite(pathMtu) || pathMtu <= IP_HEADER_BYTES) {
     return {
       ok: false,
       error: `Path MTU must be greater than the IP header size (${IP_HEADER_BYTES} bytes).`,
+    }
+  }
+  if (pathMtu > MAX_IPV4_PACKET_BYTES) {
+    return {
+      ok: false,
+      error: `Path MTU can't exceed ${MAX_IPV4_PACKET_BYTES.toLocaleString()} bytes -- IPv4's Total Length header field is only 16 bits.`,
     }
   }
 

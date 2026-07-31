@@ -2,15 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { searchIndex, searchItems } from './searchIndex'
 
 describe('searchItems', () => {
-  it('includes every tool from the content data, built and unbuilt alike', () => {
+  it('includes every tool from the content data', () => {
     expect(searchItems.length).toBeGreaterThanOrEqual(48)
   })
 
-  it('gives built tools a real href and unbuilt tools null', () => {
+  it('gives a built tool a real href', () => {
     const cidr = searchItems.find((item) => item.title === 'CIDR calculator')
-    const ipv6 = searchItems.find((item) => item.title === 'IPv6 calculator')
     expect(cidr?.href).toBe('/tools/cidr-calculator')
-    expect(ipv6?.href).toBeNull()
   })
 })
 

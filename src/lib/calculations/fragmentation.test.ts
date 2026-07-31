@@ -86,4 +86,24 @@ describe('calculateFragmentation', () => {
     expect(calculateFragmentation(20, 1500).ok).toBe(false)
     expect(calculateFragmentation(1500, 20).ok).toBe(false)
   })
+
+  it('accepts the largest possible IPv4 packet (65535 bytes)', () => {
+    const result = calculateFragmentation(65_535, 1500)
+    expect(result.ok).toBe(true)
+  })
+
+  it('rejects a packet size over the IPv4 16-bit Total Length limit', () => {
+    expect(calculateFragmentation(65_536, 1500).ok).toBe(false)
+  })
+
+  it('rejects a path MTU over the IPv4 16-bit Total Length limit', () => {
+    expect(calculateFragmentation(9000, 70_000).ok).toBe(false)
+  })
+
+  it('rejects a pathological packet size instead of hanging on billions of fragments', () => {
+    // Regression test: previously unbounded, a huge packet size with a tiny
+    // MTU produced billions of fragments and hung the browser tab.
+    const result = calculateFragmentation(999_999_999_999, 21)
+    expect(result.ok).toBe(false)
+  })
 })

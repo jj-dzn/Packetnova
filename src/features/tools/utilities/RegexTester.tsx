@@ -1,7 +1,11 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { Input } from '../../../components/ui/Input'
-import { testRegex, type RegexMatch } from '../../../lib/calculations/regexTester'
+import { testRegex, type RegexMatch, type RegexResult } from '../../../lib/calculations/regexTester'
+import type { CalculationResult } from '../../../lib/calculations/result'
+
+const DEBOUNCE_MS = 150
+const EVAL_TIMEOUT_MS = 750
 
 function renderHighlighted(text: string, matches: RegexMatch[]): ReactNode {
   if (matches.length === 0) return text
@@ -25,8 +29,53 @@ export function RegexTester() {
   const [pattern, setPattern] = useState('\\d+')
   const [flags, setFlags] = useState('g')
   const [text, setText] = useState('Order #123 shipped, invoice #456 pending.')
+  const [calc, setCalc] = useState<CalculationResult<RegexResult>>(() =>
+    testRegex(pattern, flags, text),
+  )
 
-  const calc = testRegex(pattern, flags, text)
+  // Evaluated off the main thread with a hard timeout: a pattern like (a+)+$
+  // against pathological input can take exponential time inside a single
+  // RegExp.exec() call, which can't be interrupted once it starts running on
+  // the main thread -- only a worker can be terminated mid-evaluation.
+  useEffect(() => {
+    let worker: Worker | null = null
+    let timeoutId: number | undefined
+    let settled = false
+
+    const debounceId = window.setTimeout(() => {
+      worker = new Worker(new URL('../../../lib/calculations/regexWorker.ts', import.meta.url), {
+        type: 'module',
+      })
+
+      timeoutId = window.setTimeout(() => {
+        if (settled) return
+        settled = true
+        worker?.terminate()
+        setCalc({
+          ok: false,
+          error:
+            'This pattern is taking too long to evaluate -- it may be susceptible to catastrophic backtracking. Try simplifying it or shortening the sample text.',
+        })
+      }, EVAL_TIMEOUT_MS)
+
+      worker.onmessage = (event: MessageEvent<CalculationResult<RegexResult>>) => {
+        if (settled) return
+        settled = true
+        window.clearTimeout(timeoutId)
+        setCalc(event.data)
+        worker?.terminate()
+      }
+
+      worker.postMessage({ pattern, flags, text })
+    }, DEBOUNCE_MS)
+
+    return () => {
+      settled = true
+      window.clearTimeout(debounceId)
+      window.clearTimeout(timeoutId)
+      worker?.terminate()
+    }
+  }, [pattern, flags, text])
 
   return (
     <ToolPageLayout
