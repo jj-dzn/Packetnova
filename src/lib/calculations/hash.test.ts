@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { computeHash, verifyHash } from './hash'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { computeHash, SecureContextRequiredError, verifyHash } from './hash'
 
 function toBuffer(text: string): ArrayBuffer {
   return new TextEncoder().encode(text).buffer as ArrayBuffer
@@ -30,6 +30,24 @@ describe('computeHash', () => {
     expect(await computeHash(toBuffer('abc'), 'SHA-256')).toBe(
       'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
     )
+  })
+})
+
+describe('computeHash in an insecure context (crypto.subtle unavailable)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('throws a SecureContextRequiredError for a Web Crypto algorithm', async () => {
+    vi.stubGlobal('crypto', {})
+    await expect(computeHash(toBuffer('abc'), 'SHA-256')).rejects.toThrow(
+      SecureContextRequiredError,
+    )
+  })
+
+  it('MD5 still works, since js-md5 never touches crypto.subtle', async () => {
+    vi.stubGlobal('crypto', {})
+    expect(await computeHash(toBuffer('abc'), 'MD5')).toBe('900150983cd24fb0d6963f7d28e17f72')
   })
 })
 

@@ -10,12 +10,27 @@ function bufferToHex(buffer: ArrayBuffer): string {
     .join('')
 }
 
+// crypto.subtle only exists in a secure context (HTTPS, or localhost) --
+// on a plain http:// origin it's silently undefined rather than throwing a
+// descriptive error itself, so every SHA-* hash would otherwise fail with a
+// confusing "Cannot read properties of undefined" instead of pointing at
+// the actual cause.
+export class SecureContextRequiredError extends Error {
+  constructor() {
+    super('This needs a secure connection -- reload the page over https:// and try again.')
+    this.name = 'SecureContextRequiredError'
+  }
+}
+
 // MD5 isn't part of the Web Crypto API (it's cryptographically broken, so
 // browsers never implemented it there) -- js-md5 covers that one case, and
 // everything else goes through the browser's native, audited implementation.
 export async function computeHash(data: ArrayBuffer, algorithm: HashAlgorithm): Promise<string> {
   if (algorithm === 'MD5') {
     return md5(data)
+  }
+  if (!crypto.subtle) {
+    throw new SecureContextRequiredError()
   }
   const digest = await crypto.subtle.digest(algorithm, data)
   return bufferToHex(digest)

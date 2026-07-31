@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Select } from '../../../components/ui/Select'
-import { computeHash, HASH_ALGORITHMS, type HashAlgorithm } from '../../../lib/calculations/hash'
+import {
+  computeHash,
+  HASH_ALGORITHMS,
+  SecureContextRequiredError,
+  type HashAlgorithm,
+} from '../../../lib/calculations/hash'
 
 export function HashGenerator() {
   const [mode, setMode] = useState<'text' | 'file'>('text')
@@ -30,8 +35,12 @@ export function HashGenerator() {
         }
         const result = await computeHash(buffer as ArrayBuffer, algorithm)
         if (!cancelled) setHash(result)
-      } catch {
-        if (!cancelled) setError('Could not hash that input.')
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof SecureContextRequiredError ? err.message : 'Could not hash that input.',
+          )
+        }
       }
     }
 

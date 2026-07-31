@@ -3,7 +3,12 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
-import { verifyHash, HASH_ALGORITHMS, type HashAlgorithm } from '../../../lib/calculations/hash'
+import {
+  verifyHash,
+  HASH_ALGORITHMS,
+  SecureContextRequiredError,
+  type HashAlgorithm,
+} from '../../../lib/calculations/hash'
 
 export function HashVerifier() {
   const [text, setText] = useState('Hello, PacketNova!')
@@ -11,16 +16,30 @@ export function HashVerifier() {
   const [algorithm, setAlgorithm] = useState<HashAlgorithm>('SHA-256')
   const [computed, setComputed] = useState<string | null>(null)
   const [matches, setMatches] = useState<boolean | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
 
     async function run() {
-      const buffer = new TextEncoder().encode(text).buffer as ArrayBuffer
-      const result = await verifyHash(buffer, algorithm, expected)
-      if (!cancelled) {
-        setComputed(result.computed)
-        setMatches(expected.trim() ? result.matches : null)
+      setError(null)
+      try {
+        const buffer = new TextEncoder().encode(text).buffer as ArrayBuffer
+        const result = await verifyHash(buffer, algorithm, expected)
+        if (!cancelled) {
+          setComputed(result.computed)
+          setMatches(expected.trim() ? result.matches : null)
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setComputed(null)
+          setMatches(null)
+          setError(
+            err instanceof SecureContextRequiredError
+              ? err.message
+              : 'Could not verify that input.',
+          )
+        }
       }
     }
 
@@ -81,13 +100,17 @@ export function HashVerifier() {
         </div>
       }
       result={
-        <dl>
-          <ResultRow label="Computed" value={computed ?? '...'} />
-          <ResultRow
-            label="Match?"
-            value={matches === null ? 'Enter an expected hash' : matches ? 'Yes' : 'No'}
-          />
-        </dl>
+        error ? (
+          <p className="text-sm text-danger">{error}</p>
+        ) : (
+          <dl>
+            <ResultRow label="Computed" value={computed ?? '...'} />
+            <ResultRow
+              label="Match?"
+              value={matches === null ? 'Enter an expected hash' : matches ? 'Yes' : 'No'}
+            />
+          </dl>
+        )
       }
     />
   )
