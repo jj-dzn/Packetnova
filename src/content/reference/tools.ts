@@ -100,22 +100,27 @@ export const toolCategories: ToolCategory[] = [
       {
         name: 'BGP route visualizer',
         description: 'Watch how BGP path attributes decide the route between two networks.',
+        slug: 'bgp-route-visualizer',
       },
       {
         name: 'Longest prefix match simulator',
         description: 'See which route wins when multiple entries in a routing table overlap.',
+        slug: 'longest-prefix-match-simulator',
       },
       {
         name: 'Route lookup simulator',
         description: 'Step through how a router picks the next hop for a destination address.',
+        slug: 'route-lookup-simulator',
       },
       {
         name: 'Administrative distance reference',
         description: 'Look up the default administrative distance for every routing source.',
+        slug: 'administrative-distance-reference',
       },
       {
         name: 'Metric comparison tool',
         description: 'Compare routing metrics across protocols on equal footing.',
+        slug: 'metric-comparison-tool',
       },
     ],
   },

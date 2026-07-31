@@ -17,6 +17,11 @@ import { TransferTimeCalculator } from './features/tools/vpn/TransferTimeCalcula
 import { BandwidthEstimator } from './features/tools/vpn/BandwidthEstimator'
 import { TunnelOverheadCalculator } from './features/tools/vpn/TunnelOverheadCalculator'
 import { PacketFragmentationCalculator } from './features/tools/vpn/PacketFragmentationCalculator'
+import { AdministrativeDistanceReference } from './features/tools/routing/AdministrativeDistanceReference'
+import { MetricComparisonTool } from './features/tools/routing/MetricComparisonTool'
+import { LpmSimulator } from './features/tools/routing/LpmSimulator'
+import { RouteLookupSimulator } from './features/tools/routing/RouteLookupSimulator'
+import { BgpBestPathSelector } from './features/tools/routing/BgpBestPathSelector'
 
 function App() {
   return (
@@ -43,6 +48,14 @@ function App() {
             path="/tools/packet-fragmentation-calculator"
             element={<PacketFragmentationCalculator />}
           />
+          <Route
+            path="/tools/administrative-distance-reference"
+            element={<AdministrativeDistanceReference />}
+          />
+          <Route path="/tools/metric-comparison-tool" element={<MetricComparisonTool />} />
+          <Route path="/tools/longest-prefix-match-simulator" element={<LpmSimulator />} />
+          <Route path="/tools/route-lookup-simulator" element={<RouteLookupSimulator />} />
+          <Route path="/tools/bgp-route-visualizer" element={<BgpBestPathSelector />} />
           <Route path="/visualizers" element={<ComingSoonPage title="Visualizers" />} />
           <Route path="/blog" element={<ComingSoonPage title="Blog" />} />
           <Route path="/search" element={<SearchPage />} />
