@@ -6,7 +6,12 @@ describe('formatMacAddress', () => {
     const result = formatMacAddress('00:1a:2b:3c:4d:5e')
     expect(result).toEqual({
       ok: true,
-      result: { colon: '00:1a:2b:3c:4d:5e', hyphen: '00-1a-2b-3c-4d-5e', dot: '001a.2b3c.4d5e' },
+      result: {
+        colon: '00:1a:2b:3c:4d:5e',
+        hyphen: '00-1a-2b-3c-4d-5e',
+        dot: '001a.2b3c.4d5e',
+        bytes: [0x00, 0x1a, 0x2b, 0x3c, 0x4d, 0x5e],
+      },
     })
   })
 

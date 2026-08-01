@@ -5,6 +5,7 @@ export interface MacFormatResult {
   colon: string
   hyphen: string
   dot: string
+  bytes: number[]
 }
 
 export function formatMacAddress(input: string): CalculationResult<MacFormatResult> {
@@ -19,6 +20,7 @@ export function formatMacAddress(input: string): CalculationResult<MacFormatResu
       colon: formatMac(parsed.bytes, 'colon'),
       hyphen: formatMac(parsed.bytes, 'hyphen'),
       dot: formatMac(parsed.bytes, 'dot'),
+      bytes: parsed.bytes,
     },
   }
 }

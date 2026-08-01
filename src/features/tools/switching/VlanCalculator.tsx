@@ -2,7 +2,19 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
+import { Pill } from '../../../components/ui/Pill'
 import { calculateVlan } from '../../../lib/calculations/vlan'
+
+function buildVlanCliSnippet(vlanId: number): string {
+  return [
+    `vlan ${vlanId}`,
+    ` name VLAN${vlanId}`,
+    '!',
+    'interface GigabitEthernet0/1',
+    ' switchport mode access',
+    ` switchport access vlan ${vlanId}`,
+  ].join('\n')
+}
 
 // A simple, schematic version for now -- proper router/switch icon
 // primitives are a shared-diagram-system concern (a later roadmap
@@ -45,6 +57,7 @@ function TrunkDiagram({ vlanId, hex }: { vlanId: number; hex: string }) {
 
 export function VlanCalculator() {
   const [vlanId, setVlanId] = useState('100')
+  const [showCli, setShowCli] = useState(false)
 
   const calc = calculateVlan(Number(vlanId))
 
@@ -75,6 +88,16 @@ export function VlanCalculator() {
             </dl>
             {calc.result.note && <p className="text-xs text-fg-subtle">{calc.result.note}</p>}
             <TrunkDiagram vlanId={calc.result.vlanId} hex={calc.result.hex} />
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} Cisco IOS config (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildVlanCliSnippet(calc.result.vlanId)}
+                </pre>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

@@ -55,6 +55,7 @@ export function DnsRecordReference() {
           { key: 'type', label: 'Type', mono: true },
           { key: 'description', label: 'Description' },
           { key: 'example', label: 'Example', mono: true },
+          { key: 'rfc', label: 'RFC', mono: true },
         ]}
         rows={dnsRecordTypes}
       />

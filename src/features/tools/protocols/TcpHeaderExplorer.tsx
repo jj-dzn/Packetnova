@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { ReferencePageLayout } from '../ReferencePageLayout'
 import { ResultRow } from '../ResultRow'
 import { HeaderByteDiagram } from '../HeaderByteDiagram'
+import { RfcFootnote } from '../RfcFootnote'
+import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
 import { DataTable } from '../../../components/ui/DataTable'
@@ -12,6 +14,11 @@ import {
 } from '../../../lib/calculations/tcpFlags'
 import { tcpHeaderFields } from '../../../content/reference/tcpHeaderFields'
 import type { HeaderField } from '../../../content/reference/tcpHeaderFields'
+
+// A round trip long enough to be a realistic "high BDP" path (satellite,
+// long-haul WAN) without needing the visitor to enter their own RTT --
+// illustrative, not derived from any of the tool's other inputs.
+const ILLUSTRATIVE_RTT_MS = 100
 
 const FLAG_LABELS: { key: keyof TcpFlags; label: string }[] = [
   { key: 'urg', label: 'URG' },
@@ -219,6 +226,23 @@ export function TcpHeaderExplorer() {
             ) : (
               <p className="text-sm text-danger">{headerCalc.error}</p>
             )}
+            {Number(windowSize) > 0 && (
+              <div className="lg:col-span-2">
+                <Aside>
+                  Window size caps how much unacknowledged data can be in flight at once, so it's
+                  also a hard ceiling on throughput once a path's latency gets long enough: max
+                  throughput works out to window size divided by round-trip time, regardless of how
+                  fast the link itself is. At a {windowSize}-byte window over a{' '}
+                  {ILLUSTRATIVE_RTT_MS}ms round trip -- not unusual for a satellite or long-haul WAN
+                  path -- that caps out around{' '}
+                  {((Number(windowSize) * 8) / (ILLUSTRATIVE_RTT_MS / 1000) / 1_000_000).toFixed(2)}{' '}
+                  Mbps, no matter how much bandwidth is actually available. TCP window scaling (RFC
+                  7323) is what lifts the classic 16-bit, 65,535-byte ceiling this field implies --
+                  without it, that number above is the hard limit on any single connection over this
+                  path.
+                </Aside>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -232,6 +256,10 @@ export function TcpHeaderExplorer() {
         ]}
         rows={tcpHeaderFields}
       />
+      <RfcFootnote>
+        Defined in RFC 793 -- RFC 9293 is the current consolidated specification, folding in decades
+        of clarifications and errata without changing the wire format.
+      </RfcFootnote>
     </ReferencePageLayout>
   )
 }

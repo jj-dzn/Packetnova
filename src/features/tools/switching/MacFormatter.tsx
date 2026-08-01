@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { MacBinaryBreakdown } from './MacBinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
+import { Pill } from '../../../components/ui/Pill'
 import { formatMacAddress } from '../../../lib/calculations/macFormat'
 
 export function MacFormatter() {
   const [input, setInput] = useState('00:1a:2b:3c:4d:5e')
+  const [showBinary, setShowBinary] = useState(false)
 
   const calc = formatMacAddress(input)
 
@@ -30,11 +33,23 @@ export function MacFormatter() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow label="Colon" value={calc.result.colon} />
-            <ResultRow label="Hyphen" value={calc.result.hyphen} />
-            <ResultRow label="Dot (Cisco)" value={calc.result.dot} />
-          </dl>
+          <div className="flex flex-col gap-3">
+            <dl>
+              <ResultRow label="Colon" value={calc.result.colon} />
+              <ResultRow label="Hyphen" value={calc.result.hyphen} />
+              <ResultRow label="Dot (Cisco)" value={calc.result.dot} />
+            </dl>
+            <div>
+              <Pill active={showBinary} onClick={() => setShowBinary((v) => !v)}>
+                {showBinary ? 'Hide' : 'Show'} binary (expert)
+              </Pill>
+              {showBinary && (
+                <div className="mt-3">
+                  <MacBinaryBreakdown bytes={calc.result.bytes} />
+                </div>
+              )}
+            </div>
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

@@ -1,4 +1,5 @@
 import { ReferencePageLayout } from '../ReferencePageLayout'
+import { RfcFootnote } from '../RfcFootnote'
 import { HeaderByteDiagram } from '../HeaderByteDiagram'
 import { DataTable } from '../../../components/ui/DataTable'
 import { udpHeaderFields } from '../../../content/reference/udpHeaderFields'
@@ -23,6 +24,7 @@ export function UdpHeaderExplorer() {
         ]}
         rows={udpHeaderFields}
       />
+      <RfcFootnote>Defined in RFC 768.</RfcFootnote>
     </ReferencePageLayout>
   )
 }

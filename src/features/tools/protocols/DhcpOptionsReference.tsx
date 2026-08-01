@@ -1,4 +1,5 @@
 import { ReferencePageLayout } from '../ReferencePageLayout'
+import { RfcFootnote } from '../RfcFootnote'
 import { DataTable } from '../../../components/ui/DataTable'
 import { dhcpOptions, type DhcpOptionEntry } from '../../../content/reference/dhcpOptions'
 
@@ -18,6 +19,7 @@ export function DhcpOptionsReference() {
         ]}
         rows={dhcpOptions}
       />
+      <RfcFootnote>Defined in RFC 2132.</RfcFootnote>
     </ReferencePageLayout>
   )
 }

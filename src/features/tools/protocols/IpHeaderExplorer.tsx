@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { ReferencePageLayout } from '../ReferencePageLayout'
 import { ResultRow } from '../ResultRow'
+import { RfcFootnote } from '../RfcFootnote'
 import { HeaderByteDiagram } from '../HeaderByteDiagram'
 import { DataTable } from '../../../components/ui/DataTable'
 import { calculateIpFlags, type IpFlags } from '../../../lib/calculations/ipFlags'
@@ -80,6 +81,7 @@ export function IpHeaderExplorer() {
         ]}
         rows={ipHeaderFields}
       />
+      <RfcFootnote>Defined in RFC 791.</RfcFootnote>
     </ReferencePageLayout>
   )
 }

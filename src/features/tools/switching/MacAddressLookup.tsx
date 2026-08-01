@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { MacBinaryBreakdown } from './MacBinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
+import { Pill } from '../../../components/ui/Pill'
 import { lookupMac } from '../../../lib/calculations/macLookup'
 
 export function MacAddressLookup() {
   const [input, setInput] = useState('00:00:0c:12:34:56')
+  const [showBinary, setShowBinary] = useState(false)
 
   const calc = lookupMac(input)
 
@@ -48,6 +51,16 @@ export function MacAddressLookup() {
               Vendor lookup covers a small, individually-verified set of well-known OUIs, not the
               full ~50,000-entry IEEE registry.
             </p>
+            <div>
+              <Pill active={showBinary} onClick={() => setShowBinary((v) => !v)}>
+                {showBinary ? 'Hide' : 'Show'} binary (expert)
+              </Pill>
+              {showBinary && (
+                <div className="mt-3">
+                  <MacBinaryBreakdown bytes={calc.result.bytes} />
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

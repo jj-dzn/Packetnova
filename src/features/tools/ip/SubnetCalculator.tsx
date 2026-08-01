@@ -6,13 +6,31 @@ import { BinaryBreakdown } from './BinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { Pill } from '../../../components/ui/Pill'
-import { calculateSubnets } from '../../../lib/calculations/subnet'
+import { calculateSubnets, type SubnetInfo } from '../../../lib/calculations/subnet'
 import {
   calculateVlsm,
   type VlsmAllocation,
   type VlsmRequest,
 } from '../../../lib/calculations/vlsm'
-import { parseCIDR } from '../../../lib/validation/ip'
+import { ipv4ToString, parseCIDR, prefixLengthToSubnetMask } from '../../../lib/validation/ip'
+
+function buildEqualCliSnippet(subnets: SubnetInfo[], mask: string): string {
+  return subnets
+    .map(
+      (subnet, index) =>
+        `interface Vlan${index + 1}\n description ${subnet.cidr}\n ip address ${subnet.firstUsable ?? 'n/a'} ${mask}`,
+    )
+    .join('\n!\n')
+}
+
+function buildVlsmCliSnippet(allocations: VlsmAllocation[]): string {
+  return allocations
+    .map((allocation) => {
+      const mask = ipv4ToString(prefixLengthToSubnetMask(allocation.prefixLength).value)
+      return `interface Vlan${allocation.id}\n description ${allocation.label || 'Unnamed subnet'}\n ip address ${allocation.firstUsable ?? 'n/a'} ${mask}`
+    })
+    .join('\n!\n')
+}
 
 // VLSM allocates largest-request-first to minimize fragmentation of the
 // base block (see vlsm.ts) -- the guided walkthrough steps through that
@@ -70,6 +88,7 @@ type Mode = 'equal' | 'vlsm'
 export function SubnetCalculator() {
   const [mode, setMode] = useState<Mode>('equal')
   const [cidrInput, setCidrInput] = useState('192.168.1.0/24')
+  const [showCli, setShowCli] = useState(false)
 
   const [newPrefixInput, setNewPrefixInput] = useState('26')
   const equalCalc = calculateSubnets(cidrInput, Number(newPrefixInput))
@@ -226,6 +245,16 @@ export function SubnetCalculator() {
                   </tbody>
                 </table>
               </div>
+              <div>
+                <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                  {showCli ? 'Hide' : 'Show'} Cisco IOS config (expert)
+                </Pill>
+                {showCli && (
+                  <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                    {buildEqualCliSnippet(equalCalc.result.subnets, equalCalc.result.subnetMask)}
+                  </pre>
+                )}
+              </div>
             </div>
           ) : (
             <p className="text-sm text-danger">{equalCalc.error}</p>
@@ -294,6 +323,16 @@ export function SubnetCalculator() {
                     })}
                   </tbody>
                 </table>
+              </div>
+              <div>
+                <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                  {showCli ? 'Hide' : 'Show'} Cisco IOS config (expert)
+                </Pill>
+                {showCli && (
+                  <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                    {buildVlsmCliSnippet(vlsmCalc.result.allocations)}
+                  </pre>
+                )}
               </div>
             </div>
           </GuidedMode>

@@ -17,6 +17,7 @@ export function TlsVersionExplorer() {
           { key: 'year', label: 'Year', mono: true },
           { key: 'status', label: 'Status' },
           { key: 'notes', label: 'Notes' },
+          { key: 'rfc', label: 'RFC', mono: true },
         ]}
         rows={tlsVersions}
       />

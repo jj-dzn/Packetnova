@@ -1,4 +1,5 @@
 import { ReferencePageLayout } from '../ReferencePageLayout'
+import { RfcFootnote } from '../RfcFootnote'
 import { DataTable } from '../../../components/ui/DataTable'
 import { icmpTypes, type IcmpEntry } from '../../../content/reference/icmpTypes'
 
@@ -18,6 +19,10 @@ export function IcmpExplorer() {
         ]}
         rows={icmpTypes}
       />
+      <RfcFootnote>
+        Defined in RFC 792 -- this covers ICMPv4. ICMPv6 is a separate, larger specification (RFC
+        4443), since IPv6 also folds in what IPv4 handled separately with ARP and IGMP.
+      </RfcFootnote>
     </ReferencePageLayout>
   )
 }

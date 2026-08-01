@@ -4,6 +4,7 @@ import { ResultRow } from '../ResultRow'
 import { BitToggleSandbox } from '../BitToggleSandbox'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
+import { Pill } from '../../../components/ui/Pill'
 import { convertBase } from '../../../lib/calculations/baseConverter'
 
 const MAX_SANDBOX_VALUE = 0xffffffff
@@ -11,8 +12,13 @@ const MAX_SANDBOX_VALUE = 0xffffffff
 export function BaseConverterTool() {
   const [value, setValue] = useState('255')
   const [fromBase, setFromBase] = useState<'2' | '8' | '10' | '16'>('10')
+  const [showCustomBase, setShowCustomBase] = useState(false)
+  const [customBase, setCustomBase] = useState('36')
 
   const calc = convertBase(value, Number(fromBase) as 2 | 8 | 10 | 16)
+  const customBaseNum = Number(customBase)
+  const customBaseValid =
+    Number.isInteger(customBaseNum) && customBaseNum >= 2 && customBaseNum <= 36
 
   return (
     <ToolPageLayout
@@ -73,6 +79,42 @@ export function BaseConverterTool() {
                 />
               </div>
             )}
+            <div className="border-t border-border pt-4">
+              <Pill active={showCustomBase} onClick={() => setShowCustomBase((v) => !v)}>
+                {showCustomBase ? 'Hide' : 'Show'} custom base (expert)
+              </Pill>
+              {showCustomBase && (
+                <div className="mt-3 flex flex-col gap-3">
+                  <div>
+                    <label htmlFor="base-custom" className="text-sm font-medium">
+                      Custom base (2-36)
+                    </label>
+                    <Input
+                      id="base-custom"
+                      type="number"
+                      min={2}
+                      max={36}
+                      className="mt-2 w-24"
+                      value={customBase}
+                      onChange={(e) => setCustomBase(e.target.value)}
+                    />
+                  </div>
+                  {customBaseValid ? (
+                    <ResultRow
+                      label={`Base ${customBaseNum}`}
+                      value={Number(calc.result.decimal).toString(customBaseNum)}
+                    />
+                  ) : (
+                    <p className="text-sm text-danger">Base must be a whole number from 2 to 36.</p>
+                  )}
+                  <p className="text-xs text-fg-subtle">
+                    Base 36 uses every digit 0-9 plus letters a-z -- the largest radix a single
+                    character can represent without inventing new symbols, and the ceiling
+                    JavaScript's own number formatting supports.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

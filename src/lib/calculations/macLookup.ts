@@ -8,6 +8,7 @@ export interface MacLookupResult {
   isMulticast: boolean
   isLocallyAdministered: boolean
   vendor: string | null
+  bytes: number[]
 }
 
 export function lookupMac(input: string): CalculationResult<MacLookupResult> {
@@ -28,6 +29,7 @@ export function lookupMac(input: string): CalculationResult<MacLookupResult> {
       isMulticast: isMulticast(b0),
       isLocallyAdministered: isLocallyAdministered(b0),
       vendor: knownOuis[oui] ?? null,
+      bytes: parsed.bytes,
     },
   }
 }

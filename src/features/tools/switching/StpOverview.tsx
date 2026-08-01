@@ -4,6 +4,7 @@ import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
+import { Pill } from '../../../components/ui/Pill'
 import { TopologyCanvas, type TopologyEdge, type TopologyNode } from '../../diagram/TopologyCanvas'
 import {
   computeStpPortRoles,
@@ -42,8 +43,18 @@ const EXAMPLE_POSITIONS: Record<string, { x: number; y: number }> = {
   D: { x: 75, y: 180 },
 }
 
+function buildStpCliSnippet(bridges: BridgeCandidate[], rootBridgeId: string): string {
+  return bridges
+    .map((bridge) => {
+      const header = `! ${bridge.id}${bridge.id === rootBridgeId ? ' (elected root)' : ''}`
+      return `${header}\nspanning-tree vlan 1 priority ${bridge.priority}`
+    })
+    .join('\n\n')
+}
+
 export function StpOverview() {
   const [bridges, setBridges] = useState<BridgeCandidate[]>(DEFAULT_BRIDGES)
+  const [showCli, setShowCli] = useState(false)
 
   const calc = electRootBridge(bridges)
 
@@ -113,10 +124,22 @@ export function StpOverview() {
         }
         result={
           calc.ok ? (
-            <dl>
-              <ResultRow label="Root bridge" value={calc.result.rootBridgeId} />
-              <ResultRow label="Decided by" value={calc.result.decidedBy} />
-            </dl>
+            <div className="flex flex-col gap-4">
+              <dl>
+                <ResultRow label="Root bridge" value={calc.result.rootBridgeId} />
+                <ResultRow label="Decided by" value={calc.result.decidedBy} />
+              </dl>
+              <div>
+                <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                  {showCli ? 'Hide' : 'Show'} Cisco IOS config (expert)
+                </Pill>
+                {showCli && (
+                  <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                    {buildStpCliSnippet(bridges, calc.result.rootBridgeId)}
+                  </pre>
+                )}
+              </div>
+            </div>
           ) : (
             <p className="text-sm text-danger">{calc.error}</p>
           )

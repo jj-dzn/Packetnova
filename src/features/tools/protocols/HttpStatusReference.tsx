@@ -1,4 +1,5 @@
 import { ReferencePageLayout } from '../ReferencePageLayout'
+import { RfcFootnote } from '../RfcFootnote'
 import { DataTable } from '../../../components/ui/DataTable'
 import { Badge } from '../../../components/ui/Badge'
 import { httpStatusCodes, type HttpStatusEntry } from '../../../content/reference/httpStatusCodes'
@@ -38,6 +39,10 @@ export function HttpStatusReference() {
         ]}
         rows={httpStatusCodes}
       />
+      <RfcFootnote>
+        Defined in RFC 9110 (HTTP Semantics) -- the current consolidated specification, obsoleting
+        RFC 7231 and the older RFC 2616.
+      </RfcFootnote>
     </ReferencePageLayout>
   )
 }
