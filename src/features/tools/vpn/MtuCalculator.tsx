@@ -56,6 +56,26 @@ export function MtuCalculator() {
               value={payload}
               onChange={(e) => setPayload(e.target.value)}
             />
+            <input
+              type="range"
+              aria-label="Payload size to test, drag to explore"
+              min={0}
+              max={9000}
+              step={1}
+              value={Math.min(9000, Math.max(0, Number(payload) || 0))}
+              onChange={(e) => setPayload(e.target.value)}
+              className="mt-3 w-full accent-accent"
+            />
+            <div className="relative mt-1 h-3 text-[10px] text-fg-subtle">
+              <span className="absolute left-0">0</span>
+              {/* 1500/9000 -- positioned to its actual place on the scale,
+                  not the visual midpoint, so it stays an honest reference
+                  point rather than just decoration. */}
+              <span className="absolute -translate-x-1/2" style={{ left: '16.7%' }}>
+                1500
+              </span>
+              <span className="absolute right-0">9000 (jumbo)</span>
+            </div>
           </div>
         </div>
       }

@@ -4,6 +4,45 @@ import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { calculateVlan } from '../../../lib/calculations/vlan'
 
+// A simple, schematic version for now -- proper router/switch icon
+// primitives are a shared-diagram-system concern (a later roadmap
+// milestone), not something to invent one-off here. This still makes the
+// tagged-vs-untagged distinction concrete: the frame only carries a VLAN
+// tag while it's on the trunk between switches, not on the access links to
+// each end host.
+function TrunkDiagram({ vlanId, hex }: { vlanId: number; hex: string }) {
+  return (
+    <div className="flex items-center gap-1 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-[11px]">
+      <div className="shrink-0 rounded-md border border-border bg-surface px-2 py-3 text-center text-fg-muted">
+        PC
+      </div>
+      <div className="flex flex-1 flex-col items-center gap-0.5">
+        <span className="whitespace-nowrap text-fg-subtle">untagged</span>
+        <div className="h-px w-full bg-border" />
+      </div>
+      <div className="shrink-0 rounded-md border border-accent-alt/40 bg-accent-alt/10 px-2 py-3 text-center text-accent-alt">
+        Switch A
+      </div>
+      <div className="flex flex-[2] flex-col items-center gap-0.5">
+        <span className="whitespace-nowrap text-accent">
+          802.1Q trunk -- VLAN {vlanId} ({hex}) tagged
+        </span>
+        <div className="h-0.5 w-full bg-accent" />
+      </div>
+      <div className="shrink-0 rounded-md border border-accent-alt/40 bg-accent-alt/10 px-2 py-3 text-center text-accent-alt">
+        Switch B
+      </div>
+      <div className="flex flex-1 flex-col items-center gap-0.5">
+        <span className="whitespace-nowrap text-fg-subtle">untagged</span>
+        <div className="h-px w-full bg-border" />
+      </div>
+      <div className="shrink-0 rounded-md border border-border bg-surface px-2 py-3 text-center text-fg-muted">
+        PC
+      </div>
+    </div>
+  )
+}
+
 export function VlanCalculator() {
   const [vlanId, setVlanId] = useState('100')
 
@@ -35,6 +74,7 @@ export function VlanCalculator() {
               <ResultRow label="Category" value={calc.result.category} />
             </dl>
             {calc.result.note && <p className="text-xs text-fg-subtle">{calc.result.note}</p>}
+            <TrunkDiagram vlanId={calc.result.vlanId} hex={calc.result.hex} />
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

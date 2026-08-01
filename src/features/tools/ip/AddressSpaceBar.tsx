@@ -4,6 +4,14 @@ interface AddressSpaceBarProps {
   firstUsable: string | null
   lastUsable: string | null
   usableHosts: number
+  /** Numeric bounds + the address currently being inspected -- when all
+   * three are given, renders a marker showing exactly where it falls in
+   * the bar. Lets the CIDR calculator's bit-toggle sandbox visibly move
+   * something when toggling a host bit: the range itself doesn't change,
+   * but this marker does. */
+  currentValue?: number
+  networkValue?: number
+  broadcastValue?: number
 }
 
 // A single network's address range as a bar: network address and broadcast
@@ -20,6 +28,9 @@ export function AddressSpaceBar({
   firstUsable,
   lastUsable,
   usableHosts,
+  currentValue,
+  networkValue,
+  broadcastValue,
 }: AddressSpaceBarProps) {
   if (firstUsable === null) {
     return (
@@ -32,8 +43,20 @@ export function AddressSpaceBar({
   const showNetworkCap = firstUsable !== networkAddress
   const showBroadcastCap = lastUsable !== broadcastAddress
 
+  const canShowMarker =
+    currentValue !== undefined &&
+    networkValue !== undefined &&
+    broadcastValue !== undefined &&
+    broadcastValue > networkValue
+  const markerPercent = canShowMarker
+    ? Math.min(
+        100,
+        Math.max(0, ((currentValue! - networkValue!) / (broadcastValue! - networkValue!)) * 100),
+      )
+    : null
+
   return (
-    <div className="flex h-10 overflow-hidden rounded-md border border-border font-mono text-[11px]">
+    <div className="relative flex h-10 overflow-hidden rounded-md border border-border font-mono text-[11px]">
       {showNetworkCap && (
         <div
           className="flex w-24 shrink-0 items-center justify-center truncate border-r border-border bg-fg-subtle/10 px-1 text-fg-muted"
@@ -55,6 +78,14 @@ export function AddressSpaceBar({
         >
           {broadcastAddress}
         </div>
+      )}
+      {markerPercent !== null && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute top-0 h-full w-0.5 -translate-x-1/2 bg-fg shadow-[0_0_6px_1px_var(--color-accent)]"
+          style={{ left: `${markerPercent}%` }}
+          title="Current address"
+        />
       )}
     </div>
   )

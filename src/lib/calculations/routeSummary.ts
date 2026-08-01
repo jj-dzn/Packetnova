@@ -8,18 +8,30 @@ import {
 import { rangeToBlocks } from './ipRange'
 import type { CalculationResult } from './result'
 
+export interface RouteMergeGroup {
+  /** Original input lines that collapsed into this one contiguous span. */
+  inputs: string[]
+  /** The output CIDR block(s) covering that span -- more than one when the
+   * span doesn't land on a single power-of-2-aligned boundary. */
+  outputs: string[]
+}
+
 export interface RouteSummaryResult {
   inputCount: number
   summarizedRoutes: string[]
   reductionCount: number
+  /** Which inputs collapsed into which outputs -- the merge-map visual
+   * needs this grouping, not just the flat before/after counts. */
+  mergeGroups: RouteMergeGroup[]
 }
 
 interface AddressRange {
   start: number
   end: number
+  inputs: string[]
 }
 
-function parseLineToRange(line: string): AddressRange | null {
+function parseLineToRange(line: string): Omit<AddressRange, 'inputs'> | null {
   const cidr = parseCIDR(line)
   if (cidr) {
     const { ip, prefixLength } = cidr
@@ -40,7 +52,8 @@ function parseLineToRange(line: string): AddressRange | null {
 // Standard interval-merge: sort by start, then fold in any range that
 // starts at or before (end + 1) of the range being built -- "+1" so two
 // exactly-adjacent blocks (e.g. .0/25 and .128/25) merge into one span
-// instead of staying as separate neighbors.
+// instead of staying as separate neighbors. Each merged span keeps the
+// list of original input lines that fed into it, for the merge-map visual.
 function mergeRanges(ranges: AddressRange[]): AddressRange[] {
   const sorted = [...ranges].sort((a, b) => a.start - b.start)
   const merged: AddressRange[] = []
@@ -49,8 +62,9 @@ function mergeRanges(ranges: AddressRange[]): AddressRange[] {
     const last = merged[merged.length - 1]
     if (last && range.start <= last.end + 1) {
       last.end = Math.max(last.end, range.end)
+      last.inputs.push(...range.inputs)
     } else {
-      merged.push({ ...range })
+      merged.push({ ...range, inputs: [...range.inputs] })
     }
   }
 
@@ -73,15 +87,17 @@ export function summarizeRoutes(input: string): CalculationResult<RouteSummaryRe
     if (!range) {
       return { ok: false, error: `"${line}" is not a valid IP address or CIDR block.` }
     }
-    ranges.push(range)
+    ranges.push({ ...range, inputs: [line] })
   }
 
   const merged = mergeRanges(ranges)
-  const summarizedRoutes = merged.flatMap(({ start, end }) =>
-    rangeToBlocks(start, end).map(
+  const mergeGroups: RouteMergeGroup[] = merged.map(({ start, end, inputs }) => ({
+    inputs,
+    outputs: rangeToBlocks(start, end).map(
       ({ network, prefixLength }) => `${ipv4ToString(network)}/${prefixLength}`,
     ),
-  )
+  }))
+  const summarizedRoutes = mergeGroups.flatMap((group) => group.outputs)
 
   return {
     ok: true,
@@ -89,6 +105,7 @@ export function summarizeRoutes(input: string): CalculationResult<RouteSummaryRe
       inputCount: lines.length,
       summarizedRoutes,
       reductionCount: lines.length - summarizedRoutes.length,
+      mergeGroups,
     },
   }
 }

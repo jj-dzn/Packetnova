@@ -11,6 +11,24 @@ import {
   type BgpOrigin,
 } from '../../../lib/calculations/bgpBestPath'
 
+// Maps each trace step's name (from bgpBestPath.ts's STEPS) to the input
+// field it corresponds to -- hovering a trace row highlights that field
+// across every candidate card, so it's visually obvious which attribute a
+// step actually looked at instead of having to match the prose to the form.
+const STEP_TO_FIELD: Record<string, string> = {
+  'Highest weight': 'Weight',
+  'Highest local preference': 'Local pref',
+  'Locally originated': 'Locally originated',
+  'Shortest AS path': 'AS path length',
+  'Lowest origin type': 'Origin',
+  'Lowest MED': 'MED',
+  'eBGP over iBGP': 'Session',
+  'Lowest IGP metric to next hop': 'IGP metric',
+  'Oldest route': 'Route age (s)',
+  'Lowest router ID': 'Router ID',
+  'Lowest neighbor IP': 'Neighbor IP',
+}
+
 const DEFAULT_CANDIDATES: BgpCandidate[] = [
   {
     id: 'Path A',
@@ -42,9 +60,21 @@ const DEFAULT_CANDIDATES: BgpCandidate[] = [
   },
 ]
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field({
+  label,
+  highlighted = false,
+  children,
+}: {
+  label: string
+  highlighted?: boolean
+  children: ReactNode
+}) {
   return (
-    <label className="flex flex-col gap-1 text-xs font-medium text-fg-muted">
+    <label
+      className={`flex flex-col gap-1 rounded-sm text-xs font-medium transition-colors ${
+        highlighted ? 'text-accent' : 'text-fg-muted'
+      }`}
+    >
       {label}
       {children}
     </label>
@@ -54,8 +84,12 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 export function BgpBestPathSelector() {
   const [candidates, setCandidates] = useState<BgpCandidate[]>(DEFAULT_CANDIDATES)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [hoveredStep, setHoveredStep] = useState<string | null>(null)
 
   const calc = selectBgpBestPath(candidates)
+  const hoveredTrace =
+    calc.ok && hoveredStep ? calc.result.trace.find((t) => t.step === hoveredStep) : undefined
+  const highlightedField = hoveredStep ? STEP_TO_FIELD[hoveredStep] : undefined
 
   function updateCandidate(index: number, patch: Partial<BgpCandidate>) {
     setCandidates((current) => current.map((c, i) => (i === index ? { ...c, ...patch } : c)))
@@ -91,120 +125,135 @@ export function BgpBestPathSelector() {
           >
             {showAdvanced ? 'Hide' : 'Show'} advanced attributes
           </Pill>
-          {candidates.map((candidate, index) => (
-            <div key={index} className="rounded-md border border-border p-3">
-              <div className="mb-3 flex items-center justify-between">
-                <Input
-                  value={candidate.id}
-                  onChange={(e) => updateCandidate(index, { id: e.target.value })}
-                  className="max-w-[10rem] font-medium"
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => removeCandidate(index)}
-                  disabled={candidates.length <= 1}
-                  aria-label="Remove candidate"
-                >
-                  &times;
-                </Button>
+          {candidates.map((candidate, index) => {
+            const eliminatedAtHover =
+              hoveredTrace !== undefined && !hoveredTrace.remaining.includes(candidate.id)
+            return (
+              <div
+                key={index}
+                className={`rounded-md border border-border p-3 transition-opacity ${eliminatedAtHover ? 'opacity-40' : ''}`}
+              >
+                <div className="mb-3 flex items-center justify-between">
+                  <Input
+                    value={candidate.id}
+                    onChange={(e) => updateCandidate(index, { id: e.target.value })}
+                    className="max-w-[10rem] font-medium"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => removeCandidate(index)}
+                    disabled={candidates.length <= 1}
+                    aria-label="Remove candidate"
+                  >
+                    &times;
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  <Field label="Weight" highlighted={highlightedField === 'Weight'}>
+                    <Input
+                      value={candidate.weight}
+                      onChange={(e) => updateCandidate(index, { weight: Number(e.target.value) })}
+                    />
+                  </Field>
+                  <Field label="Local pref" highlighted={highlightedField === 'Local pref'}>
+                    <Input
+                      value={candidate.localPreference}
+                      onChange={(e) =>
+                        updateCandidate(index, { localPreference: Number(e.target.value) })
+                      }
+                    />
+                  </Field>
+                  <Field label="AS path length" highlighted={highlightedField === 'AS path length'}>
+                    <Input
+                      value={candidate.asPathLength}
+                      onChange={(e) =>
+                        updateCandidate(index, { asPathLength: Number(e.target.value) })
+                      }
+                    />
+                  </Field>
+                  <Field label="Origin" highlighted={highlightedField === 'Origin'}>
+                    <Select
+                      value={candidate.origin}
+                      onChange={(e) =>
+                        updateCandidate(index, { origin: e.target.value as BgpOrigin })
+                      }
+                    >
+                      <option value="igp">IGP</option>
+                      <option value="egp">EGP</option>
+                      <option value="incomplete">Incomplete</option>
+                    </Select>
+                  </Field>
+                  <Field label="MED" highlighted={highlightedField === 'MED'}>
+                    <Input
+                      value={candidate.med}
+                      onChange={(e) => updateCandidate(index, { med: Number(e.target.value) })}
+                    />
+                  </Field>
+                  <Field label="Session" highlighted={highlightedField === 'Session'}>
+                    <Select
+                      value={candidate.isEbgp ? 'ebgp' : 'ibgp'}
+                      onChange={(e) =>
+                        updateCandidate(index, { isEbgp: e.target.value === 'ebgp' })
+                      }
+                    >
+                      <option value="ebgp">eBGP</option>
+                      <option value="ibgp">iBGP</option>
+                    </Select>
+                  </Field>
+                  <Field label="IGP metric" highlighted={highlightedField === 'IGP metric'}>
+                    <Input
+                      value={candidate.igpMetricToNextHop}
+                      onChange={(e) =>
+                        updateCandidate(index, { igpMetricToNextHop: Number(e.target.value) })
+                      }
+                    />
+                  </Field>
+                  <Field
+                    label="Locally originated"
+                    highlighted={highlightedField === 'Locally originated'}
+                  >
+                    <Select
+                      value={candidate.locallyOriginated ? 'yes' : 'no'}
+                      onChange={(e) =>
+                        updateCandidate(index, { locallyOriginated: e.target.value === 'yes' })
+                      }
+                    >
+                      <option value="no">No</option>
+                      <option value="yes">Yes</option>
+                    </Select>
+                  </Field>
+                  {showAdvanced && (
+                    <>
+                      <Field
+                        label="Route age (s)"
+                        highlighted={highlightedField === 'Route age (s)'}
+                      >
+                        <Input
+                          value={candidate.routeAgeSeconds}
+                          onChange={(e) =>
+                            updateCandidate(index, { routeAgeSeconds: Number(e.target.value) })
+                          }
+                        />
+                      </Field>
+                      <Field label="Router ID" highlighted={highlightedField === 'Router ID'}>
+                        <Input
+                          value={candidate.routerId}
+                          onChange={(e) => updateCandidate(index, { routerId: e.target.value })}
+                        />
+                      </Field>
+                      <Field label="Neighbor IP" highlighted={highlightedField === 'Neighbor IP'}>
+                        <Input
+                          value={candidate.neighborIp}
+                          onChange={(e) => updateCandidate(index, { neighborIp: e.target.value })}
+                        />
+                      </Field>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                <Field label="Weight">
-                  <Input
-                    value={candidate.weight}
-                    onChange={(e) => updateCandidate(index, { weight: Number(e.target.value) })}
-                  />
-                </Field>
-                <Field label="Local pref">
-                  <Input
-                    value={candidate.localPreference}
-                    onChange={(e) =>
-                      updateCandidate(index, { localPreference: Number(e.target.value) })
-                    }
-                  />
-                </Field>
-                <Field label="AS path length">
-                  <Input
-                    value={candidate.asPathLength}
-                    onChange={(e) =>
-                      updateCandidate(index, { asPathLength: Number(e.target.value) })
-                    }
-                  />
-                </Field>
-                <Field label="Origin">
-                  <Select
-                    value={candidate.origin}
-                    onChange={(e) =>
-                      updateCandidate(index, { origin: e.target.value as BgpOrigin })
-                    }
-                  >
-                    <option value="igp">IGP</option>
-                    <option value="egp">EGP</option>
-                    <option value="incomplete">Incomplete</option>
-                  </Select>
-                </Field>
-                <Field label="MED">
-                  <Input
-                    value={candidate.med}
-                    onChange={(e) => updateCandidate(index, { med: Number(e.target.value) })}
-                  />
-                </Field>
-                <Field label="Session">
-                  <Select
-                    value={candidate.isEbgp ? 'ebgp' : 'ibgp'}
-                    onChange={(e) => updateCandidate(index, { isEbgp: e.target.value === 'ebgp' })}
-                  >
-                    <option value="ebgp">eBGP</option>
-                    <option value="ibgp">iBGP</option>
-                  </Select>
-                </Field>
-                <Field label="IGP metric">
-                  <Input
-                    value={candidate.igpMetricToNextHop}
-                    onChange={(e) =>
-                      updateCandidate(index, { igpMetricToNextHop: Number(e.target.value) })
-                    }
-                  />
-                </Field>
-                <Field label="Locally originated">
-                  <Select
-                    value={candidate.locallyOriginated ? 'yes' : 'no'}
-                    onChange={(e) =>
-                      updateCandidate(index, { locallyOriginated: e.target.value === 'yes' })
-                    }
-                  >
-                    <option value="no">No</option>
-                    <option value="yes">Yes</option>
-                  </Select>
-                </Field>
-                {showAdvanced && (
-                  <>
-                    <Field label="Route age (s)">
-                      <Input
-                        value={candidate.routeAgeSeconds}
-                        onChange={(e) =>
-                          updateCandidate(index, { routeAgeSeconds: Number(e.target.value) })
-                        }
-                      />
-                    </Field>
-                    <Field label="Router ID">
-                      <Input
-                        value={candidate.routerId}
-                        onChange={(e) => updateCandidate(index, { routerId: e.target.value })}
-                      />
-                    </Field>
-                    <Field label="Neighbor IP">
-                      <Input
-                        value={candidate.neighborIp}
-                        onChange={(e) => updateCandidate(index, { neighborIp: e.target.value })}
-                      />
-                    </Field>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
+            )
+          })}
           <Button type="button" variant="secondary" onClick={addCandidate} className="self-start">
             + Add candidate
           </Button>
@@ -230,7 +279,11 @@ export function BgpBestPathSelector() {
                     {calc.result.trace.map((step) => (
                       <tr
                         key={step.step}
-                        className="border-b border-border font-mono last:border-b-0"
+                        onMouseEnter={() => setHoveredStep(step.step)}
+                        onMouseLeave={() => setHoveredStep(null)}
+                        className={`border-b border-border font-mono transition-colors last:border-b-0 ${
+                          hoveredStep === step.step ? 'bg-accent/10' : ''
+                        }`}
                       >
                         <td className="px-3 py-2">{step.step}</td>
                         <td className="px-3 py-2">{step.remaining.join(', ')}</td>

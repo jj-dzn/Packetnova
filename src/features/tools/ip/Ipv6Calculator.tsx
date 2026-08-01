@@ -6,6 +6,56 @@ import { analyzeIPv6 } from '../../../lib/calculations/ipv6'
 import { calculateIpv6Subnets } from '../../../lib/calculations/ipv6Subnet'
 import { calculateEui64 } from '../../../lib/calculations/eui64'
 
+// IPv4 tools already have bit-level breakdowns (BinaryBreakdown); IPv6
+// never did, since laying out all 128 bits flat the same way would be
+// unreadable. Per-hextet disclosure instead: click a group to see just its
+// 16 bits, closing the same "this should be a picture, not just a string"
+// gap T3 already closed for IPv4.
+function HextetBreakdown({ expanded }: { expanded: string }) {
+  const hextets = expanded.split(':')
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+
+  return (
+    <div>
+      <p className="text-xs font-medium text-fg-muted">Expanded, hextet by hextet</p>
+      <div className="mt-1.5 flex flex-wrap gap-1.5">
+        {hextets.map((hextet, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => setOpenIndex((current) => (current === index ? null : index))}
+            aria-expanded={openIndex === index}
+            className={`rounded-md border px-2 py-1 font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+              openIndex === index
+                ? 'border-accent bg-accent/10 text-accent'
+                : 'border-border bg-bg text-fg hover:border-accent/40'
+            }`}
+          >
+            {hextet}
+          </button>
+        ))}
+      </div>
+      {openIndex !== null && (
+        <div className="mt-2 flex flex-wrap items-center gap-4 rounded-md border border-border bg-bg p-3">
+          <span className="text-xs text-fg-subtle">
+            Group {openIndex + 1} of 8 -- {hextets[openIndex]}
+          </span>
+          <div className="flex gap-3 font-mono text-sm">
+            {hextets[openIndex]!.split('').map((hexDigit, nibbleIndex) => (
+              <span key={nibbleIndex} className="flex flex-col items-center gap-1">
+                <span className="text-accent">
+                  {parseInt(hexDigit, 16).toString(2).padStart(4, '0')}
+                </span>
+                <span className="text-[10px] text-fg-subtle">{hexDigit}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function Ipv6Calculator() {
   const [input, setInput] = useState('2001:0db8:0000:0000:0000:ff00:0042:8329/64')
   const [newPrefixInput, setNewPrefixInput] = useState('80')
@@ -52,6 +102,8 @@ export function Ipv6Calculator() {
               />
               <ResultRow label="Address type" value={calc.result.addressType} />
             </dl>
+
+            <HextetBreakdown expanded={calc.result.expanded} />
 
             {hasBasePrefix && (
               <div className="flex flex-col gap-3 border-t border-border pt-4">

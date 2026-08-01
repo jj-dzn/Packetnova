@@ -40,10 +40,47 @@ export function RouteSummarizer() {
               />
               <ResultRow label="Reduction" value={`${calc.result.reductionCount} fewer routes`} />
             </dl>
-            <div className="max-h-80 overflow-y-auto rounded-md border border-border p-3 font-mono text-sm">
-              {calc.result.summarizedRoutes.map((route) => (
-                <p key={route}>{route}</p>
-              ))}
+            <div>
+              <p className="mb-2 text-sm font-medium text-fg-muted">
+                Merge map -- which inputs became which output
+              </p>
+              <div className="flex max-h-80 flex-col gap-1.5 overflow-y-auto">
+                {calc.result.mergeGroups.map((group, index) => {
+                  const merged = group.inputs.length > 1
+                  return (
+                    <div
+                      key={index}
+                      className={`flex flex-wrap items-center gap-2 rounded-md border p-2 text-xs ${
+                        merged ? 'border-accent/40 bg-accent/5' : 'border-border'
+                      }`}
+                    >
+                      <div className="flex flex-wrap gap-1">
+                        {group.inputs.map((input, inputIndex) => (
+                          <span
+                            key={inputIndex}
+                            className="rounded bg-fg-subtle/10 px-1.5 py-0.5 font-mono text-fg-muted"
+                          >
+                            {input}
+                          </span>
+                        ))}
+                      </div>
+                      <span aria-hidden="true" className="text-fg-subtle">
+                        &rarr;
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {group.outputs.map((output) => (
+                          <span
+                            key={output}
+                            className="rounded bg-accent/15 px-1.5 py-0.5 font-mono text-accent"
+                          >
+                            {output}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         ) : (

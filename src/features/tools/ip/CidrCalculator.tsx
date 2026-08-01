@@ -6,7 +6,7 @@ import { AddressSpaceBar } from './AddressSpaceBar'
 import { BitToggleSandbox } from '../BitToggleSandbox'
 import { Input } from '../../../components/ui/Input'
 import { calculateCidr } from '../../../lib/calculations/cidr'
-import { ipv4ToString } from '../../../lib/validation/ip'
+import { ipv4ToString, parseIPv4 } from '../../../lib/validation/ip'
 
 export function CidrCalculator() {
   const [input, setInput] = useState('192.168.1.0/24')
@@ -61,6 +61,9 @@ export function CidrCalculator() {
               firstUsable={calc.result.firstUsable}
               lastUsable={calc.result.lastUsable}
               usableHosts={calc.result.usableHosts}
+              currentValue={calc.result.ipValue}
+              networkValue={parseIPv4(calc.result.networkAddress)?.value}
+              broadcastValue={parseIPv4(calc.result.broadcastAddress)?.value}
             />
             <BinaryBreakdown
               label="Address in binary"
