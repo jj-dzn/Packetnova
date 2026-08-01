@@ -318,6 +318,9 @@ const VlanMisconfigurationScenario = lazy(() =>
     default: m.VlanMisconfigurationScenario,
   })),
 )
+const NetworkJourneyPage = lazy(() =>
+  import('./pages/NetworkJourneyPage').then((m) => ({ default: m.NetworkJourneyPage })),
+)
 const PingPet = lazy(() => import('./features/labs/PingPet').then((m) => ({ default: m.PingPet })))
 const RetroTerminal = lazy(() =>
   import('./features/labs/RetroTerminal').then((m) => ({ default: m.RetroTerminal })),
@@ -480,6 +483,7 @@ function App() {
             <Route path="/labs/packet-runner" element={<PacketRunner />} />
             <Route path="/terminal" element={<RetroTerminal />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/journey" element={<NetworkJourneyPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

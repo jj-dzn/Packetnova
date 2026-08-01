@@ -102,6 +102,11 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `About - ${SITE_TITLE}`,
     description: 'Why "nova" -- the idea behind PacketNova, and what it actually is.',
   },
+  '/journey': {
+    title: `Follow a packet's journey - ${SITE_TITLE}`,
+    description:
+      'One request, from your browser to a server across the internet -- every concept this site teaches separately, in the order it actually happens.',
+  },
 }
 
 const NOT_FOUND_META: PageMeta = {

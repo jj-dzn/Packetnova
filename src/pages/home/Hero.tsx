@@ -65,8 +65,11 @@ export function Hero() {
           visualizers -- all running in your browser, all free.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link to="/journey" className="pointer-events-auto">
+            <Button>Follow a packet's journey</Button>
+          </Link>
           <Link to="/tools" className="pointer-events-auto">
-            <Button>Browse tools</Button>
+            <Button variant="secondary">Browse tools</Button>
           </Link>
           <Link to="/visualizers" className="pointer-events-auto">
             <Button variant="secondary">Explore visualizers</Button>
