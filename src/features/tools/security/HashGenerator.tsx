@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
-import { ResultRow } from '../ResultRow'
 import { Select } from '../../../components/ui/Select'
+import { CopyButton } from '../../../components/ui/CopyButton'
 import {
   computeHash,
   HASH_ALGORITHMS,
@@ -9,13 +9,41 @@ import {
   type HashAlgorithm,
 } from '../../../lib/calculations/hash'
 
+function AvalancheHash({ hash, previousHash }: { hash: string; previousHash: string | null }) {
+  if (!previousHash || previousHash.length !== hash.length) {
+    return <span className="break-all font-mono">{hash}</span>
+  }
+  const changedCount = hash.split('').filter((c, i) => c !== previousHash[i]).length
+  return (
+    <span className="break-all font-mono">
+      {hash.split('').map((char, i) => (
+        <span
+          key={i}
+          className={
+            char !== previousHash[i] ? 'animate-pn-avalanche-flash text-accent' : undefined
+          }
+        >
+          {char}
+        </span>
+      ))}
+      {changedCount > 0 && (
+        <span className="ml-2 whitespace-nowrap font-sans text-xs text-fg-subtle">
+          ({Math.round((changedCount / hash.length) * 100)}% of characters changed)
+        </span>
+      )}
+    </span>
+  )
+}
+
 export function HashGenerator() {
   const [mode, setMode] = useState<'text' | 'file'>('text')
   const [text, setText] = useState('Hello, PacketNova!')
   const [file, setFile] = useState<File | null>(null)
   const [algorithm, setAlgorithm] = useState<HashAlgorithm>('SHA-256')
   const [hash, setHash] = useState<string | null>(null)
+  const [previousHash, setPreviousHash] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const hashRef = useRef<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -34,7 +62,11 @@ export function HashGenerator() {
           return
         }
         const result = await computeHash(buffer as ArrayBuffer, algorithm)
-        if (!cancelled) setHash(result)
+        if (!cancelled) {
+          setPreviousHash(hashRef.current)
+          hashRef.current = result
+          setHash(result)
+        }
       } catch (err) {
         if (!cancelled) {
           setError(
@@ -110,9 +142,15 @@ export function HashGenerator() {
         error ? (
           <p className="text-sm text-danger">{error}</p>
         ) : hash ? (
-          <dl>
-            <ResultRow label={algorithm} value={hash} />
-          </dl>
+          <div className="flex items-center justify-between gap-4 border-b border-border py-2">
+            <span className="shrink-0 text-sm text-fg-muted">{algorithm}</span>
+            <span className="flex min-w-0 items-center justify-end gap-1.5">
+              <span className="min-w-0 text-right text-sm">
+                <AvalancheHash hash={hash} previousHash={previousHash} />
+              </span>
+              <CopyButton value={hash} label={algorithm} />
+            </span>
+          </div>
         ) : (
           <p className="text-sm text-fg-muted">
             {mode === 'file' ? 'Choose a file to hash it.' : 'Computing...'}

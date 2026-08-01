@@ -51,6 +51,22 @@ export function PacketFragmentationCalculator() {
               />
               <ResultRow label="Fragments" value={String(calc.result.fragments.length)} />
             </dl>
+            <div className="flex h-10 gap-1">
+              {calc.result.fragments.map((fragment) => (
+                <div
+                  key={fragment.index}
+                  title={`Fragment ${fragment.index}: ${fragment.totalBytes} bytes`}
+                  style={{
+                    flexGrow: fragment.totalBytes,
+                    flexBasis: 0,
+                    animationDelay: `${(fragment.index - 1) * 90}ms`,
+                  }}
+                  className="animate-pn-fragment-peel flex min-w-0 items-center justify-center overflow-hidden rounded-sm border border-accent/40 bg-accent/10 px-1 text-center font-mono text-[11px] text-accent"
+                >
+                  <span className="truncate">#{fragment.index}</span>
+                </div>
+              ))}
+            </div>
             <div className="max-h-80 overflow-y-auto rounded-md border border-border">
               <table className="w-full text-left text-sm">
                 <thead className="sticky top-0 bg-surface">

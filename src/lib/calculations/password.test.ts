@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generatePassword } from './password'
+import { calculatePasswordEntropyBits, generatePassword } from './password'
 
 const allSets = { uppercase: true, lowercase: true, digits: true, symbols: true }
 
@@ -59,5 +59,47 @@ describe('generatePassword', () => {
   it('rejects an out-of-range length', () => {
     expect(generatePassword({ length: 0, ...allSets }).ok).toBe(false)
     expect(generatePassword({ length: 257, ...allSets }).ok).toBe(false)
+  })
+})
+
+describe('calculatePasswordEntropyBits', () => {
+  it('computes length * log2(charset size)', () => {
+    // digits-only, length 10: charset size 10, log2(10) ~= 3.3219
+    const bits = calculatePasswordEntropyBits({
+      length: 10,
+      uppercase: false,
+      lowercase: false,
+      digits: true,
+      symbols: false,
+    })
+    expect(bits).toBeCloseTo(10 * Math.log2(10), 5)
+  })
+
+  it('increases with a larger character set at the same length', () => {
+    const digitsOnly = calculatePasswordEntropyBits({
+      length: 12,
+      uppercase: false,
+      lowercase: false,
+      digits: true,
+      symbols: false,
+    })
+    const allSetsBits = calculatePasswordEntropyBits({ length: 12, ...allSets })
+    expect(allSetsBits).toBeGreaterThan(digitsOnly)
+  })
+
+  it('is 0 when no character set is selected', () => {
+    expect(
+      calculatePasswordEntropyBits({
+        length: 20,
+        uppercase: false,
+        lowercase: false,
+        digits: false,
+        symbols: false,
+      }),
+    ).toBe(0)
+  })
+
+  it('is 0 for a non-positive length', () => {
+    expect(calculatePasswordEntropyBits({ length: 0, ...allSets })).toBe(0)
   })
 })

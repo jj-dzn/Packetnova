@@ -59,6 +59,17 @@
 
   /* Ambient once-per-second pulse for the hero's latency orb. */
   --animate-pn-orb-pulse: pn-orb-pulse 1s ease-in-out infinite;
+
+  /* A fragment block separating from the original packet -- plays once per
+     mount, so React's default reconciliation (new fragment rows mount fresh
+     when the breakdown actually changes shape) is enough to replay it,
+     without needing key-remount tricks. */
+  --animate-pn-fragment-peel: pn-fragment-peel 400ms ease-out forwards;
+
+  /* A single hex character briefly highlighting -- used by the Hash
+     generator's avalanche-effect display to flag positions that changed
+     from the previous hash. */
+  --animate-pn-avalanche-flash: pn-avalanche-flash 700ms ease-out;
 }
 
 /* Rest a few percent short of the true 0%/100% edge -- a label's own text
@@ -162,6 +173,26 @@
   50% {
     transform: scale(1.35);
     opacity: 0.15;
+  }
+}
+
+@keyframes pn-fragment-peel {
+  from {
+    transform: translateY(-10px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pn-avalanche-flash {
+  0% {
+    background-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  }
+  100% {
+    background-color: transparent;
   }
 }
 

@@ -39,3 +39,19 @@ export function generatePassword(options: PasswordOptions): CalculationResult<st
 
   return { ok: true, result: password }
 }
+
+/**
+ * Entropy of the option space in bits (length * log2(charset size)) --
+ * deliberately independent of any specific generated password, so it can
+ * update live as options change, before the user generates anything.
+ */
+export function calculatePasswordEntropyBits(options: PasswordOptions): number {
+  const charsetSize =
+    (options.uppercase ? CHARSETS.uppercase.length : 0) +
+    (options.lowercase ? CHARSETS.lowercase.length : 0) +
+    (options.digits ? CHARSETS.digits.length : 0) +
+    (options.symbols ? CHARSETS.symbols.length : 0)
+
+  if (charsetSize === 0 || options.length <= 0) return 0
+  return options.length * Math.log2(charsetSize)
+}

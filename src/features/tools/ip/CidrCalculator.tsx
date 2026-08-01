@@ -3,8 +3,10 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
 import { AddressSpaceBar } from './AddressSpaceBar'
+import { BitToggleSandbox } from '../BitToggleSandbox'
 import { Input } from '../../../components/ui/Input'
 import { calculateCidr } from '../../../lib/calculations/cidr'
+import { ipv4ToString } from '../../../lib/validation/ip'
 
 export function CidrCalculator() {
   const [input, setInput] = useState('192.168.1.0/24')
@@ -66,6 +68,17 @@ export function CidrCalculator() {
               prefixLength={calc.result.prefixLength}
             />
             <p className="text-xs text-fg-subtle">{calc.result.classification.explanation}</p>
+            <div className="border-t border-border pt-4">
+              <p className="mb-2 text-sm font-medium text-fg-muted">Bit-toggle sandbox</p>
+              <BitToggleSandbox
+                value={calc.result.ipValue}
+                prefixLength={calc.result.prefixLength}
+                onToggle={(bitIndex) => {
+                  const newValue = (calc.result.ipValue ^ (1 << (31 - bitIndex))) >>> 0
+                  setInput(`${ipv4ToString(newValue)}/${calc.result.prefixLength}`)
+                }}
+              />
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

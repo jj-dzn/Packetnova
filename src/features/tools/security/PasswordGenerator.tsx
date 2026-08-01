@@ -3,7 +3,27 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { CopyButton } from '../../../components/ui/CopyButton'
-import { generatePassword } from '../../../lib/calculations/password'
+import { calculatePasswordEntropyBits, generatePassword } from '../../../lib/calculations/password'
+
+interface EntropyTier {
+  min: number
+  label: string
+  barClass: string
+}
+
+const ENTROPY_TIERS: EntropyTier[] = [
+  { min: 0, label: 'Very weak', barClass: 'bg-danger' },
+  { min: 28, label: 'Weak', barClass: 'bg-warning' },
+  { min: 36, label: 'Reasonable', barClass: 'bg-warning' },
+  { min: 60, label: 'Strong', barClass: 'bg-success' },
+  { min: 100, label: 'Very strong', barClass: 'bg-success' },
+]
+
+const ENTROPY_BAR_MAX_BITS = 128
+
+function entropyTier(bits: number): EntropyTier {
+  return [...ENTROPY_TIERS].reverse().find((tier) => bits >= tier.min) ?? ENTROPY_TIERS[0]!
+}
 
 export function PasswordGenerator() {
   const [length, setLength] = useState('20')
@@ -28,6 +48,16 @@ export function PasswordGenerator() {
   function regenerate() {
     setRegenerateNonce((n) => n + 1)
   }
+
+  const entropyBits = calculatePasswordEntropyBits({
+    length: Number(length),
+    uppercase,
+    lowercase,
+    digits,
+    symbols,
+  })
+  const tier = entropyTier(entropyBits)
+  const entropyPercent = Math.min(100, (entropyBits / ENTROPY_BAR_MAX_BITS) * 100)
 
   return (
     <ToolPageLayout
@@ -80,6 +110,20 @@ export function PasswordGenerator() {
               />
               Symbols (!@#$...)
             </label>
+          </div>
+          <div>
+            <div className="flex items-center justify-between text-xs text-fg-muted">
+              <span>Entropy</span>
+              <span className="font-mono">
+                {entropyBits.toFixed(1)} bits -- {tier.label}
+              </span>
+            </div>
+            <div className="mt-1 h-2 overflow-hidden rounded-full bg-border">
+              <div
+                className={`h-full rounded-full transition-[width] duration-300 ease-out ${tier.barClass}`}
+                style={{ width: `${entropyPercent}%` }}
+              />
+            </div>
           </div>
           <Button type="button" onClick={regenerate} className="self-start">
             Generate new password
