@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { SequenceDiagramContent, type SequenceStep } from './SequenceDiagramVisualizer'
+import { Pill } from '../../components/ui/Pill'
 
 const NORMAL_STEPS: SequenceStep[] = [
   {
@@ -151,30 +152,6 @@ const SCENARIOS: { key: Scenario; label: string; steps: SequenceStep[] }[] = [
   { key: 'syn-ack-lost', label: 'SYN-ACK lost', steps: SYN_ACK_LOST_STEPS },
 ]
 
-function ScenarioButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium ${
-        active
-          ? 'border-accent bg-accent/10 text-accent'
-          : 'border-border text-fg-muted hover:text-fg'
-      }`}
-    >
-      {label}
-    </button>
-  )
-}
-
 export function TcpHandshakeVisualizer() {
   const [scenario, setScenario] = useState<Scenario>('normal')
   const active = SCENARIOS.find((s) => s.key === scenario)!
@@ -191,12 +168,9 @@ export function TcpHandshakeVisualizer() {
     >
       <div className="mb-6 flex flex-wrap gap-2">
         {SCENARIOS.map((s) => (
-          <ScenarioButton
-            key={s.key}
-            label={s.label}
-            active={scenario === s.key}
-            onClick={() => setScenario(s.key)}
-          />
+          <Pill key={s.key} active={scenario === s.key} onClick={() => setScenario(s.key)}>
+            {s.label}
+          </Pill>
         ))}
       </div>
       <SequenceDiagramContent

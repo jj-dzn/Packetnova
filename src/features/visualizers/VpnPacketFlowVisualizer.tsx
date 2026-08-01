@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { MiddleboxFlowContent, type MiddleboxStep } from './MiddleboxFlowVisualizer'
 import { SequenceDiagramContent, type SequenceStep } from './SequenceDiagramVisualizer'
+import { Pill } from '../../components/ui/Pill'
 
 const CLIENT_ADDR = '10.0.0.5'
 const DEST_ADDR = '198.51.100.20:443'
@@ -85,30 +86,6 @@ const TRANSPORT_STEPS: SequenceStep[] = [
 
 type Mode = 'tunnel' | 'transport'
 
-function ModeButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium ${
-        active
-          ? 'border-accent bg-accent/10 text-accent'
-          : 'border-border text-fg-muted hover:text-fg'
-      }`}
-    >
-      {label}
-    </button>
-  )
-}
-
 export function VpnPacketFlowVisualizer() {
   const [mode, setMode] = useState<Mode>('tunnel')
 
@@ -123,16 +100,12 @@ export function VpnPacketFlowVisualizer() {
       }
     >
       <div className="mb-6 flex gap-2">
-        <ModeButton
-          label="Tunnel mode"
-          active={mode === 'tunnel'}
-          onClick={() => setMode('tunnel')}
-        />
-        <ModeButton
-          label="Transport mode"
-          active={mode === 'transport'}
-          onClick={() => setMode('transport')}
-        />
+        <Pill active={mode === 'tunnel'} onClick={() => setMode('tunnel')}>
+          Tunnel mode
+        </Pill>
+        <Pill active={mode === 'transport'} onClick={() => setMode('transport')}>
+          Transport mode
+        </Pill>
       </div>
 
       {mode === 'tunnel' ? (

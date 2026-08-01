@@ -4,35 +4,12 @@ import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
+import { Pill } from '../../../components/ui/Pill'
 import { calculateSubnets } from '../../../lib/calculations/subnet'
 import { calculateVlsm, type VlsmRequest } from '../../../lib/calculations/vlsm'
 import { parseCIDR } from '../../../lib/validation/ip'
 
 type Mode = 'equal' | 'vlsm'
-
-function ModeButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium ${
-        active
-          ? 'border-accent bg-accent/10 text-accent'
-          : 'border-border text-fg-muted hover:text-fg'
-      }`}
-    >
-      {label}
-    </button>
-  )
-}
 
 export function SubnetCalculator() {
   const [mode, setMode] = useState<Mode>('equal')
@@ -71,16 +48,12 @@ export function SubnetCalculator() {
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">
-            <ModeButton
-              label="Equal split"
-              active={mode === 'equal'}
-              onClick={() => setMode('equal')}
-            />
-            <ModeButton
-              label="Variable (VLSM)"
-              active={mode === 'vlsm'}
-              onClick={() => setMode('vlsm')}
-            />
+            <Pill active={mode === 'equal'} onClick={() => setMode('equal')}>
+              Equal split
+            </Pill>
+            <Pill active={mode === 'vlsm'} onClick={() => setMode('vlsm')}>
+              Variable (VLSM)
+            </Pill>
           </div>
 
           <div>
@@ -137,7 +110,7 @@ export function SubnetCalculator() {
                     type="button"
                     onClick={() => removeRequest(request.id)}
                     aria-label={`Remove ${request.label || 'subnet'}`}
-                    className="rounded-md border border-border px-2 py-2 text-xs text-fg-muted hover:border-danger hover:text-danger"
+                    className="rounded-md border border-border px-2 py-2 text-xs text-fg-muted hover:border-danger hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                   >
                     &times;
                   </button>

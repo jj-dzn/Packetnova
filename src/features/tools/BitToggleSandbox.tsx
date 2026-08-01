@@ -39,7 +39,7 @@ export function BitToggleSandbox({
                   type="button"
                   onClick={() => onToggle(bitIndex)}
                   aria-label={`Bit ${bitIndex}, currently ${bitValue}, click to toggle`}
-                  className={`flex h-7 w-6 items-center justify-center rounded-sm border font-mono text-xs transition-colors ${
+                  className={`flex h-7 w-6 items-center justify-center rounded-sm border font-mono text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                     bitValue
                       ? isNetworkBit
                         ? 'border-accent bg-accent/20 text-accent'

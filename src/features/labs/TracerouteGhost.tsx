@@ -3,6 +3,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { Input } from '../../components/ui/Input'
+import { Pill } from '../../components/ui/Pill'
 import { measureLatency, PING_TARGETS, type PingTarget } from '../../lib/labs/pingPet'
 import { generateHops, type GhostHop } from '../../lib/labs/tracerouteGhost'
 
@@ -123,22 +124,17 @@ export function TracerouteGhost() {
         <div className="flex w-full max-w-md flex-col gap-3">
           <div className="flex flex-wrap justify-center gap-2">
             {PING_TARGETS.map((option) => (
-              <button
+              <Pill
                 key={option.host}
-                type="button"
                 disabled={busy}
+                active={target.host === option.host && !customHost.trim()}
                 onClick={() => {
                   setTarget(option)
                   setCustomHost('')
                 }}
-                className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors disabled:opacity-50 ${
-                  target.host === option.host && !customHost.trim()
-                    ? 'border-accent bg-accent/10 text-accent'
-                    : 'border-border text-fg-muted hover:text-fg'
-                }`}
               >
                 {option.label}
-              </button>
+              </Pill>
             ))}
           </div>
 

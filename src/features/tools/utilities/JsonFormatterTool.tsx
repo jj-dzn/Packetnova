@@ -20,14 +20,14 @@ export function JsonFormatterTool() {
             <button
               type="button"
               onClick={() => setMode('pretty')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'pretty' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'pretty' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Pretty
             </button>
             <button
               type="button"
               onClick={() => setMode('minify')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'minify' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'minify' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Minify
             </button>

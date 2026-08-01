@@ -158,7 +158,7 @@ function LayerRow({
       type="button"
       onClick={onClick}
       style={{ height }}
-      className={`flex items-center justify-center px-2 text-center text-xs font-medium transition-colors ${bordered ? 'border-b border-border' : ''} ${
+      className={`flex items-center justify-center px-2 text-center text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset ${bordered ? 'border-b border-border' : ''} ${
         active
           ? 'bg-accent/10 text-accent'
           : highlighted

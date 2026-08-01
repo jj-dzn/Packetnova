@@ -11,9 +11,9 @@
   --color-fg-subtle: var(--pn-fg-subtle);
   --color-accent: var(--pn-accent);
   --color-accent-alt: var(--pn-accent-alt);
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
+  --color-success: var(--pn-success);
+  --color-warning: var(--pn-warning);
+  --color-danger: var(--pn-danger);
 
   --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono:
@@ -205,6 +205,13 @@
   --pn-fg-subtle: #64748b;
   --pn-accent: #7c3aed;
   --pn-accent-alt: #0d9488;
+  /* Darker than the dark-theme versions below -- at Badge's normal
+     bg-{tone}/10 tint, the vibrant dark-theme shades fall well under WCAG
+     AA (as low as 1.9:1) against light backgrounds. These clear 4.5:1
+     against both --pn-bg and --pn-surface. */
+  --pn-success: #0a7534;
+  --pn-warning: #945707;
+  --pn-danger: #c31a1a;
 }
 
 .dark {
@@ -216,6 +223,9 @@
   --pn-fg-subtle: #7c8598;
   --pn-accent: #8b7cff;
   --pn-accent-alt: #22d3ee;
+  --pn-success: #22c55e;
+  --pn-warning: #f59e0b;
+  --pn-danger: #ef4444;
 }
 
 body {

@@ -281,7 +281,7 @@ function RoutersPanel({
               onClick={() => onRemove(id)}
               disabled={!canRemove}
               aria-label={`Remove ${id}`}
-              className="text-fg-subtle hover:text-danger disabled:pointer-events-none disabled:opacity-30"
+              className="rounded text-fg-subtle hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:pointer-events-none disabled:opacity-30"
             >
               &times;
             </button>
@@ -339,7 +339,7 @@ function LinksPanel({
               type="button"
               onClick={() => onRemove(index)}
               aria-label={`Remove link ${edge.from}-${edge.to}`}
-              className="text-fg-subtle hover:text-danger"
+              className="rounded text-fg-subtle hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               &times;
             </button>

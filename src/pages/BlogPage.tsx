@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { Badge } from '../components/ui/Badge'
 import { Card } from '../components/ui/Card'
+import { Pill } from '../components/ui/Pill'
 import { blogPosts, allTags, formatPostDate } from '../lib/blog/posts'
 
 export function BlogPage() {
@@ -21,14 +22,22 @@ export function BlogPage() {
 
       {allTags.length > 0 && (
         <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
-          <TagButton label="All" active={activeTag === null} onClick={() => setActiveTag(null)} />
+          <Pill
+            active={activeTag === null}
+            onClick={() => setActiveTag(null)}
+            className="capitalize"
+          >
+            All
+          </Pill>
           {allTags.map((tag) => (
-            <TagButton
+            <Pill
               key={tag}
-              label={tag}
               active={activeTag === tag}
               onClick={() => setActiveTag(tag)}
-            />
+              className="capitalize"
+            >
+              {tag}
+            </Pill>
           ))}
         </div>
       )}
@@ -56,29 +65,5 @@ export function BlogPage() {
         </div>
       )}
     </div>
-  )
-}
-
-function TagButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium capitalize ${
-        active
-          ? 'border-accent bg-accent/10 text-accent'
-          : 'border-border text-fg-muted hover:border-accent/40 hover:text-fg'
-      }`}
-    >
-      {label}
-    </button>
   )
 }

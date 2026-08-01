@@ -75,7 +75,7 @@ export function BlueScreenButton() {
         <button
           type="button"
           onClick={trigger}
-          className="h-24 w-24 rounded-full bg-danger text-xs font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_0_32px_-6px_var(--color-danger)] transition-transform hover:scale-105 active:scale-95"
+          className="h-24 w-24 rounded-full bg-danger text-xs font-semibold text-white shadow-[0_0_0_1px_rgba(255,255,255,0.1),0_0_32px_-6px_var(--color-danger)] transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
         >
           DO NOT PRESS
         </button>

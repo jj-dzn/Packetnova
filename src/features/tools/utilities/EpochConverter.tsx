@@ -24,14 +24,14 @@ export function EpochConverter() {
             <button
               type="button"
               onClick={() => setMode('epochToDate')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'epochToDate' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'epochToDate' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Epoch to date
             </button>
             <button
               type="button"
               onClick={() => setMode('dateToEpoch')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'dateToEpoch' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'dateToEpoch' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Date to epoch
             </button>

@@ -52,18 +52,18 @@ export function LpmSimulator() {
           <div className="flex flex-col gap-2">
             <span className="text-sm font-medium">Routes</span>
             {routes.map((route, index) => (
-              <div key={index} className="flex gap-2">
+              <div key={index} className="flex flex-wrap gap-2">
                 <Input
                   value={route.cidr}
                   onChange={(e) => updateRoute(index, { cidr: e.target.value })}
                   placeholder="10.0.0.0/8"
-                  className="flex-1"
+                  className="min-w-[9rem] flex-1"
                 />
                 <Input
                   value={route.label}
                   onChange={(e) => updateRoute(index, { label: e.target.value })}
                   placeholder="Label"
-                  className="flex-1"
+                  className="min-w-[7rem] flex-1"
                 />
                 <Button
                   type="button"

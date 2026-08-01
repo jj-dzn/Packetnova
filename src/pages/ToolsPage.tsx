@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Badge } from '../components/ui/Badge'
 import { PreviewCard } from '../components/ui/PreviewCard'
+import { Pill } from '../components/ui/Pill'
 import { toolCategories } from '../content/reference/tools'
 
 const totalTools = toolCategories.reduce((count, category) => count + category.tools.length, 0)
@@ -30,18 +31,17 @@ export function ToolsPage() {
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-2">
-        <CategoryButton
-          label="All"
-          active={activeCategory === null}
-          onClick={() => setActiveCategory(null)}
-        />
+        <Pill active={activeCategory === null} onClick={() => setActiveCategory(null)}>
+          All
+        </Pill>
         {toolCategories.map((category) => (
-          <CategoryButton
+          <Pill
             key={category.slug}
-            label={`${category.label} (${category.tools.length})`}
             active={activeCategory === category.slug}
             onClick={() => setActiveCategory(category.slug)}
-          />
+          >
+            {category.label} ({category.tools.length})
+          </Pill>
         ))}
       </div>
 
@@ -67,29 +67,5 @@ export function ToolsPage() {
         ))}
       </div>
     </div>
-  )
-}
-
-function CategoryButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium ${
-        active
-          ? 'border-accent bg-accent/10 text-accent'
-          : 'border-border text-fg-muted hover:border-accent/40 hover:text-fg'
-      }`}
-    >
-      {label}
-    </button>
   )
 }

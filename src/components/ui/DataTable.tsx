@@ -43,6 +43,13 @@ export function DataTable<T>({
         placeholder={searchPlaceholder}
         aria-label={searchPlaceholder}
       />
+      {query && (
+        <p aria-live="polite" className="text-xs text-fg-subtle">
+          {filteredRows.length === 0
+            ? `No matches for "${query}"`
+            : `${filteredRows.length} of ${rows.length} row${rows.length === 1 ? '' : 's'} match`}
+        </p>
+      )}
       <div className="overflow-x-auto rounded-md border border-border">
         <table className="w-full text-left text-sm">
           <thead className="bg-surface">

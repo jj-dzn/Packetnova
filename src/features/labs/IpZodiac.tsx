@@ -56,7 +56,7 @@ export function IpZodiac() {
         <button
           type="button"
           onClick={handleSurprise}
-          className="text-sm font-medium text-accent hover:underline"
+          className="rounded text-sm font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           Surprise me with a random IP
         </button>

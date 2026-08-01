@@ -93,14 +93,14 @@ export function HashGenerator() {
             <button
               type="button"
               onClick={() => setMode('text')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'text' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'text' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Text
             </button>
             <button
               type="button"
               onClick={() => setMode('file')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'file' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'file' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               File
             </button>

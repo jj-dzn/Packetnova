@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { CopyableTextarea } from '../CopyableTextarea'
+import { Pill } from '../../../components/ui/Pill'
 import {
   convertJsonToYaml,
   convertYamlToJson,
@@ -15,30 +16,6 @@ const DEFAULT_JSON = JSON.stringify(
   null,
   2,
 )
-
-function ModeButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium ${
-        active
-          ? 'border-accent bg-accent/10 text-accent'
-          : 'border-border text-fg-muted hover:text-fg'
-      }`}
-    >
-      {label}
-    </button>
-  )
-}
 
 export function YamlFormatterTool() {
   const [mode, setMode] = useState<Mode>('format')
@@ -66,21 +43,15 @@ export function YamlFormatterTool() {
       input={
         <div className="flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">
-            <ModeButton
-              label="Format YAML"
-              active={mode === 'format'}
-              onClick={() => changeMode('format')}
-            />
-            <ModeButton
-              label="YAML → JSON"
-              active={mode === 'yaml-to-json'}
-              onClick={() => changeMode('yaml-to-json')}
-            />
-            <ModeButton
-              label="JSON → YAML"
-              active={mode === 'json-to-yaml'}
-              onClick={() => changeMode('json-to-yaml')}
-            />
+            <Pill active={mode === 'format'} onClick={() => changeMode('format')}>
+              Format YAML
+            </Pill>
+            <Pill active={mode === 'yaml-to-json'} onClick={() => changeMode('yaml-to-json')}>
+              YAML → JSON
+            </Pill>
+            <Pill active={mode === 'json-to-yaml'} onClick={() => changeMode('json-to-yaml')}>
+              JSON → YAML
+            </Pill>
           </div>
           <textarea
             value={isJsonInput ? jsonInput : yamlInput}

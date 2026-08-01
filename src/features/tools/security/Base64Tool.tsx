@@ -21,14 +21,14 @@ export function Base64Tool() {
             <button
               type="button"
               onClick={() => setMode('encode')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'encode' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'encode' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Encode
             </button>
             <button
               type="button"
               onClick={() => setMode('decode')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'decode' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'decode' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Decode
             </button>

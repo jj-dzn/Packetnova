@@ -119,7 +119,7 @@ function DuelPanel({
             type="button"
             disabled={disabled}
             onClick={() => onPick(option)}
-            className={`rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+            className={`rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50 ${
               side.target.host === option.host
                 ? 'border-accent bg-accent/10 text-accent'
                 : 'border-border text-fg-muted hover:text-fg'

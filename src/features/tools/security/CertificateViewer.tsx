@@ -3,6 +3,7 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Badge } from '../../../components/ui/Badge'
 import { CopyButton } from '../../../components/ui/CopyButton'
+import { Pill } from '../../../components/ui/Pill'
 import {
   parseCertificate,
   splitPemCertificates,
@@ -113,20 +114,15 @@ export function CertificateViewer() {
           {certResults.length > 1 && (
             <div className="flex flex-wrap gap-2">
               {certResults.map((result, index) => (
-                <button
+                <Pill
                   key={index}
-                  type="button"
+                  active={index === safeIndex}
                   onClick={() => setSelectedIndex(index)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium ${
-                    index === safeIndex
-                      ? 'border-accent bg-accent/10 text-accent'
-                      : 'border-border text-fg-muted hover:text-fg'
-                  }`}
                 >
                   {result.ok
                     ? chainLabel(index, certResults.length, result.result)
                     : `Certificate ${index + 1}`}
-                </button>
+                </Pill>
               ))}
             </div>
           )}

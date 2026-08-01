@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { MiddleboxFlowContent, type MiddleboxStep } from './MiddleboxFlowVisualizer'
+import { Pill } from '../../components/ui/Pill'
 
 const PRIVATE_ADDR = '192.168.1.10:5000'
 const PUBLIC_ADDR = '203.0.113.5:40001'
@@ -43,30 +44,6 @@ const STEPS: MiddleboxStep[] = [
 
 type Mode = 'static' | 'pat'
 
-function ModeButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string
-  active: boolean
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`rounded-full border px-3 py-1 text-xs font-medium ${
-        active
-          ? 'border-accent bg-accent/10 text-accent'
-          : 'border-border text-fg-muted hover:text-fg'
-      }`}
-    >
-      {label}
-    </button>
-  )
-}
-
 export function NatFlowVisualizer() {
   const [mode, setMode] = useState<Mode>('static')
 
@@ -81,16 +58,12 @@ export function NatFlowVisualizer() {
       }
     >
       <div className="mb-6 flex gap-2">
-        <ModeButton
-          label="Static NAT (1:1)"
-          active={mode === 'static'}
-          onClick={() => setMode('static')}
-        />
-        <ModeButton
-          label="PAT / NAT overload (many:1)"
-          active={mode === 'pat'}
-          onClick={() => setMode('pat')}
-        />
+        <Pill active={mode === 'static'} onClick={() => setMode('static')}>
+          Static NAT (1:1)
+        </Pill>
+        <Pill active={mode === 'pat'} onClick={() => setMode('pat')}>
+          PAT / NAT overload (many:1)
+        </Pill>
       </div>
 
       {mode === 'static' ? (

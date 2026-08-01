@@ -21,14 +21,14 @@ export function AsciiConverterTool() {
             <button
               type="button"
               onClick={() => setMode('textToCodes')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'textToCodes' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'textToCodes' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Text to codes
             </button>
             <button
               type="button"
               onClick={() => setMode('codesToText')}
-              className={`rounded-md border px-3 py-1.5 text-sm ${mode === 'codesToText' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
+              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'codesToText' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
             >
               Codes to text
             </button>
