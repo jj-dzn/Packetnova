@@ -8,6 +8,7 @@ import { useDarkMode } from '../../hooks/useDarkMode'
 const navLinks = [
   { to: '/tools', label: 'Tools' },
   { to: '/visualizers', label: 'Visualizers' },
+  { to: '/scenarios', label: 'Scenarios' },
   { to: '/blog', label: 'Blog' },
   { to: '/labs', label: 'Labs' },
 ]

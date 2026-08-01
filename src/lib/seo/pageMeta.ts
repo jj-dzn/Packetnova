@@ -1,5 +1,6 @@
 import { toolCategories } from '../../content/reference/tools'
 import { visualizers } from '../../content/reference/visualizers'
+import { scenarios } from '../../content/reference/scenarios'
 import { blogPosts } from '../blog/posts'
 
 export interface PageMeta {
@@ -24,6 +25,10 @@ const STATIC_PAGES: Record<string, PageMeta> = {
   '/visualizers': {
     title: `Visualizers - ${SITE_TITLE}`,
     description: 'Step-by-step animations of how networking protocols actually work.',
+  },
+  '/scenarios': {
+    title: `Scenarios - ${SITE_TITLE}`,
+    description: 'Guided troubleshooting labs that chain real tools and visualizers together.',
   },
   '/blog': {
     title: `Blog - ${SITE_TITLE}`,
@@ -130,6 +135,13 @@ export function getPageMeta(pathname: string): PageMeta {
     if (visualizer) {
       return { title: `${visualizer.name} - ${SITE_TITLE}`, description: visualizer.description }
     }
+  }
+
+  const scenarioMatch = /^\/scenarios\/([^/]+)$/.exec(pathname)
+  if (scenarioMatch) {
+    const scenario = scenarios.find((s) => s.slug === scenarioMatch[1])
+    if (scenario)
+      return { title: `${scenario.title} - ${SITE_TITLE}`, description: scenario.symptom }
   }
 
   const blogMatch = /^\/blog\/([^/]+)$/.exec(pathname)

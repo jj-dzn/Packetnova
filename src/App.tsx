@@ -5,6 +5,7 @@ import { RouteLoadingFallback } from './components/layout/RouteLoadingFallback'
 import { HomePage } from './pages/HomePage'
 import { ToolsPage } from './pages/ToolsPage'
 import { VisualizersPage } from './pages/VisualizersPage'
+import { ScenariosPage } from './pages/ScenariosPage'
 import { BlogPage } from './pages/BlogPage'
 import { BlogPostPage } from './pages/BlogPostPage'
 import { SearchPage } from './pages/SearchPage'
@@ -281,6 +282,41 @@ const DhcpDoraVisualizer = lazy(() =>
     default: m.DhcpDoraVisualizer,
   })),
 )
+const SiteToSiteVpnFailureScenario = lazy(() =>
+  import('./features/scenarios/SiteToSiteVpnFailureScenario').then((m) => ({
+    default: m.SiteToSiteVpnFailureScenario,
+  })),
+)
+const SubnettingMistakeScenario = lazy(() =>
+  import('./features/scenarios/SubnettingMistakeScenario').then((m) => ({
+    default: m.SubnettingMistakeScenario,
+  })),
+)
+const RoutingBlackHoleScenario = lazy(() =>
+  import('./features/scenarios/RoutingBlackHoleScenario').then((m) => ({
+    default: m.RoutingBlackHoleScenario,
+  })),
+)
+const NatPortForwardingScenario = lazy(() =>
+  import('./features/scenarios/NatPortForwardingScenario').then((m) => ({
+    default: m.NatPortForwardingScenario,
+  })),
+)
+const MtuFragmentationScenario = lazy(() =>
+  import('./features/scenarios/MtuFragmentationScenario').then((m) => ({
+    default: m.MtuFragmentationScenario,
+  })),
+)
+const BgpPathSelectionScenario = lazy(() =>
+  import('./features/scenarios/BgpPathSelectionScenario').then((m) => ({
+    default: m.BgpPathSelectionScenario,
+  })),
+)
+const VlanMisconfigurationScenario = lazy(() =>
+  import('./features/scenarios/VlanMisconfigurationScenario').then((m) => ({
+    default: m.VlanMisconfigurationScenario,
+  })),
+)
 const PingPet = lazy(() => import('./features/labs/PingPet').then((m) => ({ default: m.PingPet })))
 const RetroTerminal = lazy(() =>
   import('./features/labs/RetroTerminal').then((m) => ({ default: m.RetroTerminal })),
@@ -411,6 +447,20 @@ function App() {
             />
             <Route path="/visualizers/ospf-spf-animation" element={<OspfSpfVisualizer />} />
             <Route path="/visualizers/dhcp-dora-sequence" element={<DhcpDoraVisualizer />} />
+            <Route path="/scenarios" element={<ScenariosPage />} />
+            <Route
+              path="/scenarios/site-to-site-vpn-failure"
+              element={<SiteToSiteVpnFailureScenario />}
+            />
+            <Route path="/scenarios/subnetting-mistake" element={<SubnettingMistakeScenario />} />
+            <Route path="/scenarios/routing-black-hole" element={<RoutingBlackHoleScenario />} />
+            <Route path="/scenarios/nat-port-forwarding" element={<NatPortForwardingScenario />} />
+            <Route path="/scenarios/mtu-fragmentation" element={<MtuFragmentationScenario />} />
+            <Route path="/scenarios/bgp-path-selection" element={<BgpPathSelectionScenario />} />
+            <Route
+              path="/scenarios/vlan-misconfiguration"
+              element={<VlanMisconfigurationScenario />}
+            />
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/labs" element={<LabsPage />} />

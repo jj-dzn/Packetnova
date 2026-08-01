@@ -77,14 +77,25 @@ export function TopologyCanvas({
             />
             {edge.label !== undefined && (
               <>
-                <rect
-                  x={midX - 10}
-                  y={midY - 9}
-                  width={20}
-                  height={14}
-                  fill="var(--color-bg)"
-                  opacity={0.85}
-                />
+                {(() => {
+                  const labelText = String(edge.label)
+                  // Sized for the common case (short numeric costs like "10")
+                  // but grows for longer labels instead of letting them
+                  // overflow a fixed-width backdrop -- 6px/char at this
+                  // font-mono 10px size is an approximation, not a measured
+                  // width, so it errs slightly wide rather than clipping.
+                  const labelWidth = Math.max(20, labelText.length * 6 + 8)
+                  return (
+                    <rect
+                      x={midX - labelWidth / 2}
+                      y={midY - 9}
+                      width={labelWidth}
+                      height={14}
+                      fill="var(--color-bg)"
+                      opacity={0.85}
+                    />
+                  )
+                })()}
                 <text
                   x={midX}
                   y={midY + 1}
