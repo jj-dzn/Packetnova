@@ -1,6 +1,7 @@
 import { SectionHeader } from './SectionHeader'
 import { PreviewCard } from '../../components/ui/PreviewCard'
 import { toolCategories } from '../../content/reference/tools'
+import { useScrollReveal } from '../../hooks/useScrollReveal'
 
 const tools = [
   {
@@ -36,8 +37,13 @@ const liveToolCount = toolCategories.reduce(
 )
 
 export function PopularTools() {
+  const { ref, revealed } = useScrollReveal<HTMLElement>()
+
   return (
-    <section className="py-14">
+    <section
+      ref={ref}
+      className={`py-14 transition-all duration-500 ease-out ${revealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+    >
       <SectionHeader
         title="Popular tools"
         subtitle={`A few favorites -- ${liveToolCount} tools live across the full toolkit`}

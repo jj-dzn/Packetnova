@@ -48,7 +48,7 @@ export function BlogPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visiblePosts.map((post) => (
             <Link key={post.slug} to={`/blog/${post.slug}`} className="block">
-              <Card interactive className="flex h-full flex-col gap-3">
+              <Card interactive tilt className="flex h-full flex-col gap-3">
                 <div className="flex flex-wrap items-center gap-1.5">
                   {post.tags.map((tag) => (
                     <Badge key={tag} tone="accent">

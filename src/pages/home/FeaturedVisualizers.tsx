@@ -3,10 +3,16 @@ import { SectionHeader } from './SectionHeader'
 import { PreviewCard } from '../../components/ui/PreviewCard'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
+import { useScrollReveal } from '../../hooks/useScrollReveal'
 
 export function FeaturedVisualizers() {
+  const { ref, revealed } = useScrollReveal<HTMLElement>()
+
   return (
-    <section className="py-14">
+    <section
+      ref={ref}
+      className={`py-14 transition-all duration-500 ease-out ${revealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+    >
       <SectionHeader
         title="Interactive visualizers"
         subtitle="Step-by-step animations of how protocols actually work"
@@ -22,7 +28,7 @@ export function FeaturedVisualizers() {
           comingSoon={false}
         />
         <Link to="/visualizers" className="block">
-          <Card interactive className="flex h-full flex-col items-start justify-center gap-2">
+          <Card interactive tilt className="flex h-full flex-col items-start justify-center gap-2">
             <Badge tone="accent">9 more</Badge>
             <p className="text-sm text-fg-muted">
               TLS handshake, packet encapsulation, and more on the way.

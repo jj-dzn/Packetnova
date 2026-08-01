@@ -1,10 +1,16 @@
 import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { PingPetCreature } from '../../features/labs/PingPetCreature'
+import { useScrollReveal } from '../../hooks/useScrollReveal'
 
 export function LabsTeaser() {
+  const { ref, revealed } = useScrollReveal<HTMLElement>()
+
   return (
-    <section className="py-10">
+    <section
+      ref={ref}
+      className={`py-10 transition-all duration-500 ease-out ${revealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+    >
       <Link
         to="/labs"
         className="group relative flex flex-col items-center gap-6 overflow-hidden rounded-lg border border-accent/30 bg-surface p-8 text-center transition-colors hover:border-accent hover:shadow-[0_0_32px_-12px_var(--color-accent)] sm:flex-row sm:text-left"

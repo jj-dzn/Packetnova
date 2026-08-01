@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { Select } from '../../../components/ui/Select'
 import { CopyButton } from '../../../components/ui/CopyButton'
+import { Skeleton } from '../../../components/ui/Skeleton'
 import {
   computeHash,
   HASH_ALGORITHMS,
@@ -43,6 +44,7 @@ export function HashGenerator() {
   const [hash, setHash] = useState<string | null>(null)
   const [previousHash, setPreviousHash] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isComputing, setIsComputing] = useState(false)
   const hashRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -50,6 +52,7 @@ export function HashGenerator() {
 
     async function run() {
       setError(null)
+      setIsComputing(true)
       try {
         const buffer =
           mode === 'text'
@@ -58,7 +61,10 @@ export function HashGenerator() {
               ? await file.arrayBuffer()
               : null
         if (!buffer) {
-          if (!cancelled) setHash(null)
+          if (!cancelled) {
+            setHash(null)
+            setIsComputing(false)
+          }
           return
         }
         const result = await computeHash(buffer as ArrayBuffer, algorithm)
@@ -66,12 +72,14 @@ export function HashGenerator() {
           setPreviousHash(hashRef.current)
           hashRef.current = result
           setHash(result)
+          setIsComputing(false)
         }
       } catch (err) {
         if (!cancelled) {
           setError(
             err instanceof SecureContextRequiredError ? err.message : 'Could not hash that input.',
           )
+          setIsComputing(false)
         }
       }
     }
@@ -151,9 +159,14 @@ export function HashGenerator() {
               <CopyButton value={hash} label={algorithm} />
             </span>
           </div>
+        ) : isComputing ? (
+          <div className="flex items-center justify-between gap-4 border-b border-border py-2">
+            <span className="shrink-0 text-sm text-fg-muted">{algorithm}</span>
+            <Skeleton className="h-4 w-40" />
+          </div>
         ) : (
           <p className="text-sm text-fg-muted">
-            {mode === 'file' ? 'Choose a file to hash it.' : 'Computing...'}
+            {mode === 'file' ? 'Choose a file to hash it.' : 'Enter some text to hash.'}
           </p>
         )
       }

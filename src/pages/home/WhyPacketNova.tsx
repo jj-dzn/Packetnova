@@ -1,3 +1,5 @@
+import { useScrollReveal } from '../../hooks/useScrollReveal'
+
 const reasons = [
   {
     title: 'Correctness first',
@@ -21,8 +23,13 @@ const reasons = [
 ]
 
 export function WhyPacketNova() {
+  const { ref, revealed } = useScrollReveal<HTMLElement>()
+
   return (
-    <section className="py-14">
+    <section
+      ref={ref}
+      className={`py-14 transition-all duration-500 ease-out ${revealed ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+    >
       <h2 className="mb-8 text-xl font-semibold">Why PacketNova</h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {reasons.map((reason) => (

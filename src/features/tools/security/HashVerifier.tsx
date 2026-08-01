@@ -17,18 +17,21 @@ export function HashVerifier() {
   const [computed, setComputed] = useState<string | null>(null)
   const [matches, setMatches] = useState<boolean | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isComputing, setIsComputing] = useState(false)
 
   useEffect(() => {
     let cancelled = false
 
     async function run() {
       setError(null)
+      setIsComputing(true)
       try {
         const buffer = new TextEncoder().encode(text).buffer as ArrayBuffer
         const result = await verifyHash(buffer, algorithm, expected)
         if (!cancelled) {
           setComputed(result.computed)
           setMatches(expected.trim() ? result.matches : null)
+          setIsComputing(false)
         }
       } catch (err) {
         if (!cancelled) {
@@ -39,6 +42,7 @@ export function HashVerifier() {
               ? err.message
               : 'Could not verify that input.',
           )
+          setIsComputing(false)
         }
       }
     }
@@ -104,7 +108,7 @@ export function HashVerifier() {
           <p className="text-sm text-danger">{error}</p>
         ) : (
           <dl>
-            <ResultRow label="Computed" value={computed ?? '...'} />
+            <ResultRow label="Computed" value={computed ?? ''} loading={isComputing} />
             <ResultRow
               label="Match?"
               value={matches === null ? 'Enter an expected hash' : matches ? 'Yes' : 'No'}
