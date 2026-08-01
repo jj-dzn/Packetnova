@@ -347,3 +347,327 @@ Labeled `T1`-`T10` (not renumbered into the core 1-15 sequence) so it can be ref
 8. JSON/YAML/XML syntax highlighting (Utilities audit) -- a formatting-only change to already-correct output.
 9. Rename the two BGP-named pages and the two routing-decision-named pages (T10) -- pure copy changes, zero logic risk.
 10. Loud visual match/no-match badge on Hash verifier (T1/T2 adjacent) -- swaps a table row for a colored badge, same underlying data.
+
+---
+
+# Experience & Identity Roadmap
+
+A third track, separate from both tracks above. Where Milestones 1-15 are about _having_ every tool and visualizer and T1-T10 are about making each one _best-in-class_, this track is about making the whole site _memorable_ -- a product and a small universe people want to explore, revisit, and recommend, not just a correct and polished reference. It leans on both prior tracks rather than repeating them: several of the ten milestones below extend components that already exist and work (the homepage hero, the Ping Pet creature, `Card`'s tilt/glow props, `useStepPlayer`, T9's expert-mode pattern, T10's cross-linking and color language) instead of proposing them from scratch.
+
+Labeled `E1`-`E10` (its own namespace, same reasoning as `T1`-`T10`). Sequential and dependency-ordered, same rule as both tracks above: don't start `E4` before `E3` is genuinely done. Each milestone is scoped to be completable independently in a few hours to a few days and merged without disrupting existing functionality. Nothing here requires a backend -- no accounts, no leaderboards, no cloud sync, no server-dependent systems; everything stays fully client-side, matching the architecture every other line of this document already assumes.
+
+## Milestone E1 — Live Interactive Hero
+
+**Goal:** Deepen the hero experience that already exists (`TrafficStarfield`'s pointer-reactive packet/node canvas, `LatencyOrb`, `HeroStatusLine`'s type-on-load status text, `TerminalCursor`) rather than rebuilding it -- the gap isn't presence, it's that the existing hero is purely decorative and doesn't yet reward closer attention or connect to the rest of the site.
+
+**Why it matters:** The first three seconds decide whether a visitor files PacketNova as "a toolkit" or "a place." The ambient piece is already strong; what's missing is a reason to actually interact with it beyond noticing it.
+
+**Features included:**
+
+- [ ] Click/tap a `TrafficStarfield` node -> brief highlight + tooltip naming a real tool or visualizer, turning the ambient graph into a light discovery affordance instead of pure decoration
+- [ ] Swap the abstract dot-packets for small labeled glyphs on pointer proximity (TCP/UDP/ICMP-style tags), so "network traffic" reads as literal, not just aesthetic
+- [ ] A scroll-tied "signal" moment extending `HeroStatusLine`'s typing motif -- e.g. the status line settling into its final state precisely as the hero scrolls out of view
+- [ ] Idle-state variation: after a stretch with no interaction, one packet traces a path down to a random card in Popular tools/Featured visualizers, previewing where the "signal" actually goes
+- [ ] All additions inherit `TrafficStarfield`'s existing reduced-motion static-frame fallback and theme-aware color re-read -- no new accessibility surface to design from zero
+
+**Estimated effort:** Medium -- extends existing Canvas/DOM components, no new page.
+
+**Dependencies:** None.
+
+**Expected impact on user engagement:** High -- converts a passive background into a light discovery mechanic on the single highest-traffic page.
+
+**Expected impact on educational value:** Low-to-medium -- mostly atmosphere, though the node-to-tool link nudges navigation toward content visitors might not have found otherwise.
+
+**Expected impact on brand identity:** Very high -- this is the first-impression moment, and it's the one place a "toolkit vs. universe" judgment actually gets made.
+
+**Benefits directly:** Homepage hero (`Hero.tsx`, `TrafficStarfield.tsx`, `HeroStatusLine.tsx`); indirectly funnels into Popular tools and Featured visualizers already below it.
+
+## Milestone E2 — PacketNova Mascot
+
+**Goal:** Give PacketNova a recurring character built from the Ping Pet creature already living in Labs (`PingPetCreature.tsx` -- a working, status-reactive, reduced-motion-safe animated SVG with idle/checking/fast/medium/slow/error states) rather than inventing an unrelated design from zero.
+
+**Why it matters:** A recurring character is what turns "a tool I used once" into "a thing I remember by name" -- the single highest-leverage move available for the "emotional attachment" goal in the brief, and PacketNova already has the visual grammar for one, just scoped narrowly to one Labs page.
+
+**Features included:**
+
+- [ ] Promote `PingPetCreature`'s construction (glowing "antenna," status-driven fill and motion, animated face) into a standalone mascot component, generalizing its `status` prop from "measured latency" to arbitrary site context
+- [ ] Appearance style: same geometric, non-skeuomorphic SVG language as the rest of the site's iconography -- no redesign, a respectful extension
+- [ ] Placement: an idle presence on `NotFoundPage` (currently text-only), a subtle "online" pulse near the logo in `Nav`, and the guide/narrator role in E5's guided mode and E10's flagship journey
+- [ ] Context-aware reactions: pleased when a calculator produces a valid result, the existing error-state face when validation fails, a checking/idle loop while a page loads -- reusing the exact visual vocabulary already built, not a new one
+- [ ] Idle animation: the `pn-pet-idle` breathing/blinking keyframe already defined and already `motion-safe`-gated, reused as-is
+- [ ] Documented extensibility: one clear pattern for adding a new reaction state as future sections adopt the mascot, so each new placement doesn't require redesigning it
+
+**Estimated effort:** Medium -- mostly composition of an existing, already-working component plus new placements, not new illustration work.
+
+**Dependencies:** None blocking, but pairs directly with E5 and E9 -- sequence those after this one.
+
+**Expected impact on user engagement:** High -- recurring characters measurably increase return visits in comparable product categories, and this one is nearly free given what already exists.
+
+**Expected impact on educational value:** Low directly, but meaningfully raises tolerance for reading tips and asides when a friendly character is the one delivering them (feeds E5 directly).
+
+**Expected impact on brand identity:** Very high -- likely the single highest-leverage item in this entire roadmap for "memorable."
+
+**Benefits directly:** `NotFoundPage`, `Nav`, Labs' Ping Pet and Ping Pet Duel (already); becomes load-bearing for E5's guided mode and E10's flagship journey.
+
+## Milestone E3 — Universal Micro-Interactions
+
+**Goal:** Close the specific micro-interaction gaps that remain, and audit the ones already built -- `Card`'s `interactive`/`tilt` props, `CopyButton`'s copy-to-checkmark feedback, `PageShell`'s page-transition fade-and-shimmer -- for where they should be applied but currently aren't.
+
+**Why it matters:** Several of the mechanisms this milestone would otherwise "add" already exist and work well; the actual gap is consistency. A site that's brilliantly polished on some pages and plain on others reads as unfinished everywhere, regardless of how good the polished pages are.
+
+**Features included:**
+
+- [ ] Audit pass: confirm every card-shaped surface (tool/visualizer/blog/lab previews, currently unified through `PreviewCard`) actually opts into `Card`'s `interactive` and `tilt` props, and extend to any bespoke in-tool card surface that doesn't yet
+- [ ] Button shimmer: `Button`'s primary variant currently only does `hover:brightness-110` -- add a single-pass light sweep on hover, matching (not duplicating) the shimmer keyframe already used for page transitions, so the two feel related instead of coincidentally similar
+- [ ] A shared skeleton pattern for loading states, extending the route-level Suspense fallback already shipped in the polish pass into per-component loading states inside a tool (e.g. a calculator result that briefly recomputes)
+- [ ] Scroll-linked entrance for below-the-fold homepage sections (Popular tools, Featured visualizers, Why PacketNova, Labs teaser), which currently render eagerly with no reveal treatment
+- [ ] Keyboard interaction polish: confirm the on-brand `focus-visible:ring-accent` treatment already standard sitewide extends cleanly to the newer touch D-pad controls added for the Labs games
+- [ ] Motion accessibility: every addition here gated behind `motion-safe:`/`prefers-reduced-motion`, matching the bar every existing animated component already meets -- no exceptions
+
+**Estimated effort:** Medium -- broad in surface area but mechanical; most of the underlying capability already exists and just needs applying consistently.
+
+**Dependencies:** None.
+
+**Expected impact on user engagement:** Medium-high -- individually small, cumulatively the difference between "nice tool" and "feels expensive."
+
+**Expected impact on educational value:** None directly.
+
+**Expected impact on brand identity:** High -- consistency is itself a brand signal, and this milestone is entirely about closing consistency gaps rather than adding anything new.
+
+**Benefits directly:** Every tool/visualizer/blog/lab preview card sitewide; `Button` everywhere; homepage sections; Labs game touch controls (added this session).
+
+## Milestone E4 — Interactive Output Panels
+
+**Goal:** Turn a first wave of six high-traffic calculators' results from "read a number" into "explore a picture," reusing the diagram primitives T3/T6 already built (`HeaderByteDiagram`, `BinaryBreakdown`, `AddressSpaceBar`, the CIDR bit-toggle sandbox) and extending them with genuinely new interaction, not just new visuals.
+
+**Why it matters:** Calculators are the highest-traffic page type on the site by a wide margin -- upgrades here touch the most visits of anything in this roadmap, and "a number changing a picture" is a stronger moment than "a number changing a table cell."
+
+**Features included:**
+
+- [ ] CIDR calculator: connect the existing bit-toggle sandbox (T6) to a live `AddressSpaceBar`, so toggling a bit visibly shows where the address now falls within the block -- ties two already-shipped-but-separate visuals together
+- [ ] IPv6 calculator: collapsible per-hextet view -- click a hextet to see its 16 bits individually, extending the `BinaryBreakdown` pattern IPv4 tools already have and IPv6 currently lacks
+- [ ] Route summarizer: a visual merge-map showing which input CIDRs collapsed into which output summary route (currently text-list only) -- a "wow feature" gap the T-series audit itself flagged and didn't schedule
+- [ ] MTU calculator: a draggable payload-size slider driving the existing fits/fragments result live, alongside (not replacing) the current numeric input
+- [ ] VLAN calculator: a visual trunk diagram showing tagged/untagged VLANs across a link (soft dependency on E6's future device primitives for the polished version; a simpler version ships here regardless)
+- [ ] BGP path comparison: hover-linking between the attribute input table and the elimination trace already shown, so it's immediately visible which row decided the outcome
+
+**Estimated effort:** Large -- six separate, real per-tool builds, even though each individually is modest and reuses existing primitives.
+
+**Dependencies:** T3 (diagram system) directly. Benefits from, but doesn't strictly require, E6's later device primitives for the VLAN diagram specifically.
+
+**Expected impact on user engagement:** High -- the highest-traffic page type on the site gets a real upgrade.
+
+**Expected impact on educational value:** Very high -- this is one of the two strongest educational levers in the whole roadmap (alongside E5).
+
+**Expected impact on brand identity:** Medium-high.
+
+**Benefits directly:** CIDR calculator, IPv6 calculator, Route summarizer, MTU calculator, VLAN calculator, BGP path comparison -- and establishes the pattern for a later wave across the rest of the 48 tools.
+
+## Milestone E5 — Step-by-Step Learning Mode
+
+**Goal:** Give calculators an opt-in guided mode built directly on `useStepPlayer`/`StepControls`, the exact hook and component pair already powering all 11 visualizers, instead of inventing a parallel stepping mechanism.
+
+**Why it matters:** Visitors already learned this interaction (arrow keys, spacebar autoplay, click-to-jump, automatic reduced-motion fallback) on the visualizer pages. Reusing it means a calculator's guided mode needs zero new interaction design and feels native on arrival.
+
+**Features included:**
+
+- [ ] A `GuidedMode` wrapper: toggles a calculator's result panel between its normal instant view and a `useStepPlayer`-driven walk-through of the same computation, inheriting the identical keyboard nav visitors already know
+- [ ] Subnet calculator: step through VLSM allocation one requested subnet at a time, showing the running remainder after each
+- [ ] The MTU -> MSS -> Packet Fragmentation chain (already cross-linked in T10): step through header overhead being subtracted one layer at a time, turning three separately-cross-linked tools into one guided narrative
+- [ ] BGP path comparison: reuse the same elimination-trace shape the BGP visualizer's `EliminationVisualizer` already computes, but drive it from the visitor's own entered candidates instead of a fixed example
+- [ ] Route summarizer: step through the binary-merge process bit by bit
+- [ ] Every guided walkthrough closes on one sentence connecting the math to a real situation (in the same voice T10 already established, e.g. "...which is why your ISP handed you a /29, not a /24")
+
+**Estimated effort:** Large -- the mechanism is reused, but four tool-specific step sequences are real content and logic work each.
+
+**Dependencies:** E4 -- several of the same tools get visual work there; sequencing after avoids doing that work twice.
+
+**Expected impact on user engagement:** High for the specific "I want to actually understand this" visitor segment, which is a meaningful share of a technical audience.
+
+**Expected impact on educational value:** Very high -- the single strongest educational lever in this roadmap.
+
+**Expected impact on brand identity:** Medium -- reinforces "built by people who actually teach this" more than it reinforces visual identity.
+
+**Benefits directly:** Subnet calculator, the MTU/MSS/Fragmentation chain, BGP path comparison, Route summarizer initially; the `GuidedMode` wrapper becomes available to every calculator built after.
+
+## Milestone E6 — Shared Diagram System
+
+**Goal:** Formalize the visual grammar already implicit across `HeaderByteDiagram`, `BinaryBreakdown`, `AddressSpaceBar`, `SequenceDiagramVisualizer`, `MiddleboxFlowVisualizer`, `LayerExplorer`, and T10's `LayerColorClasses` into one documented primitive set, and build the device-level primitives none of them currently cover: routers, switches, firewalls, NAT tables, and freeform topology.
+
+**Why it matters:** This is infrastructure, not a feature -- but it's the direct prerequisite for both E7 (scenarios need topology) and E10 (the flagship journey needs every diagram type to compose cleanly), and it's the difference between "we built six diagrams" and "we built one system that produces diagrams."
+
+**Features included:**
+
+- [ ] Extract and document the visual grammar already in production (rounded device boxes, T10's two-hue checkerboard color language, the arrow/segment conventions from `SequenceDiagramVisualizer`/`MiddleboxFlowVisualizer`) into a small shared `diagram/` primitive set
+- [ ] New primitives that don't exist anywhere on the site yet: simple, geometric router/switch/firewall icon components, matching the logo's node-and-connection visual language -- consistent with the design system's explicit "no router/cloud clichés" rule, not literal skeuomorphic device art
+- [ ] A `NatTableDiagram` primitive (inside/outside address-port mapping rows) -- the NAT flow visualizer currently animates the packet transform but never shows the table state actually driving it
+- [ ] A minimal `TopologyCanvas` primitive: freeform node-and-link layout, generalizing the fixed hand-placed positions already used in the OSPF SPF visualizer into something reusable -- the explicit prerequisite T5's future full topology-editing work and this roadmap's E7 both need
+- [ ] One worked example proving reuse concretely: the same `TopologyCanvas` used in a tool, a visualizer, and lightly embedded in a blog post, rather than just asserting the system is reusable
+
+**Estimated effort:** Large -- this is infrastructure work, sized like a platform investment rather than a single feature.
+
+**Dependencies:** T3 (existing diagram work) as direct predecessor. Blocks E7 and the topology-editing half of T5's still-open future work.
+
+**Expected impact on user engagement:** Indirect -- invisible as a feature on its own, but everything built on top of it after ships faster and more consistently.
+
+**Expected impact on educational value:** High indirectly -- device-level diagrams (router/switch/firewall/topology) are the single category of visual most conspicuously absent from the site today.
+
+**Expected impact on brand identity:** High -- visual consistency across every future diagram directly extends T10's cohesion work from "cross-links between pages" to "shared visual language between diagrams."
+
+**Benefits directly:** NAT flow visualizer (table diagram), OSPF SPF visualizer (topology primitive), every tool/visualizer built after; direct groundwork for E7 and E10.
+
+## Milestone E7 — Scenario Simulator
+
+**Goal:** Chain multiple already-shipped, already-cross-linked (T10) tools into guided troubleshooting scenarios, so PacketNova reads as a lab a visitor works through, not a folder of independent calculators.
+
+**Why it matters:** This is the most direct "feels like a lab" lever in the roadmap, and it's nearly free in tool-building terms -- every scenario below composes tools that already exist, using narrative sequencing as the only genuinely new work.
+
+**Features included:**
+
+- [ ] Site-to-site VPN failure: VPN Tunnel Overhead calculator -> MTU calculator -> Packet Fragmentation calculator -> VPN Packet Flow visualizer, framed around the exact "small requests work, large transfers hang" scenario T10's own MSS calculator prose already describes
+- [ ] Subnetting mistake: Subnet calculator (VLSM) -> Route Summarizer -> Longest Prefix Match simulator, framed as "why did this host get the wrong route"
+- [ ] Routing black hole: Route lookup simulator -> Administrative Distance reference -> Next-hop selection visualizer
+- [ ] NAT problem: NAT flow simulator -> a walkthrough of why an inbound connection fails without port forwarding (pairs naturally with T4's planned PAT/overload mode)
+- [ ] MTU issue: the MTU -> MSS -> Fragmentation chain, using E5's guided mode, framed end-to-end as one scenario instead of three separate tool visits
+- [ ] BGP path selection: BGP path comparison -> BGP best path selection visualizer, framed as "why is traffic taking the long way"
+- [ ] VLAN misconfiguration: VLAN calculator -> 802.1Q tag explorer, framed as "why can't these two hosts talk"
+- [ ] Each scenario is a thin new page (`/scenarios/:slug`) that narrates a problem, embeds the existing tools/visualizers in sequence via direct component reuse (not duplicated logic), and closes on a "what actually fixed it" summary
+
+**Estimated effort:** Large -- narrative and sequencing work across many existing pages, though no tool needs to be rebuilt to support it.
+
+**Dependencies:** T10 (cross-linking) directly extends into this. Benefits from E6's topology primitive for the NAT and routing scenarios specifically, though the VPN/MTU/BGP/VLAN scenarios don't strictly need it.
+
+**Expected impact on user engagement:** Very high -- the most "lab," least "reference site" feature in the roadmap.
+
+**Expected impact on educational value:** Very high -- problem-first framing is how networking is actually taught and actually debugged in the field, distinct from tool-first framing everywhere else on the site.
+
+**Expected impact on brand identity:** High -- directly differentiates from every competing calculator site, none of which chain tools into scenarios.
+
+**Benefits directly:** The VPN tools trio, the IP tools trio, Routing tools, the NAT/VPN visualizers, the BGP tools, the VLAN/802.1Q tools -- recombines nearly all of the original Milestone 8 tool categories into new sequences.
+
+## Milestone E8 — Expert Mode
+
+**Goal:** Generalize T9's already-proven "advanced toggle" pattern -- currently scoped to four tools (BGP path comparison, TCP header explorer, VPN Tunnel Overhead calculator, STP overview) -- to the rest of the catalog, using the identical UX so it never has to be relearned tool to tool.
+
+**Why it matters:** T9 already answered the interaction-design question (a `Pill` toggle, hidden-by-default advanced fields); this milestone is a rollout of a proven pattern plus real content, not a new mental model for visitors to learn.
+
+**Features included:**
+
+- [ ] The same `Pill`-toggle "expert mode" convention T9 established, rolled out to tools currently without one, so the pattern reads as one sitewide feature rather than four unrelated ones
+- [ ] Raw binary/hex views wherever a tool currently shows only decimal or dotted-decimal (IPv6 calculator, MAC tools, the Base converter's less-common bases)
+- [ ] RFC references as a footer line on every reference tool (DNS record types -> RFC 1035, DHCP options -> RFC 2132, etc.) -- already-correct data, just currently uncited
+- [ ] CLI-equivalent output behind the toggle: Cisco IOS-style config snippets on the VLAN calculator, Subnet calculator, and STP overview -- the single most-requested "professional trust" gap identified in the T-series audit
+- [ ] Vendor-specific behavior notes on Administrative Distance reference (Cisco and Juniper defaults genuinely differ; document both instead of silently picking one)
+- [ ] Performance-implication asides behind the same toggle on TCP header explorer (e.g. window size vs. bandwidth-delay product)
+
+**Estimated effort:** Medium -- the interaction pattern is a known quantity; this is content and per-tool wiring, not new UX design.
+
+**Dependencies:** T9 directly (extends its exact pattern). T4 (professional features) for the tools whose expert content depends on features not yet shipped.
+
+**Expected impact on user engagement:** Medium -- specifically serves returning and professional visitors rather than first-time ones.
+
+**Expected impact on educational value:** High for the segment it serves -- this is depth, not breadth, and it's depth the rest of the roadmap doesn't otherwise add.
+
+**Expected impact on brand identity:** High -- "the free tool a working engineer actually keeps a tab open for" is a distinct, earned position most competing sites don't attempt.
+
+**Benefits directly:** IPv6 calculator, MAC tools, Base converter, DNS/DHCP reference tools, VLAN/Subnet calculators, STP overview, Administrative Distance reference, TCP header explorer.
+
+## Milestone E9 — Ambient Worldbuilding
+
+**Goal:** Extend the sci-fi identity already established (`TrafficStarfield`, `LatencyOrb`, `TerminalCursor`, the Konami code -> retro terminal easter egg) from "the homepage hero has atmosphere" to "the whole site is one coherent universe" -- strictly inside the design system's own stated restraint boundary: atmosphere lives in the chrome, never inside a calculator's input or output area.
+
+**Why it matters:** This is the specific gap between "an excellent, well-designed toolkit" and "a memorable universe" named in the brief. The pieces already shipped prove the aesthetic works; this milestone is about presence -- making sure it shows up everywhere the site currently goes quiet.
+
+**Features included:**
+
+- [ ] Footer: replace the current static link bar with a small interactive strip -- a live "signal" dot reusing `LatencyOrb`'s exact pulse, and a starfield sliver reusing `TrafficStarfield`'s canvas at a tiny scale, so the atmosphere established at the top of every page also exists at the bottom
+- [ ] A new About page (doesn't exist yet): the one page on the site built for reading rather than doing, telling the "nova" origin and metaphor directly, in the same dark/glow voice as the rest of the site
+- [ ] More hidden terminal commands beyond the already-shipped Konami code -> `coffee.exe` precedent, discoverable the same way -- typed, never advertised
+- [ ] Subtle time-of-day or seasonal variation in starfield density or accent warmth -- decorative only, never touching layout or contrast, fully disabled under reduced-motion
+- [ ] A rare, non-looping "shooting star" or packet-burst moment in the hero starfield -- a "did you just see that" moment for a returning visitor, not a constant animation
+- [ ] E2's mascot makes a background cameo on the About and 404 pages specifically, tying worldbuilding and mascot together rather than building each in isolation
+
+**Estimated effort:** Medium -- individually small additions, each reusing an animation primitive that already exists.
+
+**Dependencies:** E2 (mascot) for the About/404 cameo specifically; otherwise independent.
+
+**Expected impact on user engagement:** Medium-high for returning visitors specifically -- worldbuilding rewards a second and third visit more than a first one.
+
+**Expected impact on educational value:** None directly.
+
+**Expected impact on brand identity:** Very high -- this is the milestone most directly aimed at the brief's "memorable" and "emotional attachment" goals.
+
+**Benefits directly:** Footer (every page), the new About page, the retro terminal, the homepage hero, `NotFoundPage`.
+
+## Milestone E10 — Network Journey Experience
+
+**Goal:** The flagship -- a single, continuous experience following one packet from a client device to a remote server, passing through every major concept the site currently teaches separately, built by composing E6's shared diagram primitives and the site's existing visualizers rather than starting from zero.
+
+**Why it matters:** Every other visualizer on the site teaches one concept in isolation. Nothing currently teaches the full stack as one continuous story -- this is the single feature most likely to be what someone means when they recommend PacketNova to a friend.
+
+**Features included:**
+
+- [ ] One continuous, `useStepPlayer`-driven journey: client -> TCP handshake (reuses `TcpHandshakeVisualizer`'s existing sequence data) -> TLS handshake (reuses `TlsHandshakeVisualizer`) -> IP header/encapsulation (reuses `PacketEncapsulationVisualizer` + `HeaderByteDiagram`) -> VLAN tagging (802.1Q) -> routing/next-hop decision -> NAT translation -> VPN tunnel (offered as an optional fork) -> BGP path selection across "the internet" -> arrival at the destination server
+- [ ] Built as composition, not reimplementation: every stage reuses the exact visualizer or tool component already shipped for that concept, wrapped in one connecting narrative shell -- the same reuse-not-rebuild principle E7's scenarios already establish
+- [ ] A persistent journey map (sidebar on desktop, bottom rail on mobile) showing every stage at a glance, current position highlighted, each stage directly clickable -- effectively a site-wide table of contents disguised as a story
+- [ ] Genuine branch points where the outcome depends on a choice ("VPN or direct?", "NAT or public IP?"), so a second run-through isn't identical to the first
+- [ ] E2's mascot travels with the packet as guide and narrator throughout -- its most substantial use anywhere on the site
+- [ ] Featured directly from the homepage hero (E1) as the primary "explore" call to action, alongside the existing Browse tools / Explore visualizers buttons
+
+**Estimated effort:** Large -- a genuinely new flagship page, even though most of its content is composed from components that already exist.
+
+**Dependencies:** E6 (shared diagram system) directly. Benefits substantially from E2 (mascot), E5 (guided mode), and E7 (scenario framing) already being shipped, since this milestone is effectively the sum of all three.
+
+**Expected impact on user engagement:** Very high -- designed explicitly as the "share this with a friend" moment.
+
+**Expected impact on educational value:** Very high -- the only place on the site the full protocol stack is taught as one continuous story instead of eleven separate visualizers.
+
+**Expected impact on brand identity:** Defining -- the single feature most likely to become synonymous with the product itself.
+
+**Benefits directly:** TCP and TLS handshake visualizers, Packet Encapsulation visualizer, VLAN/802.1Q tools, routing tools, NAT flow visualizer, VPN packet flow visualizer, BGP tools -- ties together nearly the entire visualizer catalog into one experience.
+
+---
+
+## Final deliverables
+
+### Versioned release roadmap
+
+Each milestone lands as one release, in the same dependency order the milestones are already sequenced in.
+
+| Version | Milestone | Headline                                                                                      |
+| ------- | --------- | --------------------------------------------------------------------------------------------- |
+| v1.1    | E1        | Live interactive hero deepened -- clickable nodes, literal packet glyphs, idle-state previews |
+| v1.2    | E2        | PacketNova gets a mascot, built from the existing Ping Pet creature                           |
+| v1.3    | E3        | Universal micro-interactions -- consistency audit + button shimmer + loading states           |
+| v1.4    | E4        | Six calculators get interactive output panels (CIDR, IPv6, Route summarizer, MTU, VLAN, BGP)  |
+| v1.5    | E5        | Step-by-step guided mode ships on four calculators, reusing the visualizer step player        |
+| v1.6    | E6        | Shared diagram system -- router/switch/firewall/NAT-table/topology primitives                 |
+| v1.7    | E7        | Scenario Simulator -- seven guided troubleshooting labs chaining existing tools               |
+| v1.8    | E8        | Expert mode generalized from 4 tools to the full catalog                                      |
+| v1.9    | E9        | Ambient worldbuilding -- interactive footer, About page, more easter eggs                     |
+| v2.0    | E10       | Network Journey Experience -- the flagship end-to-end packet journey                          |
+
+### The 10 highest-impact improvements by effort-to-value ratio
+
+1. Mascot promoted from the existing `PingPetCreature` (E2) -- the component already works; this is placement and a `status` prop generalization, not new illustration.
+2. `CopyButton`/`Card` consistency audit (E3) -- the mechanisms already exist and work; this is finding and fixing the places that don't use them yet.
+3. Click-to-highlight starfield nodes (E1) -- a small addition to a canvas component that's already rendering and already pointer-aware.
+4. Route summarizer merge-map visualization (E4) -- a single tool, already flagged as a gap by the T-series audit itself, with no dependency on anything not yet built.
+5. `GuidedMode` wrapper around `useStepPlayer` (E5) -- the hook and its keyboard handling already exist; the wrapper is thin.
+6. RFC references on reference tools (E8) -- pure content addition to already-correct data, zero logic risk.
+7. Interactive footer signal dot (E9) -- reuses `LatencyOrb` verbatim at a smaller size.
+8. BGP attribute-table-to-elimination-trace hover linking (E4) -- both data structures already exist on the same page; this connects them visually.
+9. Additional hidden terminal commands (E9) -- extends an existing, already-built easter-egg mechanism (`useKonamiCode` + retro terminal).
+10. CLI-equivalent config snippets behind T9's existing expert-mode toggle (E8) -- the toggle and the pattern already ship on 4 tools; this is content for more of them.
+
+### The 5 features most likely to make PacketNova stand out from every other networking site
+
+1. **Scenario Simulator (E7)** -- no competing free calculator site chains its own tools into guided troubleshooting labs; everything else is single-tool, single-purpose.
+2. **Network Journey Experience (E10)** -- a continuous, branching, full-stack packet journey is not something any comparable site attempts at all.
+3. **A real mascot with sitewide context-aware reactions (E2)** -- most networking tool sites have no character, let alone one that reacts to what a visitor is doing.
+4. **Shared diagram system with true topology primitives (E6)** -- router/switch/firewall/NAT-table/freeform-topology diagrams, reused consistently across tools, visualizers, and blog posts, is meaningfully rarer than one-off illustrations per page.
+5. **Ambient worldbuilding tied to a documented sci-fi identity (E9)** -- most competitors are visually interchangeable dev-tool sites; PacketNova already has a distinct visual thesis (`DESIGN_SYSTEM.md`'s "nova" direction) that almost nothing else in this space commits to as fully.
+
+### The single flagship feature
+
+**The Network Journey Experience (E10).** It's the one deliverable that cannot be described as "an improved version of something that already exists" -- every other milestone in this roadmap either deepens or generalizes a component that's already shipped, which is exactly why they're each achievable in isolation. E10 is different: it's the synthesis point where the mascot (E2), the guided-mode mechanism (E5), the scenario-framing principle (E7), and the shared diagram system (E6) all combine into one continuous story spanning nearly the entire visualizer catalog. It is also, deliberately, the last milestone -- everything before it exists in part to make it achievable without a from-scratch build.
