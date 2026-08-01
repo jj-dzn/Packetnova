@@ -106,9 +106,9 @@ export const toolCategories: ToolCategory[] = [
     label: 'Routing',
     tools: [
       {
-        name: 'BGP route visualizer',
+        name: 'BGP path comparison',
         description: 'Watch how BGP path attributes decide the route between two networks.',
-        slug: 'bgp-route-visualizer',
+        slug: 'bgp-path-comparison',
       },
       {
         name: 'Longest prefix match simulator',
@@ -225,13 +225,9 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'JWT decoder',
-        description: "Decode a JWT's header and payload without verifying it server-side.",
+        description:
+          "Decode a JWT's raw header and payload, or switch to a summary of its claims, algorithm, and expiration.",
         slug: 'jwt-decoder',
-      },
-      {
-        name: 'JWT inspector',
-        description: "Inspect a JWT's claims, algorithm, and expiration at a glance.",
-        slug: 'jwt-inspector',
       },
       {
         name: 'Base64 encode/decode',

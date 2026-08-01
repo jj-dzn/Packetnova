@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ReferencePageLayout } from '../ReferencePageLayout'
 import { ResultRow } from '../ResultRow'
 import { HeaderByteDiagram } from '../HeaderByteDiagram'
@@ -57,7 +58,25 @@ export function IpHeaderExplorer() {
           { key: 'field', label: 'Field' },
           { key: 'offset', label: 'Byte offset', mono: true },
           { key: 'size', label: 'Size', mono: true },
-          { key: 'description', label: 'Description' },
+          {
+            key: 'description',
+            label: 'Description',
+            render: (row) =>
+              row.field === 'Fragment Offset' ? (
+                <>
+                  {row.description} -- see it in action in the{' '}
+                  <Link
+                    to="/tools/packet-fragmentation-calculator"
+                    className="text-accent hover:underline"
+                  >
+                    Packet fragmentation calculator
+                  </Link>
+                  .
+                </>
+              ) : (
+                row.description
+              ),
+          },
         ]}
         rows={ipHeaderFields}
       />

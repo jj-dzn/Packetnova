@@ -1,6 +1,7 @@
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
+import { osiLayerColorClasses } from '../../content/reference/networkStackLayers'
 
 export interface LayerInfo {
   number: number
@@ -36,21 +37,24 @@ export function LayerExplorer({ category, title, description, layers }: LayerExp
         className="flex flex-col gap-8 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <div className="flex flex-col gap-1.5">
-          {layers.map((layer, index) => (
-            <button
-              key={layer.number}
-              type="button"
-              onClick={() => player.goTo(index)}
-              className={`rounded-md border px-4 py-2 text-left text-sm transition-colors ${
-                index === player.step
-                  ? 'border-accent bg-accent/10 text-accent'
-                  : 'border-border bg-bg text-fg-muted hover:border-accent/40 hover:text-fg'
-              }`}
-            >
-              <span className="mr-2 font-mono text-xs">L{layer.number}</span>
-              {layer.name}
-            </button>
-          ))}
+          {layers.map((layer, index) => {
+            const colors = osiLayerColorClasses(layer.number)
+            return (
+              <button
+                key={layer.number}
+                type="button"
+                onClick={() => player.goTo(index)}
+                className={`rounded-md border border-border border-l-4 px-4 py-2 text-left text-sm transition-colors ${colors.leftBorder} ${
+                  index === player.step
+                    ? `${colors.activeBg} ${colors.activeText}`
+                    : 'bg-bg text-fg-muted hover:text-fg'
+                }`}
+              >
+                <span className="mr-2 font-mono text-xs">L{layer.number}</span>
+                {layer.name}
+              </button>
+            )
+          })}
         </div>
 
         <div aria-live="polite">

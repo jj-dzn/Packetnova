@@ -16,6 +16,10 @@ export function PacketFragmentationCalculator() {
       category="VPN"
       title="Packet fragmentation calculator"
       description="See when and how an IPv4 packet gets fragmented for a given path MTU."
+      related={[
+        { to: '/tools/mtu-calculator', label: 'MTU calculator' },
+        { to: '/tools/mss-calculator', label: 'MSS calculator' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div>

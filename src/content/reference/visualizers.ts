@@ -40,9 +40,9 @@ export const visualizers: VisualizerListing[] = [
     slug: 'nat-flow-simulator',
   },
   {
-    name: 'Routing decision simulator',
+    name: 'Next-hop selection',
     description: 'Step through how a router picks the next hop for a packet, table entry by entry.',
-    slug: 'routing-decision-simulator',
+    slug: 'next-hop-selection',
   },
   {
     name: 'BGP best path selection',

@@ -107,3 +107,49 @@ export const TCP_IP_LAYERS: TcpIpLayer[] = [
     osiLayerNumbers: [2, 1],
   },
 ]
+
+export interface LayerColorClasses {
+  /** A persistent, always-visible left border identifying which group a
+   * layer belongs to -- independent of any "selected" state. */
+  leftBorder: string
+  /** All-sides border at two different opacities, for components (like the
+   * encapsulation visualizer's nested boxes) that aren't a left-border-only
+   * row. Written as complete literal classes -- not composed at runtime --
+   * since Tailwind's class scanner needs the full string present verbatim
+   * in source, not string-concatenated from a base color at render time. */
+  borderStrong: string
+  borderMuted: string
+  activeBg: string
+  activeText: string
+}
+
+const ACCENT_LAYER_CLASSES: LayerColorClasses = {
+  leftBorder: 'border-l-accent',
+  borderStrong: 'border-accent/40',
+  borderMuted: 'border-accent/30',
+  activeBg: 'bg-accent/10',
+  activeText: 'text-accent',
+}
+const ACCENT_ALT_LAYER_CLASSES: LayerColorClasses = {
+  leftBorder: 'border-l-accent-alt',
+  borderStrong: 'border-accent-alt/40',
+  borderMuted: 'border-accent-alt/30',
+  activeBg: 'bg-accent-alt/10',
+  activeText: 'text-accent-alt',
+}
+
+// The design system deliberately keeps the palette to two decorative hues
+// (accent, accent-alt) -- success/warning/danger are reserved for
+// validation states. So "per-layer color language" here means a
+// consistent checkerboard across the 4 TCP/IP-equivalent groups (App,
+// Transport, Internet, Network Access), not one hue per OSI layer, shared
+// by every visualizer that shows these layers: OSI Model Explorer,
+// TCP/IP Stack Explorer, and Packet Encapsulation.
+export function osiLayerColorClasses(osiLayerNumber: number): LayerColorClasses {
+  const isTransportOrLink = osiLayerNumber === 4 || osiLayerNumber <= 2
+  return isTransportOrLink ? ACCENT_ALT_LAYER_CLASSES : ACCENT_LAYER_CLASSES
+}
+
+export function tcpIpLayerColorClasses(tcpIpLayerNumber: number): LayerColorClasses {
+  return tcpIpLayerNumber % 2 === 0 ? ACCENT_LAYER_CLASSES : ACCENT_ALT_LAYER_CLASSES
+}

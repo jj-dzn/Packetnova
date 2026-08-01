@@ -7,7 +7,7 @@ tags: ['bgp', 'routing', 'path-selection']
 
 A BGP router will often learn several paths to the exact same prefix -- from different neighbors, via different providers, through different parts of the network. Only one of those paths gets installed and advertised onward. The best path algorithm is the specific, ordered sequence of tie-breakers BGP runs through to pick that one path, and understanding the order matters, because the _order_ is the whole story: a route can lose on every single attribute except the first one that actually differs, and that's the one that decides.
 
-This walks through the order Cisco IOS uses (the most commonly taught version; other vendors follow the same spirit with minor differences -- noted where it matters), why each step exists, and a worked example. PacketNova's [BGP best path selection visualizer](/visualizers/bgp-best-path-selection) animates the example below step by step, and the [BGP route visualizer](/tools/bgp-route-visualizer) tool runs the full algorithm against paths you enter yourself.
+This walks through the order Cisco IOS uses (the most commonly taught version; other vendors follow the same spirit with minor differences -- noted where it matters), why each step exists, and a worked example. PacketNova's [BGP best path selection visualizer](/visualizers/bgp-best-path-selection) animates the example below step by step, and the [BGP path comparison](/tools/bgp-path-comparison) tool runs the full algorithm against paths you enter yourself.
 
 ## The order, and why each step exists
 
@@ -36,7 +36,7 @@ Step 1 (weight) eliminates Path C immediately -- 50 loses to the 100/100 tie bet
 
 With A and B tied on weight, step 2 (local preference) breaks it: B's 200 beats A's 100. Path B wins, without the algorithm ever needing to reach AS-path length, origin, or MED at all.
 
-This exact scenario is what the [BGP best path visualizer](/visualizers/bgp-best-path-selection) animates -- watching weight eliminate one path and local preference eliminate another makes the "the first difference wins" behavior much more concrete than reading the list.
+This exact scenario is what the [BGP best path selection visualizer](/visualizers/bgp-best-path-selection) animates -- watching weight eliminate one path and local preference eliminate another makes the "the first difference wins" behavior much more concrete than reading the list.
 
 ## Checking it on a real router
 

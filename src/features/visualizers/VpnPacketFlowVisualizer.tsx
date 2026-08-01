@@ -98,6 +98,9 @@ export function VpnPacketFlowVisualizer() {
           ? 'Follow a packet through VPN encapsulation, encryption, and tunneling to the far end.'
           : 'Transport mode protects the payload directly between two IPsec peers -- no gateway, and the original IP header survives unchanged.'
       }
+      related={[
+        { to: '/tools/vpn-tunnel-overhead-calculator', label: 'VPN tunnel overhead calculator' },
+      ]}
     >
       <div className="mb-6 flex gap-2">
         <Pill active={mode === 'tunnel'} onClick={() => setMode('tunnel')}>

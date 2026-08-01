@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react'
 import { Badge } from '../../components/ui/Badge'
+import { RelatedLinks, type RelatedLink } from '../../components/ui/RelatedLinks'
 
 interface VisualizerPageLayoutProps {
   category: string
   title: string
   description: string
   children: ReactNode
+  related?: RelatedLink[]
 }
 
 export function VisualizerPageLayout({
@@ -13,6 +15,7 @@ export function VisualizerPageLayout({
   title,
   description,
   children,
+  related,
 }: VisualizerPageLayoutProps) {
   return (
     <div className="py-12">
@@ -20,6 +23,7 @@ export function VisualizerPageLayout({
         <Badge tone="accent">{category}</Badge>
         <h1 className="mt-3 text-2xl font-semibold">{title}</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">{description}</p>
+        {related && <RelatedLinks links={related} />}
       </div>
       <div className="rounded-lg border border-border bg-surface p-6">{children}</div>
     </div>

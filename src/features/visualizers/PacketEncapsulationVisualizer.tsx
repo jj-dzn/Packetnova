@@ -2,6 +2,19 @@ import type { ReactNode } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
+import {
+  tcpIpLayerColorClasses,
+  type LayerColorClasses,
+} from '../../content/reference/networkStackLayers'
+
+// TCP/IP layer numbers (Application=4 ... Network Access=1), reused here so
+// the same accent/accent-alt checkerboard from the OSI and TCP/IP stack
+// explorers applies to these layers too: Data is the application-layer
+// payload, TCP is transport, IP is internet, Ethernet is network access.
+const DATA_LAYER_NUMBER = 4
+const TCP_LAYER_NUMBER = 3
+const IP_LAYER_NUMBER = 2
+const ETH_LAYER_NUMBER = 1
 
 interface EncapStep {
   title: string
@@ -42,6 +55,7 @@ interface Wrapper {
   trailerLabel?: string
   trailerTitle?: string
   revealStep: number
+  tcpIpLayerNumber: number
 }
 
 // Ordered innermost-first (closest to the data) so each visible wrapper can
@@ -50,8 +64,20 @@ interface Wrapper {
 // nests: each layer's header (and, for Ethernet, trailer) physically wraps
 // everything added before it, not just appends alongside it.
 const WRAPPERS: Wrapper[] = [
-  { key: 'tcp', headerLabel: 'TCP', headerTitle: 'TCP header', revealStep: 1 },
-  { key: 'ip', headerLabel: 'IP', headerTitle: 'IP header', revealStep: 2 },
+  {
+    key: 'tcp',
+    headerLabel: 'TCP',
+    headerTitle: 'TCP header',
+    revealStep: 1,
+    tcpIpLayerNumber: TCP_LAYER_NUMBER,
+  },
+  {
+    key: 'ip',
+    headerLabel: 'IP',
+    headerTitle: 'IP header',
+    revealStep: 2,
+    tcpIpLayerNumber: IP_LAYER_NUMBER,
+  },
   {
     key: 'eth',
     headerLabel: 'ETH',
@@ -59,6 +85,7 @@ const WRAPPERS: Wrapper[] = [
     trailerLabel: 'FCS',
     trailerTitle: 'Ethernet trailer (FCS)',
     revealStep: 3,
+    tcpIpLayerNumber: ETH_LAYER_NUMBER,
   },
 ]
 
@@ -76,6 +103,7 @@ export function PacketEncapsulationVisualizer() {
           headerTitle={wrapper.headerTitle}
           trailerLabel={wrapper.trailerLabel}
           trailerTitle={wrapper.trailerTitle}
+          colors={tcpIpLayerColorClasses(wrapper.tcpIpLayerNumber)}
           animate={player.canAutoPlay}
         >
           {content}
@@ -119,6 +147,7 @@ function NestBox({
   headerTitle,
   trailerLabel,
   trailerTitle,
+  colors,
   animate,
   children,
 }: {
@@ -126,34 +155,44 @@ function NestBox({
   headerTitle: string
   trailerLabel?: string
   trailerTitle?: string
+  colors: LayerColorClasses
   animate: boolean
   children: ReactNode
 }) {
   return (
     <div
-      className={`flex items-stretch gap-1.5 rounded-md border border-accent/40 bg-surface p-1.5 ${animate ? 'animate-pn-fade-in' : ''}`}
+      className={`flex items-stretch gap-1.5 rounded-md border bg-surface p-1.5 ${colors.borderStrong} ${animate ? 'animate-pn-fade-in' : ''}`}
     >
-      <LabelChip label={headerLabel} title={headerTitle} />
+      <LabelChip label={headerLabel} title={headerTitle} colors={colors} />
       <div className="flex items-center">{children}</div>
-      {trailerLabel && <LabelChip label={trailerLabel} title={trailerTitle} />}
+      {trailerLabel && <LabelChip label={trailerLabel} title={trailerTitle} colors={colors} />}
     </div>
   )
 }
 
 function DataBox({ animate }: { animate: boolean }) {
+  const colors = tcpIpLayerColorClasses(DATA_LAYER_NUMBER)
   return (
     <div
-      className={`flex min-w-[4.5rem] items-center justify-center rounded-sm bg-accent/15 px-3 py-4 text-center font-mono text-xs text-accent ${animate ? 'animate-pn-fade-in' : ''}`}
+      className={`flex min-w-[4.5rem] items-center justify-center rounded-sm px-3 py-4 text-center font-mono text-xs ${colors.activeBg} ${colors.activeText} ${animate ? 'animate-pn-fade-in' : ''}`}
     >
       Data
     </div>
   )
 }
 
-function LabelChip({ label, title }: { label: string; title?: string }) {
+function LabelChip({
+  label,
+  title,
+  colors,
+}: {
+  label: string
+  title?: string
+  colors: LayerColorClasses
+}) {
   return (
     <div
-      className="flex min-w-[2.25rem] items-center justify-center rounded-sm border border-accent/30 bg-accent/10 px-1.5 py-2 text-center font-mono text-[10px] font-medium text-accent"
+      className={`flex min-w-[2.25rem] items-center justify-center rounded-sm border px-1.5 py-2 text-center font-mono text-[10px] font-medium ${colors.borderMuted} ${colors.activeBg} ${colors.activeText}`}
       title={title}
     >
       {label}

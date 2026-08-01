@@ -44,7 +44,7 @@ export function RoutingDecisionVisualizer() {
   return (
     <EliminationVisualizer
       category="Visualizer"
-      title="Routing decision simulator"
+      title="Next-hop selection"
       description="Step through how a router picks the next hop for a packet, table entry by entry."
       candidates={CANDIDATES}
       steps={STEPS}

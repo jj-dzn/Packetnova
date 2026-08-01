@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
@@ -17,6 +18,10 @@ export function MtuCalculator() {
       category="VPN"
       title="MTU calculator"
       description="Find the right MTU for a link and see what happens when a given payload doesn't fit."
+      related={[
+        { to: '/tools/mss-calculator', label: 'MSS calculator' },
+        { to: '/tools/packet-fragmentation-calculator', label: 'Packet fragmentation calculator' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div>
@@ -66,8 +71,11 @@ export function MtuCalculator() {
               <p className="text-xs text-fg-subtle">
                 A payload this size gets fragmented into multiple packets to cross this link, which
                 adds latency and per-packet overhead. For TCP traffic this is usually avoided
-                instead of fixed after the fact -- see the MSS calculator to work out the segment
-                size that fits in one packet from the start.
+                instead of fixed after the fact -- see the{' '}
+                <Link to="/tools/mss-calculator" className="text-accent hover:underline">
+                  MSS calculator
+                </Link>{' '}
+                to work out the segment size that fits in one packet from the start.
               </p>
             )}
             <Aside>

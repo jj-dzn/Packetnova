@@ -3,6 +3,9 @@ import { VisualizerPageLayout } from './VisualizerPageLayout'
 import {
   OSI_LAYERS,
   TCP_IP_LAYERS,
+  osiLayerColorClasses,
+  tcpIpLayerColorClasses,
+  type LayerColorClasses,
   type OsiLayer,
   type TcpIpLayer,
 } from '../../content/reference/networkStackLayers'
@@ -55,6 +58,7 @@ export function TcpIpStackExplorer() {
                   height={ROW_H}
                   bordered={index < OSI_LAYERS.length - 1}
                   label={`L${layer.number} ${layer.name}`}
+                  colors={osiLayerColorClasses(layer.number)}
                   active={selected.side === 'osi' && selected.layer.number === layer.number}
                   highlighted={
                     selected.side === 'tcpip' &&
@@ -101,6 +105,7 @@ export function TcpIpStackExplorer() {
                   height={layer.osiLayerNumbers.length * ROW_H}
                   bordered={index < TCP_IP_LAYERS.length - 1}
                   label={`L${layer.number} ${layer.name}`}
+                  colors={tcpIpLayerColorClasses(layer.number)}
                   active={selected.side === 'tcpip' && selected.layer.number === layer.number}
                   highlighted={
                     selected.side === 'osi' && layer.osiLayerNumbers.includes(selected.layer.number)
@@ -142,6 +147,7 @@ function LayerRow({
   height,
   bordered,
   label,
+  colors,
   active,
   highlighted,
   onClick,
@@ -149,6 +155,7 @@ function LayerRow({
   height: number
   bordered: boolean
   label: string
+  colors: LayerColorClasses
   active: boolean
   highlighted: boolean
   onClick: () => void
@@ -158,12 +165,12 @@ function LayerRow({
       type="button"
       onClick={onClick}
       style={{ height }}
-      className={`flex items-center justify-center px-2 text-center text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset ${bordered ? 'border-b border-border' : ''} ${
+      className={`flex items-center justify-center border-l-4 px-2 text-center text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-inset ${colors.leftBorder} ${bordered ? 'border-b border-border' : ''} ${
         active
-          ? 'bg-accent/10 text-accent'
+          ? `${colors.activeBg} ${colors.activeText}`
           : highlighted
-            ? 'bg-accent/5 text-fg'
-            : 'bg-bg text-fg-muted hover:bg-accent/5 hover:text-fg'
+            ? `${colors.activeBg} text-fg`
+            : 'bg-bg text-fg-muted hover:text-fg'
       }`}
     >
       {label}

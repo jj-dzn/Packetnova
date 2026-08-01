@@ -105,6 +105,7 @@ export function TlsHandshakeVisualizer() {
       category="Visualizer"
       title="TLS handshake"
       description="See exactly how a TLS session gets negotiated and encrypted -- and why TLS 1.3 cut it down to one round trip."
+      related={[{ to: '/tools/tls-version-explorer', label: 'TLS version explorer' }]}
     >
       <div className="mb-4 flex flex-wrap gap-2">
         <Pill active={version === 'tls13'} onClick={() => setVersion('tls13')}>

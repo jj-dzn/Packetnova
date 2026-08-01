@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
@@ -24,6 +25,10 @@ export function MssCalculator() {
       category="VPN"
       title="MSS calculator"
       description="Work out the maximum TCP segment size for a given MTU and header overhead."
+      related={[
+        { to: '/tools/mtu-calculator', label: 'MTU calculator' },
+        { to: '/tools/packet-fragmentation-calculator', label: 'Packet fragmentation calculator' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div>
@@ -86,9 +91,15 @@ export function MssCalculator() {
             <p className="text-xs text-fg-subtle">
               This is what fits given a {calc.result.mtu}-byte MTU. If a router somewhere along the
               path has a smaller MTU, it can clamp the MSS announced during the TCP handshake below{' '}
-              {calc.result.mss} bytes so segments never need IP fragmentation -- this is MSS
-              clamping, and it's why the value your OS reports isn't always the value a server
-              actually negotiates.
+              {calc.result.mss} bytes so segments never need{' '}
+              <Link
+                to="/tools/packet-fragmentation-calculator"
+                className="text-accent hover:underline"
+              >
+                IP fragmentation
+              </Link>{' '}
+              -- this is MSS clamping, and it's why the value your OS reports isn't always the value
+              a server actually negotiates.
             </p>
             <Aside>
               The real-world scenario this explains: a site-to-site VPN where small requests work

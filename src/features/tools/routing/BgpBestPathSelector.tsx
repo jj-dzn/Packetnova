@@ -80,7 +80,7 @@ export function BgpBestPathSelector() {
   return (
     <ToolPageLayout
       category="Routing"
-      title="BGP route visualizer"
+      title="BGP path comparison"
       description="Compare candidate BGP paths and see exactly which attribute decides the winner, in the standard tie-breaking order."
       input={
         <div className="flex flex-col gap-4">
