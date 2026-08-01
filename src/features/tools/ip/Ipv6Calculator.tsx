@@ -4,13 +4,17 @@ import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { analyzeIPv6 } from '../../../lib/calculations/ipv6'
 import { calculateIpv6Subnets } from '../../../lib/calculations/ipv6Subnet'
+import { calculateEui64 } from '../../../lib/calculations/eui64'
 
 export function Ipv6Calculator() {
-  const [input, setInput] = useState('2001:0db8:0000:0000:0000:ff00:0042:8329')
-  const [newPrefixInput, setNewPrefixInput] = useState('48')
+  const [input, setInput] = useState('2001:0db8:0000:0000:0000:ff00:0042:8329/64')
+  const [newPrefixInput, setNewPrefixInput] = useState('80')
+  const [macInput, setMacInput] = useState('00:1A:2B:3C:4D:5E')
   const calc = analyzeIPv6(input)
   const hasBasePrefix = calc.ok && calc.result.prefixLength !== null
   const subnetCalc = hasBasePrefix ? calculateIpv6Subnets(input, Number(newPrefixInput)) : null
+  const isExactly64 = calc.ok && calc.result.prefixLength === 64
+  const eui64Calc = isExactly64 ? calculateEui64(macInput, input) : null
 
   return (
     <ToolPageLayout
@@ -86,6 +90,37 @@ export function Ipv6Calculator() {
                   <p className="text-sm text-danger">{subnetCalc.error}</p>
                 ) : null}
               </div>
+            )}
+
+            {isExactly64 && (
+              <div className="flex flex-col gap-3 border-t border-border pt-4">
+                <div>
+                  <label htmlFor="ipv6-eui64-mac" className="text-sm font-medium">
+                    EUI-64 / SLAAC -- MAC address
+                  </label>
+                  <Input
+                    id="ipv6-eui64-mac"
+                    className="mt-2 font-mono"
+                    value={macInput}
+                    onChange={(event) => setMacInput(event.target.value)}
+                    placeholder="00:1A:2B:3C:4D:5E"
+                    spellCheck={false}
+                  />
+                </div>
+                {eui64Calc?.ok ? (
+                  <dl>
+                    <ResultRow label="Interface ID" value={eui64Calc.result.interfaceId} />
+                    <ResultRow label="SLAAC address" value={eui64Calc.result.fullAddress} />
+                  </dl>
+                ) : eui64Calc ? (
+                  <p className="text-sm text-danger">{eui64Calc.error}</p>
+                ) : null}
+              </div>
+            )}
+            {hasBasePrefix && calc.result.prefixLength !== 64 && (
+              <p className="text-xs text-fg-subtle">
+                EUI-64/SLAAC address generation needs an exact /64 prefix on the address above.
+              </p>
             )}
           </div>
         ) : (

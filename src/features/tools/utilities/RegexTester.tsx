@@ -6,6 +6,7 @@ import type { CalculationResult } from '../../../lib/calculations/result'
 
 const DEBOUNCE_MS = 150
 const EVAL_TIMEOUT_MS = 750
+const GROUP_BREAKDOWN_LIMIT = 200
 
 function renderHighlighted(text: string, matches: RegexMatch[]): ReactNode {
   if (matches.length === 0) return text
@@ -26,7 +27,7 @@ function renderHighlighted(text: string, matches: RegexMatch[]): ReactNode {
 }
 
 export function RegexTester() {
-  const [pattern, setPattern] = useState('\\d+')
+  const [pattern, setPattern] = useState('#(\\d+)')
   const [flags, setFlags] = useState('g')
   const [text, setText] = useState('Order #123 shipped, invoice #456 pending.')
   const [calc, setCalc] = useState<CalculationResult<RegexResult>>(() =>
@@ -133,6 +134,41 @@ export function RegexTester() {
             <p className="whitespace-pre-wrap break-words rounded-md border border-border bg-bg p-3 text-sm">
               {renderHighlighted(text, calc.result.matches)}
             </p>
+            {calc.result.matches.some((match) => match.groups.length > 0) && (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm font-medium text-fg-muted">Capture groups</p>
+                <div className="flex flex-col gap-2">
+                  {calc.result.matches.slice(0, GROUP_BREAKDOWN_LIMIT).map((match, i) => (
+                    <div key={i} className="rounded-md border border-border p-2 text-xs">
+                      <p className="font-mono">
+                        <span className="text-fg-subtle">Match {i + 1}:</span>{' '}
+                        <span className="text-accent">{match.match || '(empty match)'}</span>
+                      </p>
+                      {match.groups.length > 0 && (
+                        <ul className="mt-1 flex flex-col gap-0.5 pl-4">
+                          {match.groups.map((group, gi) => (
+                            <li key={gi} className="font-mono text-fg-muted">
+                              Group {gi + 1}:{' '}
+                              {group === undefined ? (
+                                <span className="text-fg-subtle italic">did not participate</span>
+                              ) : (
+                                <span className="text-fg">{group || '(empty)'}</span>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {calc.result.matches.length > GROUP_BREAKDOWN_LIMIT && (
+                  <p className="text-xs text-fg-subtle">
+                    +{calc.result.matches.length - GROUP_BREAKDOWN_LIMIT} more matches not shown
+                    here.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

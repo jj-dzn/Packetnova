@@ -85,6 +85,18 @@ function extractSubjectAltNames(
   return []
 }
 
+const PEM_CERT_BLOCK = /-----BEGIN CERTIFICATE-----[\s\S]+?-----END CERTIFICATE-----/g
+
+/**
+ * Splits a chain of concatenated PEM blocks (leaf, then intermediates, then
+ * usually a root) into individual PEM strings, each parseable on its own by
+ * parseCertificate. Order is preserved as given -- this doesn't attempt to
+ * verify or reorder the chain, just separate what's already there.
+ */
+export function splitPemCertificates(pem: string): string[] {
+  return pem.match(PEM_CERT_BLOCK) ?? []
+}
+
 export function parseCertificate(
   pem: string,
   now: Date = new Date(),
