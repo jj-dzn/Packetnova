@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import { DirectionPad } from './DirectionPad'
 import {
   createInitialState,
   isOppositeDirection,
@@ -36,16 +37,20 @@ export function PacketSnake() {
     return () => window.clearInterval(id)
   }, [])
 
+  function changeDirection(newDirection: SnakeDirection) {
+    setState((current) => {
+      if (current.gameOver) return current
+      if (isOppositeDirection(current.direction, newDirection)) return current
+      return { ...current, direction: newDirection }
+    })
+  }
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       const newDirection = KEY_DIRECTIONS[event.key]
       if (!newDirection) return
       event.preventDefault()
-      setState((current) => {
-        if (current.gameOver) return current
-        if (isOppositeDirection(current.direction, newDirection)) return current
-        return { ...current, direction: newDirection }
-      })
+      changeDirection(newDirection)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
@@ -62,7 +67,8 @@ export function PacketSnake() {
         <h1 className="mt-3 text-2xl font-semibold">Packet snake</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           Classic Snake, reskinned as a data stream eating loose packets. Running into yourself ends
-          the game as a routing loop. Arrow keys or WASD to steer.
+          the game as a routing loop. Arrow keys or WASD to steer, or use the on-screen controls on
+          mobile.
         </p>
       </div>
 
@@ -104,6 +110,8 @@ export function PacketSnake() {
             </div>
           )}
         </div>
+
+        <DirectionPad onPress={changeDirection} disabled={state.gameOver} />
       </Card>
     </div>
   )

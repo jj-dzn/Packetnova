@@ -40,15 +40,20 @@ export function HackerTyper() {
   const [lines, setLines] = useState<string[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
 
+  function addLine() {
+    setLines((current) => {
+      const next = [...current, CODE_FRAGMENTS[Math.floor(Math.random() * CODE_FRAGMENTS.length)]!]
+      return next.length > MAX_LINES ? next.slice(next.length - MAX_LINES) : next
+    })
+  }
+
+  // Desktop: any physical keydown, anywhere on the page. Mobile has no
+  // physical keyboard to listen for, so it needs an actual focused text
+  // input to summon the on-screen one -- see the input rendered below the
+  // terminal.
   useEffect(() => {
     function handleKeyDown() {
-      setLines((current) => {
-        const next = [
-          ...current,
-          CODE_FRAGMENTS[Math.floor(Math.random() * CODE_FRAGMENTS.length)]!,
-        ]
-        return next.length > MAX_LINES ? next.slice(next.length - MAX_LINES) : next
-      })
+      addLine()
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
@@ -82,6 +87,22 @@ export function HackerTyper() {
           ))
         )}
       </div>
+
+      <input
+        type="text"
+        inputMode="text"
+        autoComplete="off"
+        autoCapitalize="off"
+        autoCorrect="off"
+        spellCheck={false}
+        placeholder="No keyboard? Tap here and type on mobile"
+        onKeyDown={(event) => event.stopPropagation()}
+        onChange={(event) => {
+          event.target.value = ''
+          addLine()
+        }}
+        className="mt-3 w-full rounded-md border border-border bg-bg px-3 py-2 font-mono text-xs text-fg placeholder:text-fg-subtle focus:border-accent focus:outline-none"
+      />
     </div>
   )
 }

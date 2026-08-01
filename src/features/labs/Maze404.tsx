@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
+import { DirectionPad, type PadDirection } from './DirectionPad'
 import {
   DELTAS,
   generateMaze,
@@ -9,6 +10,13 @@ import {
   type Direction,
   type MazeResult,
 } from '../../lib/labs/maze404'
+
+const PAD_TO_MAZE_DIRECTION: Record<PadDirection, Direction> = {
+  up: 'north',
+  down: 'south',
+  left: 'west',
+  right: 'east',
+}
 
 const MAZE_WIDTH = 9
 const MAZE_HEIGHT = 9
@@ -47,23 +55,29 @@ export function Maze404() {
     setPosition(next.start)
   }
 
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
+  const move = useCallback(
+    (direction: Direction) => {
       if (won) return
-      const direction = KEY_DIRECTIONS[event.key]
-      if (!direction) return
-      event.preventDefault()
-
       setPosition((current) => {
         const cell = maze.cells[current.y]![current.x]!
         if (!cell.open[direction]) return current
         const { dx, dy } = DELTAS[direction]
         return { x: current.x + dx, y: current.y + dy }
       })
+    },
+    [maze, won],
+  )
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const direction = KEY_DIRECTIONS[event.key]
+      if (!direction) return
+      event.preventDefault()
+      move(direction)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [maze, won])
+  }, [move])
 
   // The shortcut cell's only real side effect: after a short beat to let
   // the "cache hit" message register, teleport straight to the exit.
@@ -80,7 +94,7 @@ export function Maze404() {
         <h1 className="mt-3 text-2xl font-semibold">404 maze</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           A minimalist maze where dead ends are fake HTTP errors and one lucky cell is a cached
-          shortcut. Arrow keys or WASD to move.
+          shortcut. Arrow keys or WASD to move, or use the on-screen controls on mobile.
         </p>
       </div>
 
@@ -132,6 +146,11 @@ export function Maze404() {
         <p className={`h-5 text-sm font-mono ${won ? 'text-success' : 'text-fg-muted'}`}>
           {message ?? ' '}
         </p>
+
+        <DirectionPad
+          onPress={(direction) => move(PAD_TO_MAZE_DIRECTION[direction])}
+          disabled={won}
+        />
 
         <Button variant="secondary" onClick={newGame}>
           {won ? 'Play again' : 'New maze'}
