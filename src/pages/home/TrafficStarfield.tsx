@@ -27,6 +27,16 @@ interface Packet {
   protocol: string
 }
 
+interface ShootingStar {
+  active: boolean
+  x: number
+  y: number
+  vx: number
+  vy: number
+  life: number
+  maxLife: number
+}
+
 const STAR_COUNT = 55
 const NODE_COUNT = 7
 const PACKET_COUNT = 9
@@ -34,6 +44,21 @@ const POINTER_RADIUS = 150
 const PROTOCOLS = ['TCP', 'UDP', 'ICMP']
 const IDLE_MS = 7000
 const SHOWCASE_MS = 2600
+
+// Late night reads emptier and quieter in real life, so a denser sky there
+// reads as "look how much is still happening" -- daytime gets the sparsest
+// sky, evening sits in between. Deliberately mild (0.85-1.25x) so it stays
+// a "huh, feels different tonight" impression, not different enough to look
+// like a bug across two visits.
+function timeOfDayDensity(): number {
+  const hour = new Date().getHours()
+  if (hour >= 0 && hour < 6) return 1.25
+  if (hour >= 18) return 1.1
+  return 0.85
+}
+
+const SHOOTING_STAR_MIN_DELAY_MS = 18000
+const SHOOTING_STAR_MAX_DELAY_MS = 45000
 
 // Every live tool and visualizer, flattened into one pool of real
 // destinations -- computed once at module load, not per-render. Each
@@ -103,7 +128,21 @@ function proximityBoost(x: number, y: number, pointer: { x: number; y: number; a
 // the canvas itself stays aria-hidden and pointer-events-none throughout,
 // exactly as before, so it can never intercept clicks meant for the hero's
 // own buttons.
-export function TrafficStarfield() {
+//
+// `minimal` strips this down to just the twinkling starfield -- no nodes,
+// no packets, no interactive links, no idle-showcase or shooting-star
+// moments -- for reuse as the footer's small ambient sliver, where a full
+// constellation of clickable destinations would be cramped and where the
+// footer isn't the "did you just see that" moment the hero is.
+interface TrafficStarfieldProps {
+  minimal?: boolean
+  starCount?: number
+}
+
+export function TrafficStarfield({
+  minimal = false,
+  starCount = STAR_COUNT,
+}: TrafficStarfieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [nodeLinks, setNodeLinks] = useState<Node[]>([])
   const [activeNodeIndex, setActiveNodeIndex] = useState<number | null>(null)
@@ -123,6 +162,16 @@ export function TrafficStarfield() {
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     const colors = { current: readThemeColors() }
     const pointer = { x: 0, y: 0, active: false }
+    const densityMultiplier = reducedMotionQuery.matches ? 1 : timeOfDayDensity()
+    const shootingStar: ShootingStar = {
+      active: false,
+      x: 0,
+      y: 0,
+      vx: 0,
+      vy: 0,
+      life: 0,
+      maxLife: 0,
+    }
 
     let width = 0
     let height = 0
@@ -131,6 +180,7 @@ export function TrafficStarfield() {
     let packets: Packet[] = []
     let idleTimer = 0
     let showcaseTimer = 0
+    let shootingStarTimer = 0
 
     function armIdleTimer() {
       window.clearTimeout(idleTimer)
@@ -146,8 +196,32 @@ export function TrafficStarfield() {
       }, IDLE_MS)
     }
 
+    function armShootingStarTimer() {
+      window.clearTimeout(shootingStarTimer)
+      if (minimal || reducedMotionQuery.matches) return
+      const delay =
+        SHOOTING_STAR_MIN_DELAY_MS +
+        Math.random() * (SHOOTING_STAR_MAX_DELAY_MS - SHOOTING_STAR_MIN_DELAY_MS)
+      shootingStarTimer = window.setTimeout(() => {
+        if (document.hidden) {
+          armShootingStarTimer()
+          return
+        }
+        const startLeft = Math.random() < 0.5
+        shootingStar.x = startLeft ? -20 : width + 20
+        shootingStar.y = Math.random() * height * 0.5
+        const speed = 0.9 + Math.random() * 0.4
+        shootingStar.vx = (startLeft ? 1 : -1) * speed
+        shootingStar.vy = speed * 0.45
+        shootingStar.life = 0
+        shootingStar.maxLife = 700 + Math.random() * 300
+        shootingStar.active = true
+        armShootingStarTimer()
+      }, delay)
+    }
+
     function seed() {
-      stars = Array.from({ length: STAR_COUNT }, () => ({
+      stars = Array.from({ length: Math.round(starCount * densityMultiplier) }, () => ({
         x: Math.random() * width,
         y: Math.random() * height,
         radius: Math.random() * 1.1 + 0.3,
@@ -155,6 +229,12 @@ export function TrafficStarfield() {
         twinkleSpeed: Math.random() * 0.0012 + 0.0004,
         twinklePhase: Math.random() * Math.PI * 2,
       }))
+      if (minimal) {
+        nodes = []
+        setNodeLinks([])
+        packets = []
+        return
+      }
       const destinations = pickRandomUnique(DESTINATIONS, NODE_COUNT)
       nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
         x: Math.random() * width * 0.8 + width * 0.1,
@@ -272,6 +352,35 @@ export function TrafficStarfield() {
           ctx!.fillText(packet.protocol, x, y - 9)
         }
       }
+
+      // A rare, non-looping streak -- fires on its own long random timer
+      // (armShootingStarTimer), not every frame, so it stays a "did you
+      // just see that" moment instead of a background loop.
+      if (animate && shootingStar.active) {
+        shootingStar.life += dt
+        if (shootingStar.life >= shootingStar.maxLife) {
+          shootingStar.active = false
+        } else {
+          shootingStar.x += shootingStar.vx * dt
+          shootingStar.y += shootingStar.vy * dt
+          const fade = 1 - shootingStar.life / shootingStar.maxLife
+          const tailX = shootingStar.x - shootingStar.vx * 14
+          const tailY = shootingStar.y - shootingStar.vy * 14
+          const gradient = ctx!.createLinearGradient(tailX, tailY, shootingStar.x, shootingStar.y)
+          gradient.addColorStop(0, `rgba(${accent}, 0)`)
+          gradient.addColorStop(1, `rgba(${accent}, ${Math.min(1, fade * 0.9)})`)
+          ctx!.strokeStyle = gradient
+          ctx!.lineWidth = 1.5
+          ctx!.beginPath()
+          ctx!.moveTo(tailX, tailY)
+          ctx!.lineTo(shootingStar.x, shootingStar.y)
+          ctx!.stroke()
+          ctx!.beginPath()
+          ctx!.arc(shootingStar.x, shootingStar.y, 1.4, 0, Math.PI * 2)
+          ctx!.fillStyle = `rgba(${accent}, ${Math.min(1, fade)})`
+          ctx!.fill()
+        }
+      }
     }
 
     let rafId = 0
@@ -328,12 +437,18 @@ export function TrafficStarfield() {
       start()
       window.clearTimeout(idleTimer)
       window.clearTimeout(showcaseTimer)
+      window.clearTimeout(shootingStarTimer)
+      shootingStar.active = false
       if (reducedMotionQuery.matches) updateActiveNode(null)
-      else armIdleTimer()
+      else {
+        armIdleTimer()
+        armShootingStarTimer()
+      }
     }
 
     start()
     armIdleTimer()
+    armShootingStarTimer()
     document.addEventListener('visibilitychange', handleVisibility)
     reducedMotionQuery.addEventListener('change', handleReducedMotionChange)
     window.addEventListener('pointermove', handlePointerMove)
@@ -348,6 +463,7 @@ export function TrafficStarfield() {
       stop()
       window.clearTimeout(idleTimer)
       window.clearTimeout(showcaseTimer)
+      window.clearTimeout(shootingStarTimer)
       resizeObserver.disconnect()
       themeObserver.disconnect()
       document.removeEventListener('visibilitychange', handleVisibility)
@@ -355,7 +471,7 @@ export function TrafficStarfield() {
       window.removeEventListener('pointermove', handlePointerMove)
       document.removeEventListener('pointerleave', handlePointerLeaveWindow)
     }
-  }, [])
+  }, [minimal, starCount])
 
   function handleNodeEnter(index: number) {
     userHoverRef.current = true

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router'
 import { PageShell } from './components/layout/PageShell'
 import { RouteLoadingFallback } from './components/layout/RouteLoadingFallback'
 import { HomePage } from './pages/HomePage'
+import { AboutPage } from './pages/AboutPage'
 import { ToolsPage } from './pages/ToolsPage'
 import { VisualizersPage } from './pages/VisualizersPage'
 import { ScenariosPage } from './pages/ScenariosPage'
@@ -478,6 +479,7 @@ function App() {
             <Route path="/labs/packet-snake" element={<PacketSnake />} />
             <Route path="/labs/packet-runner" element={<PacketRunner />} />
             <Route path="/terminal" element={<RetroTerminal />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

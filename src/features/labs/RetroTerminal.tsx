@@ -77,6 +77,24 @@ function runCommand(raw: string): string[] {
         'ERROR: no coffee maker detected on this machine.',
         '(this terminal runs on vibes and JavaScript, not caffeine)',
       ]
+    case '42':
+      return ['The answer, obviously.', '(nobody remembers the question)']
+    case 'rm':
+    case 'rm -rf':
+    case 'rm -rf /':
+      return ['Nice try.', 'Nothing in here was ever real -- this whole terminal is a <div>.']
+    case 'matrix':
+    case 'wake-up':
+      return [
+        '01010111 01100001 01101011 01100101 00100000 01110101 01110000',
+        'Wake up, packet...',
+        'The starfield has you. Follow the signal.',
+      ]
+    case 'snake':
+    case 'packetsnake':
+      return ["There's an actual snake game hiding in Labs.", 'Go play it: /labs/packet-snake']
+    case 'konami':
+      return ['You already know the code.', "(or you don't, and that's the fun part)"]
     case 'ping': {
       const host = args[0] ?? 'packetnova.ca'
       return [

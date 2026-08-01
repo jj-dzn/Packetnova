@@ -32,6 +32,7 @@ describe('getPageMeta', () => {
       '/labs/packet-snake',
       '/labs/packet-runner',
       '/terminal',
+      '/about',
     ]) {
       const meta = getPageMeta(path)
       expect(meta.title).toContain('PacketNova')

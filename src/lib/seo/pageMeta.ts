@@ -98,6 +98,10 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `Terminal - ${SITE_TITLE}`,
     description: DEFAULT_DESCRIPTION,
   },
+  '/about': {
+    title: `About - ${SITE_TITLE}`,
+    description: 'Why "nova" -- the idea behind PacketNova, and what it actually is.',
+  },
 }
 
 const NOT_FOUND_META: PageMeta = {
