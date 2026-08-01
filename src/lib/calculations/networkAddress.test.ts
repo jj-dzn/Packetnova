@@ -26,6 +26,21 @@ describe('calculateNetworkAddress', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.result.networkAddress).toBe('192.168.1.5')
+    expect(result.result.broadcastAddress).toBe('192.168.1.5')
+    expect(result.result.firstUsable).toBeNull()
+    expect(result.result.lastUsable).toBeNull()
+    expect(result.result.usableHosts).toBe(1)
+  })
+
+  it('includes broadcast address and usable range for a /24', () => {
+    const result = calculateNetworkAddress('192.168.1.130/24')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.broadcastAddress).toBe('192.168.1.255')
+    expect(result.result.firstUsable).toBe('192.168.1.1')
+    expect(result.result.lastUsable).toBe('192.168.1.254')
+    expect(result.result.totalAddresses).toBe(256)
+    expect(result.result.usableHosts).toBe(254)
   })
 
   it('classifies a public address correctly', () => {

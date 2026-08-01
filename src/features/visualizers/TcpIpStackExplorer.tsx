@@ -1,46 +1,172 @@
-import { LayerExplorer, type LayerInfo } from './LayerExplorer'
+import { useState } from 'react'
+import { VisualizerPageLayout } from './VisualizerPageLayout'
+import {
+  OSI_LAYERS,
+  TCP_IP_LAYERS,
+  type OsiLayer,
+  type TcpIpLayer,
+} from '../../content/reference/networkStackLayers'
 
-// The 4-layer TCP/IP (Internet protocol suite) model, listed Application (4)
-// down to Network Access (1). Each description names the OSI layer(s) it
-// corresponds to, since comparing against OSI is this visualizer's point.
-const LAYERS: LayerInfo[] = [
-  {
-    number: 4,
-    name: 'Application',
-    description: "Combines OSI's Session, Presentation, and Application layers (5-7) into one.",
-    examples: 'HTTP, DNS, TLS, SMTP',
-    dataUnit: 'Data',
-  },
-  {
-    number: 3,
-    name: 'Transport',
-    description: "Same role as OSI's Transport layer (4) -- TCP and UDP.",
-    examples: 'TCP, UDP',
-    dataUnit: 'Segments (TCP) / Datagrams (UDP)',
-  },
-  {
-    number: 2,
-    name: 'Internet',
-    description: "Same role as OSI's Network layer (3) -- logical addressing and routing.",
-    examples: 'IP, ICMP',
-    dataUnit: 'Packets',
-  },
-  {
-    number: 1,
-    name: 'Network Access',
-    description: "Combines OSI's Data Link and Physical layers (1-2) into one.",
-    examples: 'Ethernet, Wi-Fi, ARP',
-    dataUnit: 'Frames',
-  },
-]
+const ROW_H = 56
+const GAP_W = 40
+const TOTAL_HEIGHT = OSI_LAYERS.length * ROW_H
 
+type Selected = { side: 'osi'; layer: OsiLayer } | { side: 'tcpip'; layer: TcpIpLayer }
+
+// Precomputed once at module load (not per-render): each TCP/IP layer,
+// paired with its vertical center within the shared TOTAL_HEIGHT, in
+// top-to-bottom order.
+const TCP_IP_LAYERS_WITH_MID_Y: { layer: TcpIpLayer; midY: number }[] = (() => {
+  let cursorY = 0
+  return TCP_IP_LAYERS.map((layer) => {
+    const groupHeight = layer.osiLayerNumbers.length * ROW_H
+    const midY = cursorY + groupHeight / 2
+    cursorY += groupHeight
+    return { layer, midY }
+  })
+})()
+
+// Replaces the old single-column layer-by-layer walkthrough: this page's
+// whole premise is comparing TCP/IP against OSI, so it should actually show
+// them side by side. Row heights on the OSI side are uniform; TCP/IP row
+// heights are sized to the number of OSI layers each one absorbs, so the
+// two columns' heights line up exactly and the connecting lines land at
+// matching Y coordinates with no extra geometry needed.
 export function TcpIpStackExplorer() {
+  const [selected, setSelected] = useState<Selected>({ side: 'tcpip', layer: TCP_IP_LAYERS[0]! })
+
   return (
-    <LayerExplorer
+    <VisualizerPageLayout
       category="Visualizer"
       title="TCP/IP stack explorer"
-      description="Compare the TCP/IP model against OSI and see how real protocols map to each layer."
-      layers={LAYERS}
-    />
+      description="Compare the TCP/IP model against OSI, side by side -- click either stack to see how they line up."
+    >
+      <div className="flex flex-col gap-8">
+        <div className="flex items-start justify-center gap-0 overflow-x-auto">
+          <div className="w-32 shrink-0 sm:w-40">
+            <ColumnHeading>OSI (7 layers)</ColumnHeading>
+            <div
+              style={{ height: TOTAL_HEIGHT }}
+              className="flex flex-col overflow-hidden rounded-md border border-border"
+            >
+              {OSI_LAYERS.map((layer, index) => (
+                <LayerRow
+                  key={layer.number}
+                  height={ROW_H}
+                  bordered={index < OSI_LAYERS.length - 1}
+                  label={`L${layer.number} ${layer.name}`}
+                  active={selected.side === 'osi' && selected.layer.number === layer.number}
+                  highlighted={
+                    selected.side === 'tcpip' &&
+                    selected.layer.osiLayerNumbers.includes(layer.number)
+                  }
+                  onClick={() => setSelected({ side: 'osi', layer })}
+                />
+              ))}
+            </div>
+          </div>
+
+          <svg
+            width={GAP_W}
+            height={TOTAL_HEIGHT}
+            className="shrink-0 text-border"
+            aria-hidden="true"
+          >
+            {TCP_IP_LAYERS_WITH_MID_Y.map(({ layer, midY }) => {
+              const isActive = selected.side === 'tcpip' && selected.layer.number === layer.number
+              return (
+                <line
+                  key={layer.number}
+                  x1={0}
+                  y1={midY}
+                  x2={GAP_W}
+                  y2={midY}
+                  stroke="currentColor"
+                  strokeWidth={isActive ? 2 : 1}
+                  className={isActive ? 'text-accent' : undefined}
+                />
+              )
+            })}
+          </svg>
+
+          <div className="w-32 shrink-0 sm:w-40">
+            <ColumnHeading>TCP/IP (4 layers)</ColumnHeading>
+            <div
+              style={{ height: TOTAL_HEIGHT }}
+              className="flex flex-col overflow-hidden rounded-md border border-border"
+            >
+              {TCP_IP_LAYERS.map((layer, index) => (
+                <LayerRow
+                  key={layer.number}
+                  height={layer.osiLayerNumbers.length * ROW_H}
+                  bordered={index < TCP_IP_LAYERS.length - 1}
+                  label={`L${layer.number} ${layer.name}`}
+                  active={selected.side === 'tcpip' && selected.layer.number === layer.number}
+                  highlighted={
+                    selected.side === 'osi' && layer.osiLayerNumbers.includes(selected.layer.number)
+                  }
+                  onClick={() => setSelected({ side: 'tcpip', layer })}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div aria-live="polite">
+          <h2 className="font-medium">
+            {selected.side === 'osi' ? 'OSI' : 'TCP/IP'} -- L{selected.layer.number}{' '}
+            {selected.layer.name}
+          </h2>
+          <p className="mt-1 text-sm text-fg-muted">{selected.layer.description}</p>
+          <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+            <dt className="text-fg-subtle">Examples</dt>
+            <dd className="font-mono text-xs text-fg">{selected.layer.examples}</dd>
+            <dt className="text-fg-subtle">Data unit</dt>
+            <dd className="font-mono text-xs text-fg">{selected.layer.dataUnit}</dd>
+          </dl>
+        </div>
+      </div>
+    </VisualizerPageLayout>
+  )
+}
+
+function ColumnHeading({ children }: { children: string }) {
+  return (
+    <p className="mb-2 text-center text-xs font-semibold tracking-wide text-fg-subtle uppercase">
+      {children}
+    </p>
+  )
+}
+
+function LayerRow({
+  height,
+  bordered,
+  label,
+  active,
+  highlighted,
+  onClick,
+}: {
+  height: number
+  bordered: boolean
+  label: string
+  active: boolean
+  highlighted: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{ height }}
+      className={`flex items-center justify-center px-2 text-center text-xs font-medium transition-colors ${bordered ? 'border-b border-border' : ''} ${
+        active
+          ? 'bg-accent/10 text-accent'
+          : highlighted
+            ? 'bg-accent/5 text-fg'
+            : 'bg-bg text-fg-muted hover:bg-accent/5 hover:text-fg'
+      }`}
+    >
+      {label}
+    </button>
   )
 }

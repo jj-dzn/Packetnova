@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
+import { AddressSpaceBar } from './AddressSpaceBar'
 import { Input } from '../../../components/ui/Input'
 import { calculateNetworkAddress } from '../../../lib/calculations/networkAddress'
 
@@ -37,6 +38,13 @@ export function NetworkAddressCalculator() {
               <ResultRow label="Subnet mask" value={calc.result.subnetMask} />
               <ResultRow label="Address type" value={calc.result.classification.label} />
             </dl>
+            <AddressSpaceBar
+              networkAddress={calc.result.networkAddress}
+              broadcastAddress={calc.result.broadcastAddress}
+              firstUsable={calc.result.firstUsable}
+              lastUsable={calc.result.lastUsable}
+              usableHosts={calc.result.usableHosts}
+            />
             <BinaryBreakdown
               label="Network address in binary"
               value={calc.result.networkAddressValue}

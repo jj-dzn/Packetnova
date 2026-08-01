@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { BitFieldDiagram } from '../BitFieldDiagram'
 import { Input } from '../../../components/ui/Input'
 import { calculateDot1qTag } from '../../../lib/calculations/dot1q'
 
@@ -55,11 +56,23 @@ export function Dot1qExplorer() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow label="TPID" value="0x8100" />
-            <ResultRow label="TCI" value={`0x${calc.result.tciHex}`} />
-            <ResultRow label="Full tag" value={`0x${calc.result.fullTagHex}`} />
-          </dl>
+          <div className="flex flex-col gap-4">
+            <dl>
+              <ResultRow label="TPID" value="0x8100" />
+              <ResultRow label="TCI" value={`0x${calc.result.tciHex}`} />
+              <ResultRow label="Full tag" value={`0x${calc.result.fullTagHex}`} />
+            </dl>
+            <div>
+              <p className="mb-1 text-xs font-medium text-fg-muted">TCI (16 bits) broken down</p>
+              <BitFieldDiagram
+                fields={[
+                  { label: 'PCP', bits: 3, value: calc.result.pcp },
+                  { label: 'DEI', bits: 1, value: calc.result.dei },
+                  { label: 'VLAN ID', bits: 12, value: calc.result.vlanId },
+                ]}
+              />
+            </div>
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ReferencePageLayout } from '../ReferencePageLayout'
 import { ResultRow } from '../ResultRow'
+import { HeaderByteDiagram } from '../HeaderByteDiagram'
 import { DataTable } from '../../../components/ui/DataTable'
 import { calculateTcpFlags, type TcpFlags } from '../../../lib/calculations/tcpFlags'
 import { tcpHeaderFields } from '../../../content/reference/tcpHeaderFields'
@@ -33,6 +34,9 @@ export function TcpHeaderExplorer() {
       title="TCP header explorer"
       description="Every field in a TCP header, byte by byte, plus a quick flags-byte calculator."
     >
+      <div className="mb-8">
+        <HeaderByteDiagram fields={tcpHeaderFields} />
+      </div>
       <div className="mb-8 grid grid-cols-1 gap-6 rounded-lg border border-border bg-surface p-6 lg:grid-cols-2">
         <div>
           <span className="text-sm font-medium">Flags</span>

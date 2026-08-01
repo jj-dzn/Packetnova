@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { RangeBlocksBar } from './RangeBlocksBar'
 import { Input } from '../../../components/ui/Input'
 import { calculateIpRange } from '../../../lib/calculations/ipRange'
 
@@ -54,6 +55,7 @@ export function IpRangeCalculator() {
               />
               <ResultRow label="CIDR blocks" value={String(calc.result.cidrBlocks.length)} />
             </dl>
+            <RangeBlocksBar blocks={calc.result.cidrBlocks} />
             <ul className="flex flex-col gap-1 font-mono text-sm">
               {calc.result.cidrBlocks.map((block) => (
                 <li key={block.cidr} className="rounded-md border border-border px-3 py-2">

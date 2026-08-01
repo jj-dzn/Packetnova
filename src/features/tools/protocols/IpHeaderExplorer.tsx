@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ReferencePageLayout } from '../ReferencePageLayout'
 import { ResultRow } from '../ResultRow'
+import { HeaderByteDiagram } from '../HeaderByteDiagram'
 import { DataTable } from '../../../components/ui/DataTable'
 import { calculateIpFlags, type IpFlags } from '../../../lib/calculations/ipFlags'
 import { ipHeaderFields } from '../../../content/reference/ipHeaderFields'
@@ -17,6 +18,9 @@ export function IpHeaderExplorer() {
       title="IP header explorer"
       description="Every field in an IPv4 header, byte by byte, plus a quick flags-field calculator."
     >
+      <div className="mb-8">
+        <HeaderByteDiagram fields={ipHeaderFields} />
+      </div>
       <div className="mb-8 grid grid-cols-1 gap-6 rounded-lg border border-border bg-surface p-6 lg:grid-cols-2">
         <div>
           <span className="text-sm font-medium">Flags</span>

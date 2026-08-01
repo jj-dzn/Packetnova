@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
+import { AddressSpaceBar } from './AddressSpaceBar'
 import { Input } from '../../../components/ui/Input'
 import { calculateCidr } from '../../../lib/calculations/cidr'
 
@@ -52,6 +53,13 @@ export function CidrCalculator() {
               <ResultRow label="Usable hosts" value={calc.result.usableHosts.toLocaleString()} />
               <ResultRow label="Address type" value={calc.result.classification.label} />
             </dl>
+            <AddressSpaceBar
+              networkAddress={calc.result.networkAddress}
+              broadcastAddress={calc.result.broadcastAddress}
+              firstUsable={calc.result.firstUsable}
+              lastUsable={calc.result.lastUsable}
+              usableHosts={calc.result.usableHosts}
+            />
             <BinaryBreakdown
               label="Address in binary"
               value={calc.result.ipValue}
