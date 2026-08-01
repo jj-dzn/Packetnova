@@ -66,9 +66,12 @@ interface EncapStep {
   layers: EncapLayer[]
 }
 
-// HTTP over TCP: the "full stack" case, wrapped at the source and then
-// unwrapped again at the destination -- not just built up and left there.
-const HTTP_STEPS: EncapStep[] = [
+// HTTP over TCP: the "full stack" case. Encapsulation and decapsulation are
+// two separate, independently-steppable sequences shown one above the
+// other -- rather than one continuous walkthrough that builds up and then
+// tears back down -- so both directions are visible at a glance instead of
+// only whichever one the step player currently happens to be on.
+const HTTP_ENCAP_STEPS: EncapStep[] = [
   {
     title: 'Application data',
     description: 'The application generates data to send -- for example, an HTTP GET request.',
@@ -100,26 +103,37 @@ const HTTP_STEPS: EncapStep[] = [
     payloadLabel: 'Data',
     layers: [TCP_LAYER, IP_LAYER, ETH_LAYER],
   },
+]
+
+const HTTP_DECAP_STEPS: EncapStep[] = [
   {
-    title: "4. The frame arrives -- Ethernet's job is done",
+    title: 'Frame arrives at the destination',
     description:
-      "At the destination NIC, the Ethernet header and trailer are stripped off. They only ever needed to get the frame across this one physical hop -- what's left gets handed up to IP.",
+      'The frame arrives at the destination NIC exactly as it was built. Decapsulation now undoes each wrap in reverse -- outermost first, the opposite order from how it was added.',
+    unitName: 'Frame',
+    payloadLabel: 'Data',
+    layers: [TCP_LAYER, IP_LAYER, ETH_LAYER],
+  },
+  {
+    title: '1. Ethernet is stripped -- its job is done',
+    description:
+      "The Ethernet header and trailer are removed. They only ever needed to get the frame across this one physical hop -- what's left gets handed up to IP.",
     unitName: 'Packet',
     payloadLabel: 'Data',
     layers: [TCP_LAYER, IP_LAYER],
   },
   {
-    title: '5. IP hands off based on the destination address',
+    title: '2. IP is stripped',
     description:
-      'The IP header is stripped -- the destination address already did its job, getting the packet to this exact host. The protocol field inside it says what to hand the remainder to: TCP.',
+      'The IP header is removed -- the destination address already did its job, getting the packet to this exact host. The protocol field inside it says what to hand the remainder to: TCP.',
     unitName: 'Segment',
     payloadLabel: 'Data',
     layers: [TCP_LAYER],
   },
   {
-    title: '6. TCP delivers the data to the application',
+    title: '3. TCP is stripped -- data delivered',
     description:
-      "The TCP header is stripped -- its port numbers identified exactly which application should receive this. What's left is the original data, byte-for-byte identical to what the sender's application generated.",
+      "The TCP header is removed -- its port numbers identified exactly which application should receive this. What's left is the original data, byte-for-byte identical to what the sender's application generated.",
     unitName: 'Data',
     payloadLabel: 'Data',
     layers: [],
@@ -130,7 +144,7 @@ const HTTP_STEPS: EncapStep[] = [
 // (DHCP just re-broadcasts if nothing answers, so it doesn't need TCP's
 // reliability machinery) and IP addresses that only make sense because the
 // client has no real address yet.
-const DHCP_STEPS: EncapStep[] = [
+const DHCP_ENCAP_STEPS: EncapStep[] = [
   {
     title: 'DHCPDISCOVER message',
     description: 'The client, with no IP address of its own yet, builds a DHCPDISCOVER message.',
@@ -162,26 +176,36 @@ const DHCP_STEPS: EncapStep[] = [
     payloadLabel: 'DISCOVER',
     layers: [UDP_LAYER, IP_LAYER, ETH_LAYER],
   },
+]
+
+const DHCP_DECAP_STEPS: EncapStep[] = [
   {
-    title: '4. Every device on the segment receives it',
+    title: 'Frame arrives at every device on the segment',
     description:
-      "Because this is a broadcast frame, every host on the local segment strips its Ethernet header and looks at what's inside -- only the DHCP server actually acts on it.",
+      "Because this was a broadcast frame, every host on the local segment receives it. Decapsulation happens the same way on all of them -- only the DHCP server actually acts on what's inside.",
+    unitName: 'Frame',
+    payloadLabel: 'DISCOVER',
+    layers: [UDP_LAYER, IP_LAYER, ETH_LAYER],
+  },
+  {
+    title: '1. Ethernet is stripped',
+    description: "Every host strips its Ethernet header and looks at what's inside.",
     unitName: 'Packet',
     payloadLabel: 'DISCOVER',
     layers: [UDP_LAYER, IP_LAYER],
   },
   {
-    title: '5. IP hands off to the transport layer',
+    title: '2. IP is stripped',
     description:
-      'The IP header is stripped. Everything addressed to the broadcast address and this UDP port range gets handed up.',
+      'The IP header is removed. Everything addressed to the broadcast address and this UDP port range gets handed up.',
     unitName: 'Datagram',
     payloadLabel: 'DISCOVER',
     layers: [UDP_LAYER],
   },
   {
-    title: '6. UDP delivers it to the DHCP service',
+    title: '3. UDP is stripped -- delivered to the DHCP service',
     description:
-      'The UDP header is stripped -- destination port 67 identified this as DHCP traffic specifically. The DHCP service on the server receives the original DISCOVER message and starts building an OFFER.',
+      'The UDP header is removed -- destination port 67 identified this as DHCP traffic specifically. The DHCP service on the server receives the original DISCOVER message and starts building an OFFER.',
     unitName: 'Data',
     payloadLabel: 'DISCOVER',
     layers: [],
@@ -191,7 +215,7 @@ const DHCP_STEPS: EncapStep[] = [
 // ARP has no transport or network layer at all -- the clearest possible
 // illustration that not every packet uses the whole stack. It's carried
 // directly inside an Ethernet frame, nothing more.
-const ARP_STEPS: EncapStep[] = [
+const ARP_ENCAP_STEPS: EncapStep[] = [
   {
     title: 'ARP request',
     description:
@@ -208,10 +232,21 @@ const ARP_STEPS: EncapStep[] = [
     payloadLabel: 'ARP req',
     layers: [ETH_LAYER],
   },
+]
+
+const ARP_DECAP_STEPS: EncapStep[] = [
   {
-    title: '2. Every device on the segment receives it',
+    title: 'Frame arrives at every device on the segment',
     description:
-      'Every host on the segment strips the Ethernet header and inspects the ARP message inside. Only the host whose own IP address matches the request actually replies -- with a unicast ARP reply carrying its MAC address, going through the exact same one-layer wrap in reverse.',
+      'Every host on the segment receives this broadcast frame. Decapsulation here is just one step, since ARP never added anything beyond the Ethernet wrapper.',
+    unitName: 'Frame',
+    payloadLabel: 'ARP req',
+    layers: [ETH_LAYER],
+  },
+  {
+    title: '1. Ethernet is stripped -- message delivered',
+    description:
+      'Every host strips the Ethernet header and inspects the ARP message inside. Only the host whose own IP address matches the request actually replies -- with a unicast ARP reply carrying its MAC address, going through the exact same one-layer wrap in reverse.',
     unitName: 'Message',
     payloadLabel: 'ARP req',
     layers: [],
@@ -224,7 +259,8 @@ interface Scenario {
   key: ScenarioKey
   label: string
   description: string
-  steps: EncapStep[]
+  encapSteps: EncapStep[]
+  decapSteps: EncapStep[]
 }
 
 const SCENARIOS: Scenario[] = [
@@ -232,22 +268,25 @@ const SCENARIOS: Scenario[] = [
     key: 'http',
     label: 'HTTP over TCP',
     description:
-      "Follow a packet as it's wrapped from application data down to a frame -- then unwrapped again at the destination, layer by layer, in reverse.",
-    steps: HTTP_STEPS,
+      'See a packet wrapped from application data down to a frame, and unwrapped again at the destination -- as two separate diagrams, so both directions are visible at once.',
+    encapSteps: HTTP_ENCAP_STEPS,
+    decapSteps: HTTP_DECAP_STEPS,
   },
   {
     key: 'dhcp',
     label: 'DHCP over UDP',
     description:
       "DHCP takes the same trip through UDP instead of TCP, with source and destination addresses that only make sense because the client doesn't have a real address yet.",
-    steps: DHCP_STEPS,
+    encapSteps: DHCP_ENCAP_STEPS,
+    decapSteps: DHCP_DECAP_STEPS,
   },
   {
     key: 'arp',
     label: 'ARP (no IP at all)',
     description:
       'Not every packet uses the whole stack: ARP has no transport or network layer of its own, and goes straight from raw message to Ethernet frame.',
-    steps: ARP_STEPS,
+    encapSteps: ARP_ENCAP_STEPS,
+    decapSteps: ARP_DECAP_STEPS,
   },
 ]
 
@@ -272,7 +311,17 @@ export function PacketEncapsulationVisualizer() {
           </Pill>
         ))}
       </div>
-      <EncapWalkthrough key={scenario.key} steps={scenario.steps} />
+
+      <div className="flex flex-col gap-10">
+        <div>
+          <p className="mb-4 text-base font-semibold">Encapsulation -- at the source</p>
+          <EncapWalkthrough key={`${scenario.key}-encap`} steps={scenario.encapSteps} />
+        </div>
+        <div className="border-t border-border pt-10">
+          <p className="mb-4 text-base font-semibold">Decapsulation -- at the destination</p>
+          <EncapWalkthrough key={`${scenario.key}-decap`} steps={scenario.decapSteps} />
+        </div>
+      </div>
     </VisualizerPageLayout>
   )
 }
@@ -302,8 +351,8 @@ function EncapWalkthrough({ steps }: { steps: EncapStep[] }) {
     <div
       tabIndex={0}
       onKeyDown={player.onKeyDown}
-      aria-label="Packet encapsulation visualizer. Use the Previous and Next buttons, or the left and right arrow keys, to step through."
-      className="flex flex-col gap-8 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      aria-label="Use the Previous and Next buttons, or the left and right arrow keys, to step through."
+      className="flex flex-col gap-6 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
       <div>
         <p className="mb-2 text-center text-sm font-medium text-fg-muted">{current.unitName}</p>
