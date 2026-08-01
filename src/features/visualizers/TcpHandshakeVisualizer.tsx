@@ -144,13 +144,72 @@ const SYN_ACK_LOST_STEPS: SequenceStep[] = [
   },
 ]
 
-type Scenario = 'normal' | 'syn-lost' | 'syn-ack-lost'
+// Teardown is a 4-way close (RFC 793): each side's FIN is acknowledged
+// separately, since a FIN only means "I'm done sending" -- the side that
+// receives it may still have data left to send before closing its own
+// direction. (A server that has nothing left to say can fold its ACK and
+// FIN into one segment, but keeping them separate here shows the general
+// case, which is also what the state names below reflect.)
+const TEARDOWN_STEPS: SequenceStep[] = [
+  {
+    title: 'Connection established',
+    description:
+      'This scenario picks up from an already-open connection to show how TCP closes it down -- four segments, not three, since each direction has to be closed independently.',
+    leftState: 'ESTABLISHED',
+    rightState: 'ESTABLISHED',
+    segment: null,
+  },
+  {
+    title: '1. FIN',
+    description:
+      "The client is done sending data and sends a FIN. It can still receive data from the server -- FIN only closes the client's outbound direction.",
+    leftState: 'FIN_WAIT_1',
+    rightState: 'ESTABLISHED',
+    segment: { direction: 'right', label: 'FIN seq=500' },
+  },
+  {
+    title: '2. ACK',
+    description:
+      "The server acknowledges the client's FIN. The server may still have data left to send, so it doesn't close its own direction yet.",
+    leftState: 'FIN_WAIT_2',
+    rightState: 'CLOSE_WAIT',
+    segment: { direction: 'left', label: 'ACK ack=501' },
+  },
+  {
+    title: '3. FIN',
+    description: 'The server finishes sending and sends its own FIN.',
+    leftState: 'FIN_WAIT_2',
+    rightState: 'LAST_ACK',
+    segment: { direction: 'left', label: 'FIN seq=800' },
+  },
+  {
+    title: '4. ACK',
+    description:
+      "The client acknowledges the server's FIN. The client enters TIME_WAIT (holding the connection briefly in case this ACK was lost and the FIN needs to be re-acknowledged) before fully closing; the server closes immediately.",
+    leftState: 'TIME_WAIT',
+    rightState: 'CLOSED',
+    segment: { direction: 'right', label: 'ACK ack=801' },
+  },
+]
+
+type Scenario = 'normal' | 'syn-lost' | 'syn-ack-lost' | 'teardown'
 
 const SCENARIOS: { key: Scenario; label: string; steps: SequenceStep[] }[] = [
   { key: 'normal', label: 'Normal handshake', steps: NORMAL_STEPS },
   { key: 'syn-lost', label: 'SYN lost', steps: SYN_LOST_STEPS },
   { key: 'syn-ack-lost', label: 'SYN-ACK lost', steps: SYN_ACK_LOST_STEPS },
+  { key: 'teardown', label: 'Connection teardown', steps: TEARDOWN_STEPS },
 ]
+
+const SCENARIO_DESCRIPTIONS: Record<Scenario, string> = {
+  normal: 'Watch SYN, SYN-ACK, and ACK establish a connection step by step.',
+  'syn-lost':
+    'This is the reason engineers actually care about the handshake in production: what happens when a segment gets dropped, and how retransmission recovers it.',
+  'syn-ack-lost':
+    'This is the reason engineers actually care about the handshake in production: what happens when a segment gets dropped, and how retransmission recovers it.',
+  teardown:
+    "The handshake's state machine is only half the story -- watch the 4-way close that ends a TCP connection, and why it takes an extra step compared to opening one.",
+}
 
 export function TcpHandshakeVisualizer() {
   const [scenario, setScenario] = useState<Scenario>('normal')
@@ -160,11 +219,7 @@ export function TcpHandshakeVisualizer() {
     <VisualizerPageLayout
       category="Visualizer"
       title="TCP three-way handshake"
-      description={
-        scenario === 'normal'
-          ? 'Watch SYN, SYN-ACK, and ACK establish a connection step by step.'
-          : 'This is the reason engineers actually care about the handshake in production: what happens when a segment gets dropped, and how retransmission recovers it.'
-      }
+      description={SCENARIO_DESCRIPTIONS[scenario]}
     >
       <div className="mb-6 flex flex-wrap gap-2">
         {SCENARIOS.map((s) => (

@@ -17,7 +17,7 @@ src/
       security/          hash gen/verify, JWT decode/inspect, base64, URL encode, cert viewer, password gen
       utilities/         regex tester, JSON/YAML/XML formatter, epoch converter, base converter, ASCII converter, diff viewer
     visualizers/         TCP handshake, TLS handshake, encapsulation, OSI explorer, TCP/IP stack, NAT flow,
-                          routing decision, BGP best path, OSPF SPF animation, VPN packet flow
+                          routing decision, BGP best path, OSPF SPF animation, VPN packet flow, DHCP DORA
     learn/               topic pages (TCP/IP, routing, switching, VPN, firewalls, BGP, OSPF, DNS, DHCP, IPv6, SASE, SD-WAN,
                           packet analysis, troubleshooting)
     blog/                 post listing, post renderer, category/tag filtering

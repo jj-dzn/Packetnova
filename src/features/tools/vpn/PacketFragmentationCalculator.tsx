@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { calculateFragmentation } from '../../../lib/calculations/fragmentation'
 
@@ -96,6 +97,15 @@ export function PacketFragmentationCalculator() {
                 </tbody>
               </table>
             </div>
+            <Aside>
+              This entire calculator is IPv4-specific for a reason: in IPv6, routers never fragment
+              packets in transit at all -- only the originating host is allowed to. A router that
+              receives an IPv6 packet too big for the next link just drops it and sends back an
+              ICMPv6 "Packet Too Big" message instead. A network that quietly relied on in-transit
+              fragmentation as a safety net under IPv4 will see real packet loss the moment it's
+              dual-stacked or moved to IPv6-only, which is why getting Path MTU Discovery working
+              end-to-end matters even more there.
+            </Aside>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

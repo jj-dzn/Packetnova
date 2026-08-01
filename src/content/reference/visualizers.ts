@@ -61,4 +61,9 @@ export const visualizers: VisualizerListing[] = [
       'Follow a packet through VPN encapsulation, encryption, and tunneling to the far end.',
     slug: 'vpn-packet-flow',
   },
+  {
+    name: 'DHCP DORA sequence',
+    description: 'Watch Discover, Offer, Request, and Ack hand a client its first IP address.',
+    slug: 'dhcp-dora-sequence',
+  },
 ]

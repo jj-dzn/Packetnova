@@ -66,6 +66,7 @@ import { TcpIpStackExplorer } from './features/visualizers/TcpIpStackExplorer'
 import { RoutingDecisionVisualizer } from './features/visualizers/RoutingDecisionVisualizer'
 import { BgpBestPathVisualizer } from './features/visualizers/BgpBestPathVisualizer'
 import { OspfSpfVisualizer } from './features/visualizers/OspfSpfVisualizer'
+import { DhcpDoraVisualizer } from './features/visualizers/DhcpDoraVisualizer'
 import { LabsPage } from './pages/LabsPage'
 import { PingPet } from './features/labs/PingPet'
 import { RetroTerminal } from './features/labs/RetroTerminal'
@@ -164,6 +165,7 @@ function App() {
           />
           <Route path="/visualizers/bgp-best-path-selection" element={<BgpBestPathVisualizer />} />
           <Route path="/visualizers/ospf-spf-animation" element={<OspfSpfVisualizer />} />
+          <Route path="/visualizers/dhcp-dora-sequence" element={<DhcpDoraVisualizer />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/labs" element={<LabsPage />} />

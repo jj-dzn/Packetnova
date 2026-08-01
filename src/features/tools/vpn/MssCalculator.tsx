@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { calculateMss } from '../../../lib/calculations/mss'
@@ -89,6 +90,16 @@ export function MssCalculator() {
               clamping, and it's why the value your OS reports isn't always the value a server
               actually negotiates.
             </p>
+            <Aside>
+              The real-world scenario this explains: a site-to-site VPN where small requests work
+              fine but anything that returns a lot of data (a file download, a large web page) just
+              hangs. The TCP handshake succeeds because SYN packets are tiny, so it looks like the
+              tunnel is up and working -- the problem only shows up once a segment near the full MSS
+              tries to cross it and gets silently dropped. Configuring MSS clamping directly on the
+              tunnel endpoint (rather than hoping Path MTU Discovery's ICMP messages make it through
+              every firewall in between) is the fix network engineers reach for specifically because
+              it doesn't depend on that ICMP path working at all.
+            </Aside>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

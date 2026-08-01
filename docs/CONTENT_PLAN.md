@@ -86,6 +86,7 @@ Full inventory of tools, visualizers, learning topics, and blog posts. Use this 
 - [ ] BGP best path selection
 - [ ] OSPF SPF animation
 - [ ] VPN packet flow
+- [ ] DHCP DORA sequence
 
 ## Learn section — deprioritized (future, not in current scope)
 
