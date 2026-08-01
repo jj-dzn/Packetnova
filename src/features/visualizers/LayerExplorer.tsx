@@ -2,12 +2,15 @@ import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
 import { osiLayerColorClasses } from '../../content/reference/networkStackLayers'
+import type { RelatedLink } from '../../components/ui/RelatedLinks'
 
 export interface LayerInfo {
   number: number
   name: string
   description: string
+  detail: string
   examples: string
+  devices: string
   dataUnit: string
 }
 
@@ -16,6 +19,7 @@ interface LayerExplorerProps {
   title: string
   description: string
   layers: LayerInfo[]
+  related?: RelatedLink[]
 }
 
 // Shared "click through a stack of named layers" visualizer -- backs the
@@ -23,13 +27,27 @@ interface LayerExplorerProps {
 // (Application at the top), matching the encapsulation visualizer's
 // top-down framing. Unlike the sequence-diagram visualizers, each layer
 // here is independently reachable by clicking it directly (an "explorer"),
-// not just by stepping linearly.
-export function LayerExplorer({ category, title, description, layers }: LayerExplorerProps) {
+// not just by stepping linearly -- so unlike the flow/sequence visualizers,
+// a StepNarration transcript isn't needed here: every layer's explanation
+// is always one click away via the list below, not just reachable by
+// rewinding through history.
+export function LayerExplorer({
+  category,
+  title,
+  description,
+  layers,
+  related,
+}: LayerExplorerProps) {
   const player = useStepPlayer(layers.length)
   const current = layers[player.step]!
 
   return (
-    <VisualizerPageLayout category={category} title={title} description={description}>
+    <VisualizerPageLayout
+      category={category}
+      title={title}
+      description={description}
+      related={related}
+    >
       <div
         tabIndex={0}
         onKeyDown={player.onKeyDown}
@@ -60,9 +78,12 @@ export function LayerExplorer({ category, title, description, layers }: LayerExp
         <div aria-live="polite">
           <h2 className="font-medium">{current.name}</h2>
           <p className="mt-1 text-sm text-fg-muted">{current.description}</p>
+          <p className="mt-3 text-sm text-fg-muted">{current.detail}</p>
           <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
             <dt className="text-fg-subtle">Examples</dt>
             <dd className="font-mono text-xs text-fg">{current.examples}</dd>
+            <dt className="text-fg-subtle">Typical devices</dt>
+            <dd className="font-mono text-xs text-fg">{current.devices}</dd>
             <dt className="text-fg-subtle">Data unit</dt>
             <dd className="font-mono text-xs text-fg">{current.dataUnit}</dd>
           </dl>

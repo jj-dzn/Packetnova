@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
+import { StepNarration } from './StepNarration'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { Select } from '../../components/ui/Select'
@@ -200,10 +201,7 @@ function SpfWalkthrough({
         viewHeight={VIEW_HEIGHT}
       />
 
-      <div aria-live="polite">
-        <h2 className="font-medium">{current.title}</h2>
-        <p className="mt-1 text-sm text-fg-muted">{current.description}</p>
-      </div>
+      <StepNarration steps={steps} currentIndex={player.step} />
 
       <StepControls player={player} totalSteps={steps.length} />
     </div>

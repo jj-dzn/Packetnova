@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
+import { StepNarration } from './StepNarration'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
 
 export interface MiddleboxHop {
@@ -27,6 +28,12 @@ interface MiddleboxFlowContentProps {
   rightLabel: string
   rightValue: string
   steps: MiddleboxStep[]
+  /** Shows a small "the internet" indicator over the middle-to-right
+   * segment -- for flows where that hop genuinely leaves the local network
+   * (NAT's router-to-public-server leg), not every middlebox flow (a VPN
+   * tunnel's far end isn't necessarily "the internet" in the same
+   * illustrative sense). Off by default. */
+  crossesInternet?: boolean
 }
 
 interface MiddleboxFlowVisualizerProps extends MiddleboxFlowContentProps {
@@ -64,6 +71,7 @@ export function MiddleboxFlowContent({
   rightLabel,
   rightValue,
   steps,
+  crossesInternet = false,
 }: MiddleboxFlowContentProps) {
   const player = useStepPlayer(steps.length)
   const current = steps[player.step]!
@@ -81,6 +89,15 @@ export function MiddleboxFlowContent({
         <Box label={middleLabel} value={current.middleValue ?? middleIdleValue} highlight={false} />
         <Box label={rightLabel} value={rightValue} highlight={isFinal} />
       </div>
+
+      {crossesInternet && (
+        <div className="relative mx-2 h-6">
+          <div className="absolute inset-y-0 right-0 flex w-2/3 items-center justify-center gap-1.5 text-fg-subtle">
+            <InternetCloudIcon className="h-4 w-4 shrink-0" />
+            <span className="text-xs">the internet</span>
+          </div>
+        </div>
+      )}
 
       <div className="mx-2 flex min-h-[2.5rem] flex-col gap-4">
         {steps.map((step, index) => {
@@ -116,10 +133,7 @@ export function MiddleboxFlowContent({
         })}
       </div>
 
-      <div aria-live="polite">
-        <h2 className="font-medium">{current.title}</h2>
-        <p className="mt-1 text-sm text-fg-muted">{current.description}</p>
-      </div>
+      <StepNarration steps={steps} currentIndex={player.step} />
 
       <StepControls player={player} totalSteps={steps.length} />
     </div>
@@ -134,5 +148,24 @@ function Box({ label, value, highlight }: { label: string; value: ReactNode; hig
         {value}
       </div>
     </div>
+  )
+}
+
+// A simple, flat cloud silhouette -- three overlapping fill-only circles
+// plus a base, all the same solid color and deliberately stroke-less so the
+// overlaps merge into one shape with no visible seams, rather than a
+// borrowed icon-font glyph or a hand-traced arc path. Standing for "the
+// open internet" specifically (the standard, universal networking-diagram
+// convention for an external/untrusted network), not a device -- distinct
+// from the design system's "no router/cloud clichés" rule, which is about
+// not drawing actual network *equipment* as a cloud.
+function InternetCloudIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 16" className={className} aria-hidden="true" fill="currentColor">
+      <circle cx="7" cy="8" r="5" />
+      <circle cx="13" cy="5.5" r="6" />
+      <circle cx="18" cy="8.5" r="4.5" />
+      <rect x="4" y="8" width="16" height="6" rx="3" />
+    </svg>
   )
 }

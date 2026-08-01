@@ -43,6 +43,10 @@ export function TcpIpStackExplorer() {
       category="Visualizer"
       title="TCP/IP stack explorer"
       description="Compare the TCP/IP model against OSI, side by side -- click either stack to see how they line up."
+      related={[
+        { to: '/visualizers/osi-model-explorer', label: 'OSI model explorer' },
+        { to: '/visualizers/packet-encapsulation', label: 'Packet encapsulation' },
+      ]}
     >
       <div className="flex flex-col gap-8">
         <div className="flex items-start justify-center gap-0 overflow-x-auto">
@@ -123,9 +127,12 @@ export function TcpIpStackExplorer() {
             {selected.layer.name}
           </h2>
           <p className="mt-1 text-sm text-fg-muted">{selected.layer.description}</p>
+          <p className="mt-3 text-sm text-fg-muted">{selected.layer.detail}</p>
           <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
             <dt className="text-fg-subtle">Examples</dt>
             <dd className="font-mono text-xs text-fg">{selected.layer.examples}</dd>
+            <dt className="text-fg-subtle">Typical devices</dt>
+            <dd className="font-mono text-xs text-fg">{selected.layer.devices}</dd>
             <dt className="text-fg-subtle">Data unit</dt>
             <dd className="font-mono text-xs text-fg">{selected.layer.dataUnit}</dd>
           </dl>

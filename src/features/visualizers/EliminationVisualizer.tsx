@@ -1,5 +1,6 @@
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
+import { StepNarration } from './StepNarration'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
 import { EliminationSteps, type Candidate, type EliminationStep } from './EliminationSteps'
 
@@ -41,10 +42,7 @@ export function EliminationVisualizer({
       >
         <EliminationSteps candidates={candidates} step={current} isFinal={isFinal} />
 
-        <div aria-live="polite">
-          <h2 className="font-medium">{current.title}</h2>
-          <p className="mt-1 text-sm text-fg-muted">{current.description}</p>
-        </div>
+        <StepNarration steps={steps} currentIndex={player.step} />
 
         <StepControls player={player} totalSteps={steps.length} />
       </div>

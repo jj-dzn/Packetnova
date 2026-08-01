@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Pill } from '../../components/ui/Pill'
 import { StepControls } from '../visualizers/StepControls'
+import { StepNarration } from '../visualizers/StepNarration'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
 
 export interface GuidedStep {
@@ -41,10 +42,7 @@ export function GuidedMode({ steps, children, closingNote }: GuidedModeProps) {
           aria-label="Guided walkthrough. Use the Previous and Next buttons, or the left and right arrow keys, to step through."
           className="flex flex-col gap-4 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          <div aria-live="polite">
-            <h3 className="font-medium">{current.title}</h3>
-            <p className="mt-1 text-sm text-fg-muted">{current.description}</p>
-          </div>
+          <StepNarration steps={steps} currentIndex={player.step} />
           {current.content}
           <StepControls player={player} totalSteps={steps.length} />
           {player.isLast && closingNote && (

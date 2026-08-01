@@ -84,6 +84,7 @@ export function NatFlowVisualizer() {
           rightLabel="Public server"
           rightValue={SERVER_ADDR}
           steps={STEPS}
+          crossesInternet
         />
       ) : (
         <PatOverloadTable />

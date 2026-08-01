@@ -43,6 +43,24 @@ const TLS_13_STEPS: SequenceStep[] = [
     segment: { direction: 'right', label: 'Finished' },
     roundTripsSoFar: 1,
   },
+  {
+    title: '4. HTTP GET request',
+    description:
+      "With the connection secure, the browser finally sends the request it actually wanted to make -- everything before this point was negotiation, not the request itself. It's encrypted with the keys just derived, opaque to anything watching the wire.",
+    leftState: 'Secure',
+    rightState: 'Secure',
+    segment: { direction: 'right', label: 'GET /index.html (encrypted)' },
+    roundTripsSoFar: 1,
+  },
+  {
+    title: '5. HTTP 200 OK response',
+    description:
+      'The server responds with the requested page, also encrypted end-to-end. This is the whole point of everything above it: TLS 1.3 spent 1 round trip negotiating, then this exchange spends a 2nd actually fetching something -- 2 round trips total before the browser has anything to render.',
+    leftState: 'Secure',
+    rightState: 'Secure',
+    segment: { direction: 'left', label: '200 OK (encrypted)' },
+    roundTripsSoFar: 2,
+  },
 ]
 
 // TLS 1.2 (RFC 5246): 2-RTT full handshake -- kept for comparison, since
@@ -91,6 +109,24 @@ const TLS_12_STEPS: SequenceStep[] = [
     rightState: 'Secure',
     segment: { direction: 'left', label: 'ChangeCipherSpec + Finished' },
     roundTripsSoFar: 2,
+  },
+  {
+    title: '5. HTTP GET request',
+    description:
+      'With the connection finally secure, the browser sends the request it actually wanted to make. Same request as the TLS 1.3 side -- it just took a full extra round trip of negotiation to get here.',
+    leftState: 'Secure',
+    rightState: 'Secure',
+    segment: { direction: 'right', label: 'GET /index.html (encrypted)' },
+    roundTripsSoFar: 2,
+  },
+  {
+    title: '6. HTTP 200 OK response',
+    description:
+      "The server responds with the requested page. Total round trips before the browser has anything to render: 3 -- 2 to negotiate, 1 to actually fetch something, versus TLS 1.3's 2. That's the entire practical difference between these two versions, made concrete.",
+    leftState: 'Secure',
+    rightState: 'Secure',
+    segment: { direction: 'left', label: '200 OK (encrypted)' },
+    roundTripsSoFar: 3,
   },
 ]
 
