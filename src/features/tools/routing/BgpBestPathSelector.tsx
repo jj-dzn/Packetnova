@@ -4,6 +4,7 @@ import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { Button } from '../../../components/ui/Button'
+import { Pill } from '../../../components/ui/Pill'
 import {
   selectBgpBestPath,
   type BgpCandidate,
@@ -52,6 +53,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 
 export function BgpBestPathSelector() {
   const [candidates, setCandidates] = useState<BgpCandidate[]>(DEFAULT_CANDIDATES)
+  const [showAdvanced, setShowAdvanced] = useState(false)
 
   const calc = selectBgpBestPath(candidates)
 
@@ -82,6 +84,13 @@ export function BgpBestPathSelector() {
       description="Compare candidate BGP paths and see exactly which attribute decides the winner, in the standard tie-breaking order."
       input={
         <div className="flex flex-col gap-4">
+          <Pill
+            active={showAdvanced}
+            onClick={() => setShowAdvanced((v) => !v)}
+            className="self-start"
+          >
+            {showAdvanced ? 'Hide' : 'Show'} advanced attributes
+          </Pill>
           {candidates.map((candidate, index) => (
             <div key={index} className="rounded-md border border-border p-3">
               <div className="mb-3 flex items-center justify-between">
@@ -158,14 +167,6 @@ export function BgpBestPathSelector() {
                     }
                   />
                 </Field>
-                <Field label="Route age (s)">
-                  <Input
-                    value={candidate.routeAgeSeconds}
-                    onChange={(e) =>
-                      updateCandidate(index, { routeAgeSeconds: Number(e.target.value) })
-                    }
-                  />
-                </Field>
                 <Field label="Locally originated">
                   <Select
                     value={candidate.locallyOriginated ? 'yes' : 'no'}
@@ -177,18 +178,30 @@ export function BgpBestPathSelector() {
                     <option value="yes">Yes</option>
                   </Select>
                 </Field>
-                <Field label="Router ID">
-                  <Input
-                    value={candidate.routerId}
-                    onChange={(e) => updateCandidate(index, { routerId: e.target.value })}
-                  />
-                </Field>
-                <Field label="Neighbor IP">
-                  <Input
-                    value={candidate.neighborIp}
-                    onChange={(e) => updateCandidate(index, { neighborIp: e.target.value })}
-                  />
-                </Field>
+                {showAdvanced && (
+                  <>
+                    <Field label="Route age (s)">
+                      <Input
+                        value={candidate.routeAgeSeconds}
+                        onChange={(e) =>
+                          updateCandidate(index, { routeAgeSeconds: Number(e.target.value) })
+                        }
+                      />
+                    </Field>
+                    <Field label="Router ID">
+                      <Input
+                        value={candidate.routerId}
+                        onChange={(e) => updateCandidate(index, { routerId: e.target.value })}
+                      />
+                    </Field>
+                    <Field label="Neighbor IP">
+                      <Input
+                        value={candidate.neighborIp}
+                        onChange={(e) => updateCandidate(index, { neighborIp: e.target.value })}
+                      />
+                    </Field>
+                  </>
+                )}
               </div>
             </div>
           ))}

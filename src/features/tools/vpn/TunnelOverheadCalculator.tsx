@@ -70,11 +70,59 @@ export function TunnelOverheadCalculator() {
       }
       result={
         calc.ok ? (
-          <dl>
-            <ResultRow label="Overhead (bytes)" value={`${calc.result.overheadBytes} bytes`} />
-            <ResultRow label="Effective MTU" value={`${calc.result.effectiveMtu} bytes`} />
-            <ResultRow label="Overhead (%)" value={`${calc.result.overheadPercent.toFixed(2)}%`} />
-          </dl>
+          <div className="flex flex-col gap-6">
+            <dl>
+              <ResultRow label="Overhead (bytes)" value={`${calc.result.overheadBytes} bytes`} />
+              <ResultRow label="Effective MTU" value={`${calc.result.effectiveMtu} bytes`} />
+              <ResultRow
+                label="Overhead (%)"
+                value={`${calc.result.overheadPercent.toFixed(2)}%`}
+              />
+            </dl>
+            <div>
+              <p className="mb-2 text-sm font-medium">
+                Every tunnel type at this {calc.result.linkMtu}-byte link MTU
+              </p>
+              <div className="overflow-x-auto rounded-md border border-border">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-surface">
+                    <tr className="border-b border-border">
+                      <th className="px-3 py-2 font-medium text-fg-muted">Tunnel type</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">Overhead</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">Effective MTU</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">Overhead %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tunnelOverheadPresets
+                      .filter((p) => p.id !== 'custom')
+                      .map((p) => {
+                        const presetCalc = calculateTunnelOverhead(Number(linkMtu), p.overheadBytes)
+                        return (
+                          <tr
+                            key={p.id}
+                            className={`border-b border-border font-mono last:border-b-0 ${
+                              p.id === presetId ? 'bg-accent/10' : ''
+                            }`}
+                          >
+                            <td className="px-3 py-2 font-sans">{p.label}</td>
+                            <td className="px-3 py-2">{p.overheadBytes} B</td>
+                            <td className="px-3 py-2">
+                              {presetCalc.ok ? `${presetCalc.result.effectiveMtu} B` : '--'}
+                            </td>
+                            <td className="px-3 py-2">
+                              {presetCalc.ok
+                                ? `${presetCalc.result.overheadPercent.toFixed(2)}%`
+                                : '--'}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

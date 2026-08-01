@@ -49,3 +49,129 @@ export function electRootBridge(candidates: BridgeCandidate[]): CalculationResul
 
   return { ok: true, result: { rootBridgeId: winner.id, decidedBy: 'mac-address' } }
 }
+
+export interface StpLink {
+  from: string
+  to: string
+  cost: number
+}
+
+export type StpPortRoleName = 'root' | 'designated' | 'blocked'
+
+export interface StpPort {
+  bridgeId: string
+  neighborId: string
+  cost: number
+  role: StpPortRoleName
+}
+
+export interface StpTopologyResult {
+  rootBridgeId: string
+  costToRoot: Record<string, number>
+  ports: StpPort[]
+}
+
+function shortestCostToRoot(
+  rootId: string,
+  bridgeIds: string[],
+  links: StpLink[],
+): Record<string, number> {
+  const adjacency = new Map<string, { to: string; cost: number }[]>()
+  for (const id of bridgeIds) adjacency.set(id, [])
+  for (const link of links) {
+    adjacency.get(link.from)?.push({ to: link.to, cost: link.cost })
+    adjacency.get(link.to)?.push({ to: link.from, cost: link.cost })
+  }
+
+  const cost: Record<string, number> = { [rootId]: 0 }
+  const visited = new Set<string>()
+
+  while (visited.size < bridgeIds.length) {
+    let current: string | null = null
+    let currentCost = Infinity
+    for (const id of bridgeIds) {
+      if (visited.has(id)) continue
+      const c = cost[id]
+      if (c !== undefined && c < currentCost) {
+        current = id
+        currentCost = c
+      }
+    }
+    if (current === null) break // unreachable bridges left out of the result
+
+    visited.add(current)
+    for (const { to, cost: linkCost } of adjacency.get(current) ?? []) {
+      if (visited.has(to)) continue
+      const candidate = currentCost + linkCost
+      if (cost[to] === undefined || candidate < cost[to]!) cost[to] = candidate
+    }
+  }
+
+  return cost
+}
+
+/**
+ * Computes what STP's port-blocking prose actually means for a concrete
+ * topology: every non-root bridge gets exactly one root port (its cheapest
+ * path back to the root), every segment gets exactly one designated port
+ * (whichever side is closer to the root), and everything else blocks.
+ * Ties are broken by lowest bridge ID, same convention as root election.
+ */
+export function computeStpPortRoles(
+  candidates: BridgeCandidate[],
+  links: StpLink[],
+): CalculationResult<StpTopologyResult> {
+  const rootResult = electRootBridge(candidates)
+  if (!rootResult.ok) return rootResult
+
+  const bridgeIds = candidates.map((c) => c.id)
+  const rootId = rootResult.result.rootBridgeId
+  const costToRoot = shortestCostToRoot(rootId, bridgeIds, links)
+
+  const ports: StpPort[] = []
+
+  for (const link of links) {
+    const costA = costToRoot[link.from]
+    const costB = costToRoot[link.to]
+    if (costA === undefined || costB === undefined) continue // unreachable side, no port role
+
+    // The side closer to the root is designated for this segment; the
+    // farther side either uses this link as its root port, or -- if its
+    // root port lies elsewhere -- blocks.
+    const fromIsCloser = costA < costB || (costA === costB && link.from < link.to)
+    const designatedSide = fromIsCloser ? link.from : link.to
+    const otherSide = fromIsCloser ? link.to : link.from
+    const otherCost = fromIsCloser ? costB : costA
+
+    ports.push({
+      bridgeId: designatedSide,
+      neighborId: otherSide,
+      cost: costToRoot[designatedSide]!,
+      role: 'designated',
+    })
+
+    const isOthersRootPort =
+      otherSide !== rootId && otherCost === costToRoot[designatedSide]! + link.cost
+    ports.push({
+      bridgeId: otherSide,
+      neighborId: designatedSide,
+      cost: otherCost,
+      role: otherSide === rootId ? 'designated' : isOthersRootPort ? 'root' : 'blocked',
+    })
+  }
+
+  // A bridge can have more than one link that ties for its cheapest path --
+  // only the first one found (by link order) is the actual root port; any
+  // further "root"-looking port on the same bridge blocks instead.
+  const seenRootPort = new Set<string>()
+  for (const port of ports) {
+    if (port.role !== 'root') continue
+    if (seenRootPort.has(port.bridgeId)) {
+      port.role = 'blocked'
+    } else {
+      seenRootPort.add(port.bridgeId)
+    }
+  }
+
+  return { ok: true, result: { rootBridgeId: rootId, costToRoot, ports } }
+}

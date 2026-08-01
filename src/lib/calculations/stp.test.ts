@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { electRootBridge } from './stp'
+import { computeStpPortRoles, electRootBridge, type BridgeCandidate, type StpLink } from './stp'
+
+function role(
+  ports: { bridgeId: string; neighborId: string; role: string }[],
+  bridgeId: string,
+  neighborId: string,
+) {
+  return ports.find((p) => p.bridgeId === bridgeId && p.neighborId === neighborId)?.role
+}
 
 describe('electRootBridge', () => {
   it('the lowest priority wins outright', () => {
@@ -45,5 +53,88 @@ describe('electRootBridge', () => {
 
   it('rejects an empty candidate list', () => {
     expect(electRootBridge([]).ok).toBe(false)
+  })
+})
+
+describe('computeStpPortRoles', () => {
+  // A 4-bridge ring (A-B-C-D-A) with asymmetric costs, chosen so every
+  // bridge has a unique shortest path except C, whose two paths to the
+  // root (via B, or via D) differ -- this is the one loop, so exactly one
+  // port should end up blocked.
+  const CANDIDATES: BridgeCandidate[] = [
+    { id: 'A', priority: 4096, macAddress: '00:00:00:00:00:0a' },
+    { id: 'B', priority: 32768, macAddress: '00:00:00:00:00:0b' },
+    { id: 'C', priority: 32768, macAddress: '00:00:00:00:00:0c' },
+    { id: 'D', priority: 32768, macAddress: '00:00:00:00:00:0d' },
+  ]
+  const LINKS: StpLink[] = [
+    { from: 'A', to: 'B', cost: 10 },
+    { from: 'B', to: 'C', cost: 10 },
+    { from: 'C', to: 'D', cost: 15 },
+    { from: 'D', to: 'A', cost: 8 },
+  ]
+
+  it('elects A as root and computes cost-to-root for every bridge', () => {
+    const result = computeStpPortRoles(CANDIDATES, LINKS)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.rootBridgeId).toBe('A')
+    expect(result.result.costToRoot).toEqual({ A: 0, B: 10, C: 20, D: 8 })
+  })
+
+  it('the root bridge is designated on every one of its links', () => {
+    const result = computeStpPortRoles(CANDIDATES, LINKS)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(role(result.result.ports, 'A', 'B')).toBe('designated')
+    expect(role(result.result.ports, 'A', 'D')).toBe('designated')
+  })
+
+  it('B and D use their direct link to the root as their root port', () => {
+    const result = computeStpPortRoles(CANDIDATES, LINKS)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(role(result.result.ports, 'B', 'A')).toBe('root')
+    expect(role(result.result.ports, 'D', 'A')).toBe('root')
+  })
+
+  it("C's cheaper path is via B (cost 20) rather than via D (cost 23), so that's its root port", () => {
+    const result = computeStpPortRoles(CANDIDATES, LINKS)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(role(result.result.ports, 'C', 'B')).toBe('root')
+  })
+
+  it('blocks exactly the one redundant link in the loop (C-D)', () => {
+    const result = computeStpPortRoles(CANDIDATES, LINKS)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const blocked = result.result.ports.filter((p) => p.role === 'blocked')
+    expect(blocked).toHaveLength(1)
+    expect(blocked[0]).toMatchObject({ bridgeId: 'C', neighborId: 'D' })
+    // D's side of that same link is still forwarding (designated) -- only
+    // one side of a blocked link is actually blocked.
+    expect(role(result.result.ports, 'D', 'C')).toBe('designated')
+  })
+
+  it('a topology with no loop blocks nothing', () => {
+    const result = computeStpPortRoles(
+      [
+        { id: 'A', priority: 4096, macAddress: '00:00:00:00:00:0a' },
+        { id: 'B', priority: 32768, macAddress: '00:00:00:00:00:0b' },
+      ],
+      [{ from: 'A', to: 'B', cost: 10 }],
+    )
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.ports.some((p) => p.role === 'blocked')).toBe(false)
+  })
+
+  it('propagates a root-election error', () => {
+    const result = computeStpPortRoles(
+      [{ id: 'A', priority: 70000, macAddress: '00:00:00:00:00:0a' }],
+      [],
+    )
+    expect(result.ok).toBe(false)
   })
 })
