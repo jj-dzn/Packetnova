@@ -7,7 +7,11 @@ export interface SequenceStep {
   description: string
   leftState: string
   rightState: string
-  segment: { direction: 'right' | 'left'; label: string } | null
+  segment: { direction: 'right' | 'left'; label: string; lost?: boolean } | null
+  /** Round trips completed so far, at this step -- when set, rendered as a
+   * live counter (e.g. for comparing TLS 1.2 vs. 1.3's RTT cost). Omit for
+   * flows where round-trip count isn't a meaningful thing to track. */
+  roundTripsSoFar?: number
 }
 
 interface SequenceDiagramContentProps {
@@ -64,16 +68,27 @@ export function SequenceDiagramContent({
         <HostBox label={rightLabel} state={current.rightState} highlight={isFinal} />
       </div>
 
+      {current.roundTripsSoFar !== undefined && (
+        <p className="text-center text-sm text-fg-muted">
+          Round trips completed:{' '}
+          <span className="font-mono font-semibold text-accent">{current.roundTripsSoFar}</span>
+        </p>
+      )}
+
       <div className="mx-4 flex min-h-[2.5rem] flex-col gap-4">
         {steps.map((step, index) => {
           if (index === 0 || !step.segment || player.step < index) return null
-          const { direction, label } = step.segment
+          const { direction, label, lost } = step.segment
           const arrow = direction === 'right' ? '→' : '←'
           return (
             <div key={index} className="relative h-9">
               <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-border" />
               <div
-                className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border border-accent/40 bg-bg px-3 py-1 font-mono text-xs text-accent ${
+                className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full border px-3 py-1 font-mono text-xs ${
+                  lost
+                    ? 'border-dashed border-danger/50 bg-bg text-danger'
+                    : 'border-accent/40 bg-bg text-accent'
+                } ${
                   player.canAutoPlay
                     ? direction === 'right'
                       ? 'animate-pn-slide-right'
@@ -84,6 +99,7 @@ export function SequenceDiagramContent({
                   player.canAutoPlay ? undefined : { left: direction === 'right' ? '96%' : '4%' }
                 }
               >
+                {lost ? '✕ ' : ''}
                 {arrow} {label}
               </div>
             </div>
