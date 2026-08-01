@@ -7,6 +7,7 @@ export interface PageMeta {
   description: string
 }
 
+export const SITE_URL = 'https://packetnova.ca'
 const SITE_TITLE = 'PacketNova'
 const DEFAULT_DESCRIPTION =
   'Free, client-side networking toolkit: calculators, protocol explorers, and interactive visualizers.'

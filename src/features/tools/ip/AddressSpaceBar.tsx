@@ -36,7 +36,7 @@ export function AddressSpaceBar({
     <div className="flex h-10 overflow-hidden rounded-md border border-border font-mono text-[11px]">
       {showNetworkCap && (
         <div
-          className="flex w-24 shrink-0 items-center justify-center truncate border-r border-border bg-fg-subtle/10 px-1 text-fg-subtle"
+          className="flex w-24 shrink-0 items-center justify-center truncate border-r border-border bg-fg-subtle/10 px-1 text-fg-muted"
           title={`Network address: ${networkAddress} (not assignable to a host)`}
         >
           {networkAddress}
@@ -50,7 +50,7 @@ export function AddressSpaceBar({
       </div>
       {showBroadcastCap && (
         <div
-          className="flex w-24 shrink-0 items-center justify-center truncate border-l border-border bg-fg-subtle/10 px-1 text-fg-subtle"
+          className="flex w-24 shrink-0 items-center justify-center truncate border-l border-border bg-fg-subtle/10 px-1 text-fg-muted"
           title={`Broadcast address: ${broadcastAddress} (not assignable to a host)`}
         >
           {broadcastAddress}

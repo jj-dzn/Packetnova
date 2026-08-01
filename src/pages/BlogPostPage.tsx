@@ -4,6 +4,7 @@ import { Badge } from '../components/ui/Badge'
 import { getPostBySlug, formatPostDate } from '../lib/blog/posts'
 import { NotFoundPage } from './NotFoundPage'
 import { StructuredData } from '../components/seo/StructuredData'
+import { SITE_URL } from '../lib/seo/pageMeta'
 
 const BlogPostBody = lazy(() =>
   import('./BlogPostBody').then((module) => ({ default: module.BlogPostBody })),
@@ -21,7 +22,7 @@ export function BlogPostPage() {
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    url: `https://packetnova.ca/blog/${post.slug}`,
+    url: `${SITE_URL}/blog/${post.slug}`,
     author: { '@type': 'Organization', name: 'PacketNova' },
   }
 
