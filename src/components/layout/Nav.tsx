@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import { Button } from '../ui/Button'
 import { SearchBar } from '../ui/SearchBar'
+import { Mascot } from '../ui/Mascot'
 import { useDarkMode } from '../../hooks/useDarkMode'
 
 const navLinks = [
@@ -50,6 +51,7 @@ export function Nav() {
         <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
           <img src="/logo.svg" alt="" width={28} height={28} />
           <span className="text-lg font-semibold">PacketNova</span>
+          <Mascot mood="idle" className="h-5 w-5 shrink-0" label="PacketNova, online" />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
