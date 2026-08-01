@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { Select } from '../../components/ui/Select'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
+import { TopologyCanvas, type TopologyEdge, type TopologyNode } from '../diagram/TopologyCanvas'
 import {
   circularLayout,
   computeSpfSteps,
@@ -153,6 +154,38 @@ function SpfWalkthrough({
   const current = steps[player.step]!
   const positions = useMemo(() => circularLayout(nodeIds, VIEW_WIDTH, VIEW_HEIGHT), [nodeIds])
 
+  const topologyNodes: TopologyNode[] = nodeIds.flatMap((id) => {
+    const pos = positions[id]
+    if (!pos) return []
+    const visited = current.visited.includes(id)
+    const active = current.activeNode === id
+    const distance = current.distances[id]
+    return [
+      {
+        id,
+        x: pos.x,
+        y: pos.y,
+        label: id,
+        sublabel: distance === undefined ? '∞' : String(distance),
+        radius: active ? 26 : 22,
+        fill: visited ? 'var(--color-accent-alt)' : 'var(--color-surface)',
+        stroke: active ? 'var(--color-accent)' : 'var(--color-border)',
+        strokeWidth: active ? 3 : 1.5,
+      },
+    ]
+  })
+  const topologyEdges: TopologyEdge[] = edges.map((edge) => {
+    const isTreeEdge =
+      current.bestEdge[edge.to] === edge.from || current.bestEdge[edge.from] === edge.to
+    return {
+      from: edge.from,
+      to: edge.to,
+      label: edge.cost,
+      stroke: isTreeEdge ? 'var(--color-accent-alt)' : 'var(--color-border)',
+      strokeWidth: isTreeEdge ? 3 : 1.5,
+    }
+  })
+
   return (
     <div
       tabIndex={0}
@@ -160,88 +193,12 @@ function SpfWalkthrough({
       aria-label="OSPF SPF visualizer. Use the Previous and Next buttons, or the left and right arrow keys, to step through."
       className="flex flex-col gap-8 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
     >
-      <svg viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`} className="mx-auto w-full max-w-xl">
-        {edges.map((edge, index) => {
-          const a = positions[edge.from]
-          const b = positions[edge.to]
-          if (!a || !b) return null
-          const isTreeEdge =
-            current.bestEdge[edge.to] === edge.from || current.bestEdge[edge.from] === edge.to
-          const midX = (a.x + b.x) / 2
-          const midY = (a.y + b.y) / 2
-          return (
-            <g key={`${edge.from}-${edge.to}-${index}`}>
-              <line
-                x1={a.x}
-                y1={a.y}
-                x2={b.x}
-                y2={b.y}
-                stroke={isTreeEdge ? 'var(--color-accent-alt)' : 'var(--color-border)'}
-                strokeWidth={isTreeEdge ? 3 : 1.5}
-              />
-              <rect
-                x={midX - 10}
-                y={midY - 9}
-                width={20}
-                height={14}
-                fill="var(--color-bg)"
-                opacity={0.85}
-              />
-              <text
-                x={midX}
-                y={midY + 1}
-                textAnchor="middle"
-                fontSize="10"
-                fontFamily="var(--font-mono)"
-                fill={isTreeEdge ? 'var(--color-accent-alt)' : 'var(--color-fg-subtle)'}
-              >
-                {edge.cost}
-              </text>
-            </g>
-          )
-        })}
-
-        {nodeIds.map((id) => {
-          const pos = positions[id]
-          if (!pos) return null
-          const visited = current.visited.includes(id)
-          const active = current.activeNode === id
-          const distance = current.distances[id]
-          return (
-            <g key={id}>
-              <circle
-                cx={pos.x}
-                cy={pos.y}
-                r={active ? 26 : 22}
-                fill={visited ? 'var(--color-accent-alt)' : 'var(--color-surface)'}
-                stroke={active ? 'var(--color-accent)' : 'var(--color-border)'}
-                strokeWidth={active ? 3 : 1.5}
-              />
-              <text
-                x={pos.x}
-                y={pos.y - 3}
-                textAnchor="middle"
-                fontSize="12"
-                fontWeight="600"
-                fontFamily="var(--font-mono)"
-                fill={visited ? 'var(--color-bg)' : 'var(--color-fg)'}
-              >
-                {id}
-              </text>
-              <text
-                x={pos.x}
-                y={pos.y + 11}
-                textAnchor="middle"
-                fontSize="10"
-                fontFamily="var(--font-mono)"
-                fill={visited ? 'var(--color-bg)' : 'var(--color-fg-muted)'}
-              >
-                {distance === undefined ? '∞' : distance}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
+      <TopologyCanvas
+        nodes={topologyNodes}
+        edges={topologyEdges}
+        viewWidth={VIEW_WIDTH}
+        viewHeight={VIEW_HEIGHT}
+      />
 
       <div aria-live="polite">
         <h2 className="font-medium">{current.title}</h2>

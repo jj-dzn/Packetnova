@@ -1,11 +1,20 @@
 import { useState } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { MiddleboxFlowContent, type MiddleboxStep } from './MiddleboxFlowVisualizer'
+import { NatTableDiagram } from '../diagram/NatTableDiagram'
 import { Pill } from '../../components/ui/Pill'
 
 const PRIVATE_ADDR = '192.168.1.10:5000'
 const PUBLIC_ADDR = '203.0.113.5:40001'
 const SERVER_ADDR = '203.0.113.50:443'
+
+const MAPPED_TABLE = (
+  <NatTableDiagram
+    rows={[{ id: 'mapping', privateAddr: PRIVATE_ADDR, publicAddr: PUBLIC_ADDR }]}
+    dense
+    showHeader={false}
+  />
+)
 
 const STEPS: MiddleboxStep[] = [
   {
@@ -24,20 +33,20 @@ const STEPS: MiddleboxStep[] = [
   {
     title: '2. Router translates and forwards',
     description: `The NAT router records the mapping and rewrites the source address to a public one (${PUBLIC_ADDR}) before forwarding.`,
-    middleValue: `${PRIVATE_ADDR}  ⇄  ${PUBLIC_ADDR}`,
+    middleValue: MAPPED_TABLE,
     hop: { direction: 'right', segment: 'middle-right', label: `src=${PUBLIC_ADDR}` },
   },
   {
     title: '3. Server replies',
     description: `The server has no idea a private host exists -- it just replies to the public address it saw (${PUBLIC_ADDR}).`,
-    middleValue: `${PRIVATE_ADDR}  ⇄  ${PUBLIC_ADDR}`,
+    middleValue: MAPPED_TABLE,
     hop: { direction: 'left', segment: 'middle-right', label: `dst=${PUBLIC_ADDR}` },
   },
   {
     title: '4. Router translates back',
     description:
       'The router looks up the mapping, rewrites the destination back to the private address, and delivers it to the host.',
-    middleValue: `${PRIVATE_ADDR}  ⇄  ${PUBLIC_ADDR}`,
+    middleValue: MAPPED_TABLE,
     hop: { direction: 'left', segment: 'left-middle', label: `dst=${PRIVATE_ADDR}` },
   },
 ]
@@ -133,31 +142,15 @@ function PatOverloadTable() {
         them apart purely by which public port each connection was assigned.
       </p>
 
-      <div className="overflow-hidden rounded-md border border-border">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-surface">
-            <tr className="border-b border-border">
-              <th className="px-3 py-2 font-medium text-fg-muted">Private host:port</th>
-              <th className="px-3 py-2 font-medium text-fg-muted"></th>
-              <th className="px-3 py-2 font-medium text-fg-muted">Public {PUBLIC_IP}:port</th>
-            </tr>
-          </thead>
-          <tbody>
-            {entries.map((entry) => (
-              <tr
-                key={entry.id}
-                className="border-b border-border font-mono text-xs last:border-b-0"
-              >
-                <td className="px-3 py-2">{entry.privateAddr}</td>
-                <td className="px-3 py-2 text-fg-subtle">→</td>
-                <td className="px-3 py-2 text-accent">
-                  {PUBLIC_IP}:{entry.publicPort}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <NatTableDiagram
+        rows={entries.map((entry) => ({
+          id: entry.id,
+          privateAddr: entry.privateAddr,
+          publicAddr: `${PUBLIC_IP}:${entry.publicPort}`,
+        }))}
+        leftHeader="Private host:port"
+        rightHeader={`Public ${PUBLIC_IP}:port`}
+      />
 
       <div className="flex gap-2">
         <button

@@ -4,6 +4,7 @@ import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
+import { TopologyCanvas, type TopologyEdge, type TopologyNode } from '../../diagram/TopologyCanvas'
 import {
   computeStpPortRoles,
   electRootBridge,
@@ -164,66 +165,34 @@ function PortRoleExample() {
       <p className="mb-3 text-sm font-medium">
         A worked example: the same election and blocking on a small 4-switch ring
       </p>
-      <svg viewBox="0 0 320 220" className="mx-auto w-full max-w-sm">
-        {EXAMPLE_LINKS.map((link) => {
-          const a = EXAMPLE_POSITIONS[link.from]!
-          const b = EXAMPLE_POSITIONS[link.to]!
-          const blocked = linkIsBlocked(link)
-          const midX = (a.x + b.x) / 2
-          const midY = (a.y + b.y) / 2
-          return (
-            <g key={`${link.from}-${link.to}`}>
-              <line
-                x1={a.x}
-                y1={a.y}
-                x2={b.x}
-                y2={b.y}
-                stroke={blocked ? 'var(--color-fg-subtle)' : 'var(--color-accent-alt)'}
-                strokeWidth={blocked ? 1.5 : 3}
-                strokeDasharray={blocked ? '5 4' : undefined}
-              />
-              <rect x={midX - 10} y={midY - 9} width={20} height={14} fill="var(--color-surface)" />
-              <text
-                x={midX}
-                y={midY + 1}
-                textAnchor="middle"
-                fontSize="10"
-                fontFamily="var(--font-mono)"
-                fill="var(--color-fg-subtle)"
-              >
-                {link.cost}
-              </text>
-            </g>
-          )
-        })}
-        {EXAMPLE_BRIDGES.map((bridge) => {
+      <TopologyCanvas
+        viewWidth={320}
+        viewHeight={244}
+        className="mx-auto w-full max-w-sm"
+        nodes={EXAMPLE_BRIDGES.map((bridge): TopologyNode => {
           const pos = EXAMPLE_POSITIONS[bridge.id]!
           const isRoot = bridge.id === rootBridgeId
-          return (
-            <g key={bridge.id}>
-              <circle
-                cx={pos.x}
-                cy={pos.y}
-                r={isRoot ? 24 : 20}
-                fill={isRoot ? 'var(--color-accent-alt)' : 'var(--color-bg)'}
-                stroke={isRoot ? 'var(--color-accent)' : 'var(--color-border)'}
-                strokeWidth={isRoot ? 3 : 1.5}
-              />
-              <text
-                x={pos.x}
-                y={pos.y + 4}
-                textAnchor="middle"
-                fontSize="13"
-                fontWeight="600"
-                fontFamily="var(--font-mono)"
-                fill={isRoot ? 'var(--color-bg)' : 'var(--color-fg)'}
-              >
-                {bridge.id}
-              </text>
-            </g>
-          )
+          return {
+            id: bridge.id,
+            x: pos.x,
+            y: pos.y,
+            label: bridge.id,
+            icon: 'switch',
+            radius: isRoot ? 24 : 20,
+            fill: isRoot ? 'var(--color-accent-alt)' : 'var(--color-bg)',
+            stroke: isRoot ? 'var(--color-accent)' : 'var(--color-border)',
+            strokeWidth: isRoot ? 3 : 1.5,
+          }
         })}
-      </svg>
+        edges={EXAMPLE_LINKS.map((link): TopologyEdge => ({
+          from: link.from,
+          to: link.to,
+          label: link.cost,
+          stroke: linkIsBlocked(link) ? 'var(--color-fg-subtle)' : 'var(--color-accent-alt)',
+          strokeWidth: linkIsBlocked(link) ? 1.5 : 3,
+          dashed: linkIsBlocked(link),
+        }))}
+      />
       <div className="mt-3 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>

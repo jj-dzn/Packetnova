@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
@@ -12,7 +13,9 @@ export interface MiddleboxHop {
 export interface MiddleboxStep {
   title: string
   description: string
-  middleValue: string | null
+  /** A plain status string, or a richer diagram (e.g. a NatTableDiagram)
+   * for flows where the middlebox's state is more than one value. */
+  middleValue: ReactNode
   hop: MiddleboxHop | null
 }
 
@@ -123,13 +126,13 @@ export function MiddleboxFlowContent({
   )
 }
 
-function Box({ label, value, highlight }: { label: string; value: string; highlight: boolean }) {
+function Box({ label, value, highlight }: { label: string; value: ReactNode; highlight: boolean }) {
   return (
     <div className="rounded-lg border border-border bg-bg p-4 text-center">
       <p className="text-sm font-medium">{label}</p>
-      <p className={`mt-1 font-mono text-xs ${highlight ? 'text-success' : 'text-fg-muted'}`}>
+      <div className={`mt-1 font-mono text-xs ${highlight ? 'text-success' : 'text-fg-muted'}`}>
         {value}
-      </p>
+      </div>
     </div>
   )
 }
