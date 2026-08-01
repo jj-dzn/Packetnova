@@ -1,4 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router'
+import { toolCategories } from '../../content/reference/tools'
+import { visualizers } from '../../content/reference/visualizers'
 
 interface Star {
   x: number
@@ -12,6 +15,8 @@ interface Star {
 interface Node {
   x: number
   y: number
+  name: string
+  href: string
 }
 
 interface Packet {
@@ -19,12 +24,40 @@ interface Packet {
   toIndex: number
   progress: number
   speed: number
+  protocol: string
 }
 
 const STAR_COUNT = 55
 const NODE_COUNT = 7
 const PACKET_COUNT = 9
 const POINTER_RADIUS = 150
+const PROTOCOLS = ['TCP', 'UDP', 'ICMP']
+const IDLE_MS = 7000
+const SHOWCASE_MS = 2600
+
+// Every live tool and visualizer, flattened into one pool of real
+// destinations -- computed once at module load, not per-render. Each
+// starfield node names one of these instead of being pure decoration, so
+// the "network graph" is a light discovery affordance, not just eye candy.
+const DESTINATIONS: { name: string; href: string }[] = [
+  ...toolCategories.flatMap((category) =>
+    category.tools
+      .filter((tool) => tool.slug)
+      .map((tool) => ({ name: tool.name, href: `/tools/${tool.slug}` })),
+  ),
+  ...visualizers
+    .filter((visualizer) => visualizer.slug)
+    .map((visualizer) => ({ name: visualizer.name, href: `/visualizers/${visualizer.slug}` })),
+]
+
+function pickRandomUnique<T>(pool: T[], count: number): T[] {
+  const copy = [...pool]
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copy[i], copy[j]] = [copy[j]!, copy[i]!]
+  }
+  return copy.slice(0, count)
+}
 
 function hexToRgb(hex: string): string {
   const clean = hex.replace('#', '')
@@ -47,6 +80,10 @@ function randomNextNode(current: number, count: number): number {
   return next
 }
 
+function randomProtocol(): string {
+  return PROTOCOLS[Math.floor(Math.random() * PROTOCOLS.length)]!
+}
+
 // 1 right at the pointer, fading linearly to 0 at POINTER_RADIUS away.
 function proximityBoost(x: number, y: number, pointer: { x: number; y: number; active: boolean }) {
   if (!pointer.active) return 0
@@ -54,14 +91,29 @@ function proximityBoost(x: number, y: number, pointer: { x: number; y: number; a
   return Math.max(0, 1 - distance / POINTER_RADIUS)
 }
 
-// Purely decorative "nova" traffic animation for the homepage hero: a faint
-// constellation of nodes with packets traveling between them over a subtle
-// starfield. Simulated data only -- no real network access. Respects
+// "Nova" traffic animation for the homepage hero: a faint constellation of
+// nodes with packets traveling between them over a subtle starfield.
+// Simulated data only -- no real network access. Respects
 // prefers-reduced-motion (renders one static frame instead of animating)
 // and re-reads theme colors on light/dark toggle since the accent colors
 // differ between themes.
+//
+// Each node names a real tool or visualizer (see DESTINATIONS above) and is
+// backed by a real, keyboard-focusable <Link> in the DOM overlay below --
+// the canvas itself stays aria-hidden and pointer-events-none throughout,
+// exactly as before, so it can never intercept clicks meant for the hero's
+// own buttons.
 export function TrafficStarfield() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [nodeLinks, setNodeLinks] = useState<Node[]>([])
+  const [activeNodeIndex, setActiveNodeIndex] = useState<number | null>(null)
+  const activeNodeIndexRef = useRef<number | null>(null)
+  const userHoverRef = useRef(false)
+
+  function updateActiveNode(index: number | null) {
+    activeNodeIndexRef.current = index
+    setActiveNodeIndex(index)
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -77,6 +129,22 @@ export function TrafficStarfield() {
     let stars: Star[] = []
     let nodes: Node[] = []
     let packets: Packet[] = []
+    let idleTimer = 0
+    let showcaseTimer = 0
+
+    function armIdleTimer() {
+      window.clearTimeout(idleTimer)
+      if (reducedMotionQuery.matches) return
+      idleTimer = window.setTimeout(() => {
+        if (userHoverRef.current || nodes.length === 0) return
+        const index = Math.floor(Math.random() * nodes.length)
+        updateActiveNode(index)
+        showcaseTimer = window.setTimeout(() => {
+          if (!userHoverRef.current) updateActiveNode(null)
+          armIdleTimer()
+        }, SHOWCASE_MS)
+      }, IDLE_MS)
+    }
 
     function seed() {
       stars = Array.from({ length: STAR_COUNT }, () => ({
@@ -87,10 +155,14 @@ export function TrafficStarfield() {
         twinkleSpeed: Math.random() * 0.0012 + 0.0004,
         twinklePhase: Math.random() * Math.PI * 2,
       }))
-      nodes = Array.from({ length: NODE_COUNT }, () => ({
+      const destinations = pickRandomUnique(DESTINATIONS, NODE_COUNT)
+      nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
         x: Math.random() * width * 0.8 + width * 0.1,
         y: Math.random() * height * 0.7 + height * 0.15,
+        name: destinations[i]?.name ?? 'PacketNova',
+        href: destinations[i]?.href ?? '/tools',
       }))
+      setNodeLinks(nodes)
       packets = Array.from({ length: PACKET_COUNT }, () => {
         const fromIndex = Math.floor(Math.random() * nodes.length)
         return {
@@ -98,6 +170,7 @@ export function TrafficStarfield() {
           toIndex: randomNextNode(fromIndex, nodes.length),
           progress: Math.random(),
           speed: Math.random() * 0.0003 + 0.0002,
+          protocol: randomProtocol(),
         }
       })
     }
@@ -159,13 +232,14 @@ export function TrafficStarfield() {
         }
       }
 
-      for (const node of nodes) {
+      nodes.forEach((node, index) => {
         const boost = animate ? proximityBoost(node.x, node.y, pointer) : 0
+        const showcased = activeNodeIndexRef.current === index
         ctx!.beginPath()
-        ctx!.arc(node.x, node.y, 2.5 + boost * 2, 0, Math.PI * 2)
-        ctx!.fillStyle = `rgba(${accentAlt}, ${Math.min(1, 0.55 + boost * 0.4)})`
+        ctx!.arc(node.x, node.y, 2.5 + boost * 2 + (showcased ? 1.5 : 0), 0, Math.PI * 2)
+        ctx!.fillStyle = `rgba(${accentAlt}, ${Math.min(1, 0.55 + boost * 0.4 + (showcased ? 0.4 : 0))})`
         ctx!.fill()
-      }
+      })
 
       for (const packet of packets) {
         if (animate) {
@@ -174,16 +248,29 @@ export function TrafficStarfield() {
             packet.progress = 0
             packet.fromIndex = packet.toIndex
             packet.toIndex = randomNextNode(packet.fromIndex, nodes.length)
+            packet.protocol = randomProtocol()
           }
         }
         const from = nodes[packet.fromIndex]!
         const to = nodes[packet.toIndex]!
         const x = from.x + (to.x - from.x) * packet.progress
         const y = from.y + (to.y - from.y) * packet.progress
+        const boost = animate ? proximityBoost(x, y, pointer) : 0
         ctx!.beginPath()
         ctx!.arc(x, y, 2, 0, Math.PI * 2)
         ctx!.fillStyle = `rgba(${accent}, 0.9)`
         ctx!.fill()
+
+        // Close up, a packet reveals what it actually is -- otherwise it's
+        // just a moving dot. Kept off by default (only within
+        // POINTER_RADIUS) so the ambient view stays quiet at rest.
+        if (animate && boost > 0.45) {
+          ctx!.font = '9px ui-monospace, SFMono-Regular, Menlo, monospace'
+          ctx!.textAlign = 'center'
+          ctx!.textBaseline = 'middle'
+          ctx!.fillStyle = `rgba(${accent}, ${Math.min(1, boost)})`
+          ctx!.fillText(packet.protocol, x, y - 9)
+        }
       }
     }
 
@@ -230,15 +317,25 @@ export function TrafficStarfield() {
       pointer.y = event.clientY - rect.top
       pointer.active =
         pointer.x >= 0 && pointer.x <= rect.width && pointer.y >= 0 && pointer.y <= rect.height
+      armIdleTimer()
     }
 
     function handlePointerLeaveWindow() {
       pointer.active = false
     }
 
+    function handleReducedMotionChange() {
+      start()
+      window.clearTimeout(idleTimer)
+      window.clearTimeout(showcaseTimer)
+      if (reducedMotionQuery.matches) updateActiveNode(null)
+      else armIdleTimer()
+    }
+
     start()
+    armIdleTimer()
     document.addEventListener('visibilitychange', handleVisibility)
-    reducedMotionQuery.addEventListener('change', start)
+    reducedMotionQuery.addEventListener('change', handleReducedMotionChange)
     window.addEventListener('pointermove', handlePointerMove)
     document.addEventListener('pointerleave', handlePointerLeaveWindow)
     const themeObserver = new MutationObserver(handleThemeChange)
@@ -249,20 +346,59 @@ export function TrafficStarfield() {
 
     return () => {
       stop()
+      window.clearTimeout(idleTimer)
+      window.clearTimeout(showcaseTimer)
       resizeObserver.disconnect()
       themeObserver.disconnect()
       document.removeEventListener('visibilitychange', handleVisibility)
-      reducedMotionQuery.removeEventListener('change', start)
+      reducedMotionQuery.removeEventListener('change', handleReducedMotionChange)
       window.removeEventListener('pointermove', handlePointerMove)
       document.removeEventListener('pointerleave', handlePointerLeaveWindow)
     }
   }, [])
 
+  function handleNodeEnter(index: number) {
+    userHoverRef.current = true
+    updateActiveNode(index)
+  }
+
+  function handleNodeLeave() {
+    userHoverRef.current = false
+    updateActiveNode(null)
+  }
+
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 h-full w-full"
-    />
+    // pointer-events-none on the wrapper (not just the canvas) matters here:
+    // an absolutely-positioned element paints above normal-flow siblings
+    // regardless of DOM order, so without this the wrapper would sit above
+    // -- and block clicks to -- the hero's own buttons rendered after it.
+    // Each node <Link> below opts back into pointer-events-auto explicitly,
+    // the standard way to punch a few real interactive hotspots through an
+    // otherwise fully click-through decorative layer.
+    <div className="pointer-events-none absolute inset-0 h-full w-full">
+      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 h-full w-full" />
+      {nodeLinks.map((node, index) => (
+        <Link
+          key={`${node.href}-${index}`}
+          to={node.href}
+          onMouseEnter={() => handleNodeEnter(index)}
+          onMouseLeave={handleNodeLeave}
+          onFocus={() => handleNodeEnter(index)}
+          onBlur={handleNodeLeave}
+          aria-label={`Discover: ${node.name}`}
+          className="pointer-events-auto absolute flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          style={{ left: node.x, top: node.y }}
+        >
+          {activeNodeIndex === index && (
+            <span
+              role="tooltip"
+              className="animate-pn-fade-in pointer-events-none absolute bottom-full mb-2 whitespace-nowrap rounded-md border border-border bg-surface px-2.5 py-1 font-mono text-[11px] text-fg shadow-[0_0_16px_-4px_var(--color-accent)]"
+            >
+              {node.name}
+            </span>
+          )}
+        </Link>
+      ))}
+    </div>
   )
 }
