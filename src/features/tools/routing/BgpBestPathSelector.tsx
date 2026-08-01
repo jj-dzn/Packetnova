@@ -1,15 +1,56 @@
 import { useState, type ReactNode } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { Button } from '../../../components/ui/Button'
 import { Pill } from '../../../components/ui/Pill'
+import { EliminationSteps, type Candidate } from '../../visualizers/EliminationSteps'
 import {
   selectBgpBestPath,
   type BgpCandidate,
   type BgpOrigin,
+  type BgpResult,
 } from '../../../lib/calculations/bgpBestPath'
+
+// Reuses the exact "narrow candidates down to a winner" display the BGP
+// best-path visualizer already uses for a fixed illustrative example --
+// same visual grammar, driven here by whatever the visitor actually
+// entered above instead of a hardcoded scenario.
+function buildBgpGuidedSteps(candidates: BgpCandidate[], result: BgpResult): GuidedStep[] {
+  const eliminationCandidates: Candidate[] = candidates.map((c) => ({
+    id: c.id,
+    label: c.id,
+    detail: `Weight ${c.weight} · LocalPref ${c.localPreference} · AS-path ${c.asPathLength}`,
+  }))
+
+  const allIds = candidates.map((c) => c.id)
+  const eliminationSteps = [
+    {
+      title: 'Ready to compare',
+      description: `${candidates.length} candidate paths, tie-breaking hasn't started yet.`,
+      remainingIds: allIds,
+    },
+    ...result.trace.map((t) => ({
+      title: t.step,
+      description: `Comparing on ${t.step.toLowerCase()} -- ${t.remaining.length} of ${allIds.length} candidate${allIds.length === 1 ? '' : 's'} still tied.`,
+      remainingIds: t.remaining,
+    })),
+  ]
+
+  return eliminationSteps.map((step, index) => ({
+    title: step.title,
+    description: step.description,
+    content: (
+      <EliminationSteps
+        candidates={eliminationCandidates}
+        step={step}
+        isFinal={index === eliminationSteps.length - 1}
+      />
+    ),
+  }))
+}
 
 // Maps each trace step's name (from bgpBestPath.ts's STEPS) to the input
 // field it corresponds to -- hovering a trace row highlights that field
@@ -267,31 +308,44 @@ export function BgpBestPathSelector() {
               <ResultRow label="Decided by" value={calc.result.decidedByStep} />
             </dl>
             {calc.result.trace.length > 0 && (
-              <div className="overflow-x-auto rounded-md border border-border">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-surface">
-                    <tr className="border-b border-border">
-                      <th className="px-3 py-2 font-medium text-fg-muted">Step</th>
-                      <th className="px-3 py-2 font-medium text-fg-muted">Still in the running</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {calc.result.trace.map((step) => (
-                      <tr
-                        key={step.step}
-                        onMouseEnter={() => setHoveredStep(step.step)}
-                        onMouseLeave={() => setHoveredStep(null)}
-                        className={`border-b border-border font-mono transition-colors last:border-b-0 ${
-                          hoveredStep === step.step ? 'bg-accent/10' : ''
-                        }`}
-                      >
-                        <td className="px-3 py-2">{step.step}</td>
-                        <td className="px-3 py-2">{step.remaining.join(', ')}</td>
+              <GuidedMode
+                steps={buildBgpGuidedSteps(candidates, calc.result)}
+                closingNote={
+                  <>
+                    Order matters more than any single attribute -- a path can lose on every
+                    attribute except the first one that actually differs, and that's the one that
+                    decides. Everything below it in the list never even gets checked.
+                  </>
+                }
+              >
+                <div className="overflow-x-auto rounded-md border border-border">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-surface">
+                      <tr className="border-b border-border">
+                        <th className="px-3 py-2 font-medium text-fg-muted">Step</th>
+                        <th className="px-3 py-2 font-medium text-fg-muted">
+                          Still in the running
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {calc.result.trace.map((step) => (
+                        <tr
+                          key={step.step}
+                          onMouseEnter={() => setHoveredStep(step.step)}
+                          onMouseLeave={() => setHoveredStep(null)}
+                          className={`border-b border-border font-mono transition-colors last:border-b-0 ${
+                            hoveredStep === step.step ? 'bg-accent/10' : ''
+                          }`}
+                        >
+                          <td className="px-3 py-2">{step.step}</td>
+                          <td className="px-3 py-2">{step.remaining.join(', ')}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </GuidedMode>
             )}
           </div>
         ) : (

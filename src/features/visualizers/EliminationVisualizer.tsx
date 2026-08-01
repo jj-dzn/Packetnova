@@ -1,20 +1,9 @@
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
-import { Badge } from '../../components/ui/Badge'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
+import { EliminationSteps, type Candidate, type EliminationStep } from './EliminationSteps'
 
-export interface Candidate {
-  id: string
-  label: string
-  detail: string
-}
-
-export interface EliminationStep {
-  title: string
-  description: string
-  /** IDs of candidates still alive after this step. */
-  remainingIds: string[]
-}
+export type { Candidate, EliminationStep }
 
 interface EliminationVisualizerProps {
   category: string
@@ -41,7 +30,6 @@ export function EliminationVisualizer({
   const player = useStepPlayer(steps.length)
   const current = steps[player.step]!
   const isFinal = player.step === steps.length - 1
-  const hasWinner = isFinal && current.remainingIds.length === 1
 
   return (
     <VisualizerPageLayout category={category} title={title} description={description}>
@@ -51,28 +39,7 @@ export function EliminationVisualizer({
         aria-label={`${title} visualizer. Use the Previous and Next buttons, or the left and right arrow keys, to step through.`}
         className="flex flex-col gap-8 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
-        <div className="flex flex-col gap-2">
-          {candidates.map((candidate) => {
-            const stillIn = current.remainingIds.includes(candidate.id)
-            const isWinner = hasWinner && stillIn
-            return (
-              <div
-                key={candidate.id}
-                className={`flex flex-wrap items-center justify-between gap-2 rounded-md border px-4 py-2.5 text-sm transition-opacity ${
-                  isWinner ? 'border-success/40 bg-success/10' : 'border-border bg-bg'
-                } ${stillIn ? '' : 'opacity-40'}`}
-              >
-                <span className={`font-medium ${stillIn ? '' : 'line-through'}`}>
-                  {candidate.label}
-                </span>
-                <span className="flex items-center gap-2">
-                  <span className="font-mono text-xs text-fg-muted">{candidate.detail}</span>
-                  {isWinner && <Badge tone="success">Winner</Badge>}
-                </span>
-              </div>
-            )
-          })}
-        </div>
+        <EliminationSteps candidates={candidates} step={current} isFinal={isFinal} />
 
         <div aria-live="polite">
           <h2 className="font-medium">{current.title}</h2>

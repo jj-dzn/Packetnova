@@ -1,13 +1,69 @@
 import { useRef, useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { BinaryBreakdown } from './BinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { Pill } from '../../../components/ui/Pill'
 import { calculateSubnets } from '../../../lib/calculations/subnet'
-import { calculateVlsm, type VlsmRequest } from '../../../lib/calculations/vlsm'
+import {
+  calculateVlsm,
+  type VlsmAllocation,
+  type VlsmRequest,
+} from '../../../lib/calculations/vlsm'
 import { parseCIDR } from '../../../lib/validation/ip'
+
+// VLSM allocates largest-request-first to minimize fragmentation of the
+// base block (see vlsm.ts) -- the guided walkthrough steps through that
+// same real processing order, not the order requests happen to be listed
+// in, so it shows what the algorithm actually did.
+function buildVlsmSteps(
+  allocations: VlsmAllocation[],
+  baseCidr: string,
+  addressesAvailable: number,
+): GuidedStep[] {
+  const ordered = [...allocations].sort((a, b) => b.hostsNeeded - a.hostsNeeded)
+  let cumulative = 0
+
+  return ordered.map((allocation) => {
+    const blockSize = 2 ** (32 - allocation.prefixLength)
+    cumulative += blockSize
+    const usedPercent = Math.min(100, (cumulative / addressesAvailable) * 100)
+
+    return {
+      title: allocation.label || 'Unnamed subnet',
+      description: `Needs ${allocation.hostsNeeded.toLocaleString()} usable hosts -- the smallest block that fits is a /${allocation.prefixLength} (${allocation.usableHosts.toLocaleString()} usable).`,
+      content: (
+        <div className="flex flex-col gap-3">
+          <dl>
+            <ResultRow label="Assigned" value={allocation.cidr} />
+            <ResultRow
+              label="Usable range"
+              value={
+                allocation.firstUsable && allocation.lastUsable
+                  ? `${allocation.firstUsable} - ${allocation.lastUsable}`
+                  : 'None'
+              }
+            />
+          </dl>
+          <div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-fg-subtle/15">
+              <div
+                className="h-full rounded-full bg-accent transition-all"
+                style={{ width: `${usedPercent}%` }}
+              />
+            </div>
+            <p className="mt-1 text-xs text-fg-subtle">
+              {cumulative.toLocaleString()} / {addressesAvailable.toLocaleString()} addresses of{' '}
+              {baseCidr} used so far
+            </p>
+          </div>
+        </div>
+      ),
+    }
+  })
+}
 
 type Mode = 'equal' | 'vlsm'
 
@@ -175,53 +231,72 @@ export function SubnetCalculator() {
             <p className="text-sm text-danger">{equalCalc.error}</p>
           )
         ) : vlsmCalc.ok ? (
-          <div className="flex flex-col gap-4">
-            <dl>
-              <ResultRow label="Base network" value={vlsmCalc.result.baseCidr} />
-              <ResultRow
-                label="Addresses used"
-                value={`${vlsmCalc.result.addressesUsed.toLocaleString()} / ${vlsmCalc.result.addressesAvailable.toLocaleString()}`}
-              />
-            </dl>
-            <div className="max-h-80 overflow-y-auto rounded-md border border-border">
-              <table className="w-full text-left text-sm">
-                <thead className="sticky top-0 bg-surface">
-                  <tr className="border-b border-border">
-                    <th className="px-3 py-2 font-medium text-fg-muted">Name</th>
-                    <th className="px-3 py-2 font-medium text-fg-muted">CIDR</th>
-                    <th className="px-3 py-2 font-medium text-fg-muted">Usable range</th>
-                    <th className="px-3 py-2 font-medium text-fg-muted">
-                      Hosts (requested / available)
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {vlsmCalc.result.allocations.map((allocation) => {
-                    const spare = allocation.usableHosts - allocation.hostsNeeded
-                    return (
-                      <tr
-                        key={allocation.id}
-                        className="border-b border-border font-mono last:border-b-0"
-                      >
-                        <td className="px-3 py-2 font-sans">{allocation.label || 'Unnamed'}</td>
-                        <td className="px-3 py-2">{allocation.cidr}</td>
-                        <td className="px-3 py-2">
-                          {allocation.firstUsable && allocation.lastUsable
-                            ? `${allocation.firstUsable} - ${allocation.lastUsable}`
-                            : 'None'}
-                        </td>
-                        <td className="px-3 py-2">
-                          {allocation.hostsNeeded.toLocaleString()} /{' '}
-                          {allocation.usableHosts.toLocaleString()}
-                          <span className="text-fg-subtle"> ({spare.toLocaleString()} spare)</span>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+          <GuidedMode
+            steps={buildVlsmSteps(
+              vlsmCalc.result.allocations,
+              vlsmCalc.result.baseCidr,
+              vlsmCalc.result.addressesAvailable,
+            )}
+            closingNote={
+              <>
+                VLSM allocates biggest request first -- fitting the large blocks in while there's
+                still room for them is what leaves space for the small ones after, not the other way
+                around. Request the same subnets in a different order and you'd get the exact same
+                layout.
+              </>
+            }
+          >
+            <div className="flex flex-col gap-4">
+              <dl>
+                <ResultRow label="Base network" value={vlsmCalc.result.baseCidr} />
+                <ResultRow
+                  label="Addresses used"
+                  value={`${vlsmCalc.result.addressesUsed.toLocaleString()} / ${vlsmCalc.result.addressesAvailable.toLocaleString()}`}
+                />
+              </dl>
+              <div className="max-h-80 overflow-y-auto rounded-md border border-border">
+                <table className="w-full text-left text-sm">
+                  <thead className="sticky top-0 bg-surface">
+                    <tr className="border-b border-border">
+                      <th className="px-3 py-2 font-medium text-fg-muted">Name</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">CIDR</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">Usable range</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">
+                        Hosts (requested / available)
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vlsmCalc.result.allocations.map((allocation) => {
+                      const spare = allocation.usableHosts - allocation.hostsNeeded
+                      return (
+                        <tr
+                          key={allocation.id}
+                          className="border-b border-border font-mono last:border-b-0"
+                        >
+                          <td className="px-3 py-2 font-sans">{allocation.label || 'Unnamed'}</td>
+                          <td className="px-3 py-2">{allocation.cidr}</td>
+                          <td className="px-3 py-2">
+                            {allocation.firstUsable && allocation.lastUsable
+                              ? `${allocation.firstUsable} - ${allocation.lastUsable}`
+                              : 'None'}
+                          </td>
+                          <td className="px-3 py-2">
+                            {allocation.hostsNeeded.toLocaleString()} /{' '}
+                            {allocation.usableHosts.toLocaleString()}
+                            <span className="text-fg-subtle">
+                              {' '}
+                              ({spare.toLocaleString()} spare)
+                            </span>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          </GuidedMode>
         ) : (
           <p className="text-sm text-danger">{vlsmCalc.error}</p>
         )

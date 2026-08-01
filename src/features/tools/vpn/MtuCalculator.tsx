@@ -3,8 +3,75 @@ import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
+import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { Input } from '../../../components/ui/Input'
-import { calculateMtu } from '../../../lib/calculations/mtu'
+import { calculateMtu, type MtuResult } from '../../../lib/calculations/mtu'
+import { calculateMss } from '../../../lib/calculations/mss'
+import { calculateFragmentation } from '../../../lib/calculations/fragmentation'
+
+// The three tools T10 already cross-linked (MTU -> MSS -> Packet
+// Fragmentation) as one guided narrative instead of three separate visits --
+// each step reuses the same calc functions those standalone tools call,
+// fed from this tool's own live inputs, so the numbers stay consistent
+// across all three instead of being a disconnected fixed example.
+function buildMtuChainSteps(mtu: MtuResult, payload: number): GuidedStep[] {
+  const mssCalc = calculateMss(mtu.effectiveMtu, 4, 0, 0)
+  const fragCalc = calculateFragmentation(payload, mtu.effectiveMtu)
+
+  return [
+    {
+      title: '1. Does it fit?',
+      description: `A ${payload.toLocaleString()}-byte payload against a ${mtu.effectiveMtu.toLocaleString()}-byte effective MTU (${mtu.linkMtu.toLocaleString()}-byte link MTU minus ${mtu.overheadBytes.toLocaleString()} bytes of overhead).`,
+      content: (
+        <ResultRow
+          label="Fits?"
+          value={mtu.fits ? 'Yes' : `No -- ${mtu.excessBytes.toLocaleString()} bytes over`}
+        />
+      ),
+    },
+    {
+      title: '2. What would have prevented this',
+      description:
+        'For TCP traffic, the sender and receiver negotiate a Maximum Segment Size during the handshake -- sized to fit inside the path MTU from the start, so it never has to find out the hard way.',
+      content: mssCalc.ok ? (
+        <ResultRow label="MSS at this effective MTU" value={`${mssCalc.result.mss} bytes`} />
+      ) : (
+        <p className="text-sm text-fg-subtle">{mssCalc.error}</p>
+      ),
+    },
+    {
+      title: '3. What happens if nothing clamped it',
+      description:
+        "If a packet this size gets sent anyway -- UDP traffic, or MSS clamping that isn't configured -- fragmentation is what actually happens at the router, not a dropped packet.",
+      content: fragCalc.ok ? (
+        fragCalc.result.needsFragmentation ? (
+          <div className="flex flex-col gap-2">
+            <ResultRow label="Fragments" value={String(fragCalc.result.fragments.length)} />
+            <div className="flex h-8 gap-1">
+              {fragCalc.result.fragments.map((fragment) => (
+                <div
+                  key={fragment.index}
+                  title={`Fragment ${fragment.index}: ${fragment.totalBytes} bytes`}
+                  style={{ flexGrow: fragment.totalBytes, flexBasis: 0 }}
+                  className="flex min-w-0 items-center justify-center overflow-hidden rounded-sm border border-accent/40 bg-accent/10 px-1 text-center font-mono text-[10px] text-accent"
+                >
+                  <span className="truncate">#{fragment.index}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-fg-subtle">
+            This payload already fits at {mtu.effectiveMtu.toLocaleString()} bytes -- try a larger
+            payload above to see fragmentation actually happen.
+          </p>
+        )
+      ) : (
+        <p className="text-sm text-fg-subtle">{fragCalc.error}</p>
+      ),
+    },
+  ]
+}
 
 export function MtuCalculator() {
   const [linkMtu, setLinkMtu] = useState('1500')
@@ -81,34 +148,45 @@ export function MtuCalculator() {
       }
       result={
         calc.ok ? (
-          <div className="flex flex-col gap-4">
-            <dl>
-              <ResultRow label="Effective MTU" value={`${calc.result.effectiveMtu} bytes`} />
-              <ResultRow label="Fits?" value={calc.result.fits ? 'Yes' : 'No -- will fragment'} />
-              <ResultRow label="Excess" value={`${calc.result.excessBytes} bytes`} />
-            </dl>
-            {!calc.result.fits && (
-              <p className="text-xs text-fg-subtle">
-                A payload this size gets fragmented into multiple packets to cross this link, which
-                adds latency and per-packet overhead. For TCP traffic this is usually avoided
-                instead of fixed after the fact -- see the{' '}
-                <Link to="/tools/mss-calculator" className="text-accent hover:underline">
-                  MSS calculator
-                </Link>{' '}
-                to work out the segment size that fits in one packet from the start.
-              </p>
-            )}
-            <Aside>
-              The classic real-world version of this: a GRE or IPsec tunnel interface left at the
-              default 1500-byte MTU even though the tunnel's own overhead means it can't actually
-              carry 1500 bytes of payload. Traffic seems fine at first -- small packets and the TCP
-              handshake go through -- until something sends a full-size packet, gets silently
-              dropped, and there's no obvious error, just a connection that "hangs." That's usually
-              a Path MTU Discovery black hole: a firewall along the path is dropping the ICMP
-              "fragmentation needed" message that's supposed to tell the sender to shrink its
-              packets.
-            </Aside>
-          </div>
+          <GuidedMode
+            steps={buildMtuChainSteps(calc.result, Number(payload))}
+            closingNote={
+              <>
+                This is why real networks lean on setting MSS correctly (or working Path MTU
+                Discovery) instead of relying on fragmentation as a safety net -- fragmentation
+                works, but it costs latency and per-fragment overhead every single time it kicks in.
+              </>
+            }
+          >
+            <div className="flex flex-col gap-4">
+              <dl>
+                <ResultRow label="Effective MTU" value={`${calc.result.effectiveMtu} bytes`} />
+                <ResultRow label="Fits?" value={calc.result.fits ? 'Yes' : 'No -- will fragment'} />
+                <ResultRow label="Excess" value={`${calc.result.excessBytes} bytes`} />
+              </dl>
+              {!calc.result.fits && (
+                <p className="text-xs text-fg-subtle">
+                  A payload this size gets fragmented into multiple packets to cross this link,
+                  which adds latency and per-packet overhead. For TCP traffic this is usually
+                  avoided instead of fixed after the fact -- see the{' '}
+                  <Link to="/tools/mss-calculator" className="text-accent hover:underline">
+                    MSS calculator
+                  </Link>{' '}
+                  to work out the segment size that fits in one packet from the start.
+                </p>
+              )}
+              <Aside>
+                The classic real-world version of this: a GRE or IPsec tunnel interface left at the
+                default 1500-byte MTU even though the tunnel's own overhead means it can't actually
+                carry 1500 bytes of payload. Traffic seems fine at first -- small packets and the
+                TCP handshake go through -- until something sends a full-size packet, gets silently
+                dropped, and there's no obvious error, just a connection that "hangs." That's
+                usually a Path MTU Discovery black hole: a firewall along the path is dropping the
+                ICMP "fragmentation needed" message that's supposed to tell the sender to shrink its
+                packets.
+              </Aside>
+            </div>
+          </GuidedMode>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )
