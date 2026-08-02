@@ -28,7 +28,7 @@ function renderHighlighted(text: string, matches: RegexMatch[]): ReactNode {
 }
 
 export function RegexTester() {
-  const [pattern, setPattern] = useState('#(\\d+)')
+  const [pattern, setPattern] = useState('#(?<id>\\d+)')
   const [flags, setFlags] = useState('g')
   const [text, setText] = useState('Order #123 shipped, invoice #456 pending.')
   const [calc, setCalc] = useState<CalculationResult<RegexResult>>(() =>
@@ -147,16 +147,20 @@ export function RegexTester() {
                       </p>
                       {match.groups.length > 0 && (
                         <ul className="mt-1 flex flex-col gap-0.5 pl-4">
-                          {match.groups.map((group, gi) => (
-                            <li key={gi} className="font-mono text-fg-muted">
-                              Group {gi + 1}:{' '}
-                              {group === undefined ? (
-                                <span className="text-fg-subtle italic">did not participate</span>
-                              ) : (
-                                <span className="text-fg">{group || '(empty)'}</span>
-                              )}
-                            </li>
-                          ))}
+                          {match.groups.map((group, gi) => {
+                            const name = calc.result.groupNames[gi]
+                            return (
+                              <li key={gi} className="font-mono text-fg-muted">
+                                Group {gi + 1}
+                                {name && <span className="text-accent"> ({name})</span>}:{' '}
+                                {group === undefined ? (
+                                  <span className="text-fg-subtle italic">did not participate</span>
+                                ) : (
+                                  <span className="text-fg">{group || '(empty)'}</span>
+                                )}
+                              </li>
+                            )
+                          })}
                         </ul>
                       )}
                     </div>
@@ -183,7 +187,9 @@ export function RegexTester() {
             directly on the page -- some patterns paired with certain input can take exponential
             time to evaluate (catastrophic backtracking), which would otherwise freeze the whole
             tab. Every match found gets highlighted inline, and any capture groups inside a match
-            are broken out separately below.
+            are broken out separately below -- a group written as{' '}
+            <code className="font-mono">(?&lt;name&gt;...)</code> shows its name next to its number
+            in that breakdown, instead of just a bare index.
           </p>
         }
         whenToUseThis={

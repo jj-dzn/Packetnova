@@ -45,4 +45,26 @@ describe('testRegex', () => {
   it('rejects an invalid pattern', () => {
     expect(testRegex('(unclosed', '', 'text').ok).toBe(false)
   })
+
+  it('reports names for named capture groups, in order, alongside unnamed ones', () => {
+    const result = testRegex('(?<user>\\w+)@(\\w+)\\.(?<tld>\\w+)', '', 'a@example.com')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.groupNames).toEqual(['user', null, 'tld'])
+    expect(result.result.matches[0]!.groups).toEqual(['a', 'example', 'com'])
+  })
+
+  it('does not count non-capturing groups or lookaround as capturing', () => {
+    const result = testRegex('(?:\\d+)-(?=x)(\\w)(?<=\\d)(?<!z)', '', '12-x')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.groupNames).toEqual([null])
+  })
+
+  it('reports an empty groupNames array for a pattern with no capture groups', () => {
+    const result = testRegex('\\d+', '', 'abc123')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.groupNames).toEqual([])
+  })
 })

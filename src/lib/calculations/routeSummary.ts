@@ -31,7 +31,9 @@ interface AddressRange {
   inputs: string[]
 }
 
-function parseLineToRange(line: string): Omit<AddressRange, 'inputs'> | null {
+/** Exported for the number-line visual, which needs the same start/end
+ * range math to position each input/output block proportionally. */
+export function parseLineToRange(line: string): Omit<AddressRange, 'inputs'> | null {
   const cidr = parseCIDR(line)
   if (cidr) {
     const { ip, prefixLength } = cidr

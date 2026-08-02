@@ -6,8 +6,29 @@ describe('textToAscii', () => {
     const result = textToAscii('A')
     expect(result).toEqual({
       ok: true,
-      result: [{ char: 'A', code: 65, hex: '41', binary: '01000001' }],
+      result: [{ char: 'A', code: 65, hex: '41', binary: '01000001', utf8Bytes: '41' }],
     })
+  })
+
+  it('a single-byte ASCII character has one UTF-8 byte matching its code point', () => {
+    const result = textToAscii('A')
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result[0]!.utf8Bytes).toBe('41')
+  })
+
+  it('a two-byte UTF-8 character (e.g. "e") shows two hex bytes', () => {
+    const result = textToAscii('é') // e-acute, U+00E9 -- encodes as 2 UTF-8 bytes
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result[0]!.utf8Bytes).toBe('C3 A9')
+  })
+
+  it('a four-byte UTF-8 character (emoji) shows four hex bytes', () => {
+    const result = textToAscii('\u{1F600}') // U+1F600 grinning face
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result[0]!.utf8Bytes).toBe('F0 9F 98 80')
   })
 
   it('converts each character of a multi-character string', () => {

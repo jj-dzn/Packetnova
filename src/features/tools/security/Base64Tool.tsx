@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
+import { CharDiffView } from '../CharDiffView'
 import { base64Decode, base64Encode } from '../../../lib/calculations/base64'
 
 export function Base64Tool() {
@@ -46,7 +47,10 @@ export function Base64Tool() {
       }
       result={
         result.ok ? (
-          <CopyableTextarea value={result.result} />
+          <div className="flex flex-col gap-4">
+            <CopyableTextarea value={result.result} />
+            <CharDiffView before={input} after={result.result} />
+          </div>
         ) : (
           <p className="text-sm text-danger">{result.error}</p>
         )

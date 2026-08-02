@@ -109,13 +109,12 @@ export function HashVerifier() {
         error ? (
           <p className="text-sm text-danger">{error}</p>
         ) : (
-          <dl>
-            <ResultRow label="Computed" value={computed ?? ''} loading={isComputing} />
-            <ResultRow
-              label="Match?"
-              value={matches === null ? 'Enter an expected hash' : matches ? 'Yes' : 'No'}
-            />
-          </dl>
+          <div className="flex flex-col gap-4">
+            <VerdictBanner matches={matches} isComputing={isComputing} />
+            <dl>
+              <ResultRow label="Computed" value={computed ?? ''} loading={isComputing} />
+            </dl>
+          </div>
         )
       }
     >
@@ -164,5 +163,89 @@ export function HashVerifier() {
         }
       />
     </ToolPageLayout>
+  )
+}
+
+// A single, unmissable verdict fills the top of the panel instead of a
+// quiet "Match? Yes/No" table row -- this tool's entire purpose is that one
+// answer, so it gets treated with the same visual weight as the stakes of
+// getting it wrong (trusting a corrupted or tampered file).
+function VerdictBanner({
+  matches,
+  isComputing,
+}: {
+  matches: boolean | null
+  isComputing: boolean
+}) {
+  if (isComputing) {
+    return (
+      <div className="rounded-lg border border-border bg-surface px-4 py-5 text-center text-sm text-fg-subtle">
+        Computing…
+      </div>
+    )
+  }
+
+  if (matches === null) {
+    return (
+      <div className="rounded-lg border border-dashed border-border px-4 py-5 text-center text-sm text-fg-subtle">
+        Enter an expected hash below to compare against.
+      </div>
+    )
+  }
+
+  if (matches) {
+    return (
+      <div
+        role="status"
+        className="flex items-center justify-center gap-2 rounded-lg border border-success/40 bg-success/10 px-4 py-5 text-success"
+      >
+        <CheckIcon />
+        <span className="text-lg font-semibold">Match</span>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      role="alert"
+      className="flex items-center justify-center gap-2 rounded-lg border border-danger/40 bg-danger/10 px-4 py-5 text-danger"
+    >
+      <CrossIcon />
+      <span className="text-lg font-semibold">No match</span>
+    </div>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-7 w-7"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 13l4 4L19 7" />
+    </svg>
+  )
+}
+
+function CrossIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-7 w-7"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
   )
 }

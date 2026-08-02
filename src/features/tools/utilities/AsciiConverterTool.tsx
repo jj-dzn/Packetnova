@@ -5,7 +5,7 @@ import { asciiCodesToText, textToAscii } from '../../../lib/calculations/asciiCo
 
 export function AsciiConverterTool() {
   const [mode, setMode] = useState<'textToCodes' | 'codesToText'>('textToCodes')
-  const [text, setText] = useState('Hello!')
+  const [text, setText] = useState('Héllo! 👋')
   const [codes, setCodes] = useState('72 101 108 108 111 33')
 
   const forward = mode === 'textToCodes' ? textToAscii(text) : null
@@ -63,6 +63,7 @@ export function AsciiConverterTool() {
                     <th className="px-3 py-2 font-medium text-fg-muted">Decimal</th>
                     <th className="px-3 py-2 font-medium text-fg-muted">Hex</th>
                     <th className="px-3 py-2 font-medium text-fg-muted">Binary</th>
+                    <th className="px-3 py-2 font-medium text-fg-muted">UTF-8 bytes</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -72,6 +73,7 @@ export function AsciiConverterTool() {
                       <td className="px-3 py-2">{entry.code}</td>
                       <td className="px-3 py-2">{entry.hex}</td>
                       <td className="px-3 py-2">{entry.binary}</td>
+                      <td className="px-3 py-2">{entry.utf8Bytes}</td>
                     </tr>
                   ))}
                 </tbody>

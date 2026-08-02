@@ -8,6 +8,7 @@ import { Input } from '../../../components/ui/Input'
 import { calculateMtu, type MtuResult } from '../../../lib/calculations/mtu'
 import { calculateMss } from '../../../lib/calculations/mss'
 import { calculateFragmentation } from '../../../lib/calculations/fragmentation'
+import { DoesItFitBar } from './DoesItFitBar'
 
 // The three tools T10 already cross-linked (MTU -> MSS -> Packet
 // Fragmentation) as one guided narrative instead of three separate visits --
@@ -143,6 +144,14 @@ export function MtuCalculator() {
               </span>
               <span className="absolute right-0">9000 (jumbo)</span>
             </div>
+            {calc.ok && (
+              <div className="mt-4">
+                <DoesItFitBar
+                  effectiveMtu={calc.result.effectiveMtu}
+                  payload={Number(payload) || 0}
+                />
+              </div>
+            )}
           </div>
         </div>
       }

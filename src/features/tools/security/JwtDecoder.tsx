@@ -52,6 +52,7 @@ export function JwtDecoder() {
               spellCheck={false}
               className="mt-2 w-full rounded-md border border-border bg-bg px-3 py-2 font-mono text-xs text-fg focus:border-accent focus:outline-none"
             />
+            <ColorizedToken token={token} />
           </div>
         </div>
       }
@@ -127,6 +128,42 @@ export function JwtDecoder() {
         }
       />
     </ToolPageLayout>
+  )
+}
+
+const SEGMENT_TINTS = [
+  { name: 'Header', bg: 'bg-accent/20', text: 'text-accent' },
+  { name: 'Payload', bg: 'bg-accent-alt/20', text: 'text-accent-alt' },
+  { name: 'Signature', bg: 'bg-warning/20', text: 'text-warning' },
+]
+
+// jwt.io's signature visual for a JWT: the three dot-separated segments
+// colored distinctly right in the input, so "this is three separate
+// base64url chunks joined by dots" is visible before reading a word of the
+// explanation below. Colors any segments beyond the first three neutrally --
+// a token with more than two dots is malformed, but still worth showing as
+// segments rather than silently truncating.
+function ColorizedToken({ token }: { token: string }) {
+  const segments = token.trim().split('.')
+  if (segments.length < 2 || segments.every((s) => s === '')) return null
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-x-0.5 gap-y-1 break-all rounded-md border border-border bg-bg px-3 py-2 font-mono text-xs">
+      {segments.map((segment, i) => {
+        const tint = SEGMENT_TINTS[i]
+        return (
+          <span key={i} className="flex items-center">
+            {i > 0 && <span className="text-fg-subtle">.</span>}
+            <span
+              className={tint ? `rounded px-0.5 ${tint.bg} ${tint.text}` : 'text-fg-subtle'}
+              title={tint?.name ?? 'Unexpected extra segment'}
+            >
+              {segment || '​'}
+            </span>
+          </span>
+        )
+      })}
+    </div>
   )
 }
 

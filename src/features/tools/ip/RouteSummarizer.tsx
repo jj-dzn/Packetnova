@@ -5,6 +5,7 @@ import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { BinaryBreakdown } from './BinaryBreakdown'
+import { MergeRangeBar } from './MergeRangeBar'
 import { summarizeRoutes, type RouteMergeGroup } from '../../../lib/calculations/routeSummary'
 import { parseIPv4 } from '../../../lib/validation/ip'
 
@@ -95,33 +96,36 @@ export function RouteSummarizer() {
                     return (
                       <div
                         key={index}
-                        className={`flex flex-wrap items-center gap-2 rounded-md border p-2 text-xs ${
+                        className={`flex flex-col gap-2 rounded-md border p-2 text-xs ${
                           merged ? 'border-accent/40 bg-accent/5' : 'border-border'
                         }`}
                       >
-                        <div className="flex flex-wrap gap-1">
-                          {group.inputs.map((input, inputIndex) => (
-                            <span
-                              key={inputIndex}
-                              className="rounded bg-fg-subtle/10 px-1.5 py-0.5 font-mono text-fg-muted"
-                            >
-                              {input}
-                            </span>
-                          ))}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <div className="flex flex-wrap gap-1">
+                            {group.inputs.map((input, inputIndex) => (
+                              <span
+                                key={inputIndex}
+                                className="rounded bg-fg-subtle/10 px-1.5 py-0.5 font-mono text-fg-muted"
+                              >
+                                {input}
+                              </span>
+                            ))}
+                          </div>
+                          <span aria-hidden="true" className="text-fg-subtle">
+                            &rarr;
+                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {group.outputs.map((output) => (
+                              <span
+                                key={output}
+                                className="rounded bg-accent/15 px-1.5 py-0.5 font-mono text-accent"
+                              >
+                                {output}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                        <span aria-hidden="true" className="text-fg-subtle">
-                          &rarr;
-                        </span>
-                        <div className="flex flex-wrap gap-1">
-                          {group.outputs.map((output) => (
-                            <span
-                              key={output}
-                              className="rounded bg-accent/15 px-1.5 py-0.5 font-mono text-accent"
-                            >
-                              {output}
-                            </span>
-                          ))}
-                        </div>
+                        {merged && <MergeRangeBar inputs={group.inputs} outputs={group.outputs} />}
                       </div>
                     )
                   })}

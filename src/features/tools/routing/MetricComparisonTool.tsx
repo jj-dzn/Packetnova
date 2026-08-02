@@ -7,13 +7,22 @@ import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
 import { DataTable } from '../../../components/ui/DataTable'
 import { calculateOspfCost } from '../../../lib/calculations/ospfCost'
+import { calculateEigrpMetric } from '../../../lib/calculations/eigrpMetric'
 import { routingMetrics, type MetricInfo } from '../../../content/reference/routingMetrics'
+import { CrossProtocolMetricBar } from './CrossProtocolMetricBar'
+
+// RIP counts this single hypothetical link as exactly one hop, regardless
+// of its bandwidth or delay -- that fixed "1" next to OSPF's and EIGRP's
+// bandwidth-derived numbers is itself the lesson the bar below is making.
+const RIP_HOP_COUNT = 1
 
 export function MetricComparisonTool() {
   const [refBandwidth, setRefBandwidth] = useState('100')
   const [ifBandwidth, setIfBandwidth] = useState('1000')
+  const [ifDelay, setIfDelay] = useState('100')
 
   const calc = calculateOspfCost(Number(refBandwidth), Number(ifBandwidth))
+  const eigrpCalc = calculateEigrpMetric(Number(ifBandwidth), Number(ifDelay))
 
   return (
     <>
@@ -45,6 +54,17 @@ export function MetricComparisonTool() {
                 onChange={(e) => setIfBandwidth(e.target.value)}
               />
             </div>
+            <div>
+              <label htmlFor="metric-if-delay" className="text-sm font-medium">
+                Interface delay (microseconds, for EIGRP)
+              </label>
+              <Input
+                id="metric-if-delay"
+                className="mt-2"
+                value={ifDelay}
+                onChange={(e) => setIfDelay(e.target.value)}
+              />
+            </div>
           </div>
         }
         result={
@@ -52,7 +72,27 @@ export function MetricComparisonTool() {
             <div className="flex flex-col gap-4">
               <dl>
                 <ResultRow label="OSPF cost" value={String(calc.result.cost)} />
+                {eigrpCalc.ok && (
+                  <ResultRow
+                    label="EIGRP composite metric"
+                    value={String(eigrpCalc.result.metric)}
+                  />
+                )}
               </dl>
+              <div>
+                <p className="mb-2 text-xs font-medium text-fg-muted">
+                  This one link's metric under each protocol
+                </p>
+                <CrossProtocolMetricBar
+                  rows={[
+                    { label: 'RIP', value: RIP_HOP_COUNT, unit: 'hop' },
+                    { label: 'OSPF', value: calc.result.cost, unit: 'cost' },
+                    ...(eigrpCalc.ok
+                      ? [{ label: 'EIGRP', value: eigrpCalc.result.metric, unit: '' }]
+                      : []),
+                  ]}
+                />
+              </div>
               {calc.result.cost === 1 &&
                 calc.result.interfaceBandwidthMbps >= calc.result.referenceBandwidthMbps && (
                   <Aside>

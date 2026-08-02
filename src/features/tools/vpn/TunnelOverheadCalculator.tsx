@@ -6,6 +6,22 @@ import { Select } from '../../../components/ui/Select'
 import { calculateTunnelOverhead } from '../../../lib/calculations/tunnelOverhead'
 import { tunnelOverheadPresets } from '../../../content/reference/vpnOverhead'
 
+// A per-row payload-vs-overhead bar -- the percentage column already states
+// the ratio as a number, but a bar makes it possible to compare rows at a
+// glance while scanning the table instead of reading each percentage in turn.
+function PayloadOverheadBar({ payload, overhead }: { payload: number; overhead: number }) {
+  const total = payload + overhead
+  return (
+    <div
+      className="flex h-3 w-24 overflow-hidden rounded-sm"
+      title={`${payload}B payload, ${overhead}B overhead`}
+    >
+      <div className="bg-accent" style={{ width: `${(payload / total) * 100}%` }} />
+      <div className="bg-danger/60" style={{ width: `${(overhead / total) * 100}%` }} />
+    </div>
+  )
+}
+
 export function TunnelOverheadCalculator() {
   const [linkMtu, setLinkMtu] = useState('1500')
   const [presetId, setPresetId] = useState('wireguard')
@@ -80,8 +96,14 @@ export function TunnelOverheadCalculator() {
               />
             </dl>
             <div>
-              <p className="mb-2 text-sm font-medium">
+              <p className="mb-1 text-sm font-medium">
                 Every tunnel type at this {calc.result.linkMtu}-byte link MTU
+              </p>
+              <p className="mb-2 text-xs text-fg-subtle">
+                <span className="inline-block h-2 w-2 rounded-full bg-accent align-middle" />{' '}
+                payload &nbsp;
+                <span className="inline-block h-2 w-2 rounded-full bg-danger/60 align-middle" />{' '}
+                overhead
               </p>
               <div className="overflow-x-auto rounded-md border border-border">
                 <table className="w-full text-left text-sm">
@@ -91,6 +113,7 @@ export function TunnelOverheadCalculator() {
                       <th className="px-3 py-2 font-medium text-fg-muted">Overhead</th>
                       <th className="px-3 py-2 font-medium text-fg-muted">Effective MTU</th>
                       <th className="px-3 py-2 font-medium text-fg-muted">Overhead %</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">Payload vs. overhead</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -114,6 +137,14 @@ export function TunnelOverheadCalculator() {
                               {presetCalc.ok
                                 ? `${presetCalc.result.overheadPercent.toFixed(2)}%`
                                 : '--'}
+                            </td>
+                            <td className="px-3 py-2">
+                              {presetCalc.ok && (
+                                <PayloadOverheadBar
+                                  payload={presetCalc.result.effectiveMtu}
+                                  overhead={presetCalc.result.overheadBytes}
+                                />
+                              )}
                             </td>
                           </tr>
                         )

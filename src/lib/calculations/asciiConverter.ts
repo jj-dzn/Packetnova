@@ -5,17 +5,28 @@ export interface AsciiEntry {
   code: number
   hex: string
   binary: string
+  /** This character's UTF-8 encoding, as space-separated hex bytes -- one
+   * byte for code points under 128, up to four for the higher end of
+   * Unicode (most emoji). Distinct from `hex`/`binary` above, which are the
+   * raw code point value, not its multi-byte wire representation. */
+  utf8Bytes: string
 }
+
+const utf8Encoder = new TextEncoder()
 
 export function textToAscii(text: string): CalculationResult<AsciiEntry[]> {
   if (!text) return { ok: false, error: 'Enter some text.' }
   const entries = Array.from(text).map((char) => {
     const code = char.codePointAt(0)!
+    const utf8Bytes = Array.from(utf8Encoder.encode(char))
+      .map((byte) => byte.toString(16).padStart(2, '0').toUpperCase())
+      .join(' ')
     return {
       char,
       code,
       hex: code.toString(16).padStart(2, '0'),
       binary: code.toString(2).padStart(8, '0'),
+      utf8Bytes,
     }
   })
   return { ok: true, result: entries }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
+import { CharDiffView } from '../CharDiffView'
 import { urlDecode, urlEncode } from '../../../lib/calculations/urlEncoding'
 
 export function UrlEncodingTool() {
@@ -45,7 +46,10 @@ export function UrlEncodingTool() {
       }
       result={
         result.ok ? (
-          <CopyableTextarea value={result.result} />
+          <div className="flex flex-col gap-4">
+            <CopyableTextarea value={result.result} />
+            <CharDiffView before={input} after={result.result} />
+          </div>
         ) : (
           <p className="text-sm text-danger">{result.error}</p>
         )

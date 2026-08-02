@@ -4,6 +4,7 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { SecurityWarning } from '../SecurityWarning'
+import { CertValidityTimeline } from './CertValidityTimeline'
 import { Badge } from '../../../components/ui/Badge'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import { Pill } from '../../../components/ui/Pill'
@@ -145,6 +146,10 @@ export function CertificateViewer() {
                   look fine.
                 </SecurityWarning>
               )}
+              <CertValidityTimeline
+                notBefore={selected.result.notBefore}
+                notAfter={selected.result.notAfter}
+              />
               <dl>
                 <ResultRow label="Version" value={String(selected.result.version)} />
                 <ResultRow label="Serial number" value={selected.result.serialNumber} />

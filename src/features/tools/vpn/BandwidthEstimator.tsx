@@ -3,6 +3,7 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { calculateEffectiveBandwidth } from '../../../lib/calculations/bandwidth'
+import { EffectiveBandwidthChart } from './EffectiveBandwidthChart'
 
 export function BandwidthEstimator() {
   const [rawBandwidth, setRawBandwidth] = useState('100')
@@ -70,6 +71,16 @@ export function BandwidthEstimator() {
                 value={`${calc.result.effectiveBandwidthMbps.toFixed(2)} Mbps`}
               />
             </dl>
+            <div>
+              <p className="mb-1 text-xs font-medium text-fg-muted">
+                Effective bandwidth across packet sizes
+              </p>
+              <EffectiveBandwidthChart
+                rawBandwidthMbps={Number(rawBandwidth)}
+                overheadBytes={Number(overhead)}
+                currentPacketSize={Number(packetSize)}
+              />
+            </div>
             <p className="text-xs text-fg-subtle">
               Overhead is a fixed number of bytes per packet, so it eats a bigger share of small
               packets than large ones. Here, {calc.result.overheadBytes} bytes of overhead on a{' '}
