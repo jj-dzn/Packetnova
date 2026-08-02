@@ -80,6 +80,36 @@ function formatName(name: Record<string, string>): string {
     .join(', ')
 }
 
+function nameEquals(a: Record<string, string>, b: Record<string, string>): boolean {
+  return JSON.stringify(a) === JSON.stringify(b)
+}
+
+// The single most common real-world TLS failure: a server presenting a leaf
+// certificate without the intermediate CA that issued it. A client without
+// that intermediate already cached can't build a trust path to a root it
+// recognizes, even though the leaf itself is perfectly valid. Detects this
+// directly from the pasted chain's own issuer/subject linkage -- a single
+// non-self-signed certificate (the leaf alone, no chain at all) or any
+// break in the issuer-of-N === subject-of-N+1 links -- rather than just
+// describing the scenario in prose.
+function detectChainGap(certs: CertificateInfo[]): string | null {
+  if (certs.length === 0) return null
+
+  if (certs.length === 1) {
+    return isSelfSigned(certs[0]!)
+      ? null
+      : "Only one certificate was pasted, and it isn't self-signed -- this looks like a leaf certificate without its intermediate certificate(s). A real client building a trust path to a root it already recognizes would need at least the intermediate CA that issued this one."
+  }
+
+  for (let i = 0; i < certs.length - 1; i++) {
+    if (!nameEquals(certs[i]!.issuer, certs[i + 1]!.subject)) {
+      return `Certificate ${i + 1}'s issuer doesn't match certificate ${i + 2}'s subject -- this chain doesn't link cleanly. A certificate may be missing, out of order, or from an unrelated chain.`
+    }
+  }
+
+  return null
+}
+
 export function CertificateViewer() {
   const [pem, setPem] = useState(EXAMPLE_CERT_CHAIN)
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -89,6 +119,12 @@ export function CertificateViewer() {
     blocks.length > 0 ? blocks.map((block) => parseCertificate(block)) : [parseCertificate(pem)]
   const safeIndex = Math.min(selectedIndex, certResults.length - 1)
   const selected = certResults[safeIndex]!
+  const allParsed = certResults.every((result) => result.ok)
+  const chainGap = allParsed
+    ? detectChainGap(
+        certResults.map((result) => (result as { ok: true; result: CertificateInfo }).result),
+      )
+    : null
 
   return (
     <ToolPageLayout
@@ -115,6 +151,7 @@ export function CertificateViewer() {
       }
       result={
         <div className="flex flex-col gap-4">
+          {chainGap && <SecurityWarning>{chainGap}</SecurityWarning>}
           {certResults.length > 1 && (
             <div className="flex flex-wrap gap-2">
               {certResults.map((result, index) => (

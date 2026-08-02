@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
+import { Select } from '../../../components/ui/Select'
 import { calculateLatency } from '../../../lib/calculations/latency'
+import { latencyPresets } from '../../../content/reference/latencyPresets'
 
 const MIN_TRAVEL_ANIM_MS = 400
 const MAX_TRAVEL_ANIM_MS = 2500
@@ -23,6 +26,7 @@ function travelAnimationDuration(oneWayMs: number): number {
 export function LatencyCalculator() {
   const [distance, setDistance] = useState('1000')
   const [speed, setSpeed] = useState('200')
+  const [presetId, setPresetId] = useState('custom')
 
   const calc = calculateLatency(Number(distance), Number(speed))
 
@@ -34,6 +38,34 @@ export function LatencyCalculator() {
       input={
         <div className="flex flex-col gap-4">
           <div>
+            <label htmlFor="latency-preset" className="text-sm font-medium">
+              Real-world distance preset
+            </label>
+            <Select
+              id="latency-preset"
+              className="mt-2"
+              value={presetId}
+              onChange={(e) => {
+                const id = e.target.value
+                setPresetId(id)
+                const preset = latencyPresets.find((p) => p.id === id)
+                if (preset) setDistance(String(preset.distanceKm))
+              }}
+            >
+              <option value="custom">Custom distance</option>
+              {latencyPresets.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.label} (~{preset.distanceKm.toLocaleString()} km)
+                </option>
+              ))}
+            </Select>
+            <p className="mt-1 text-xs text-fg-subtle">
+              Approximate great-circle distances, not fiber-route distances -- real cable paths
+              follow terrain and existing infrastructure, so actual latency usually runs a bit
+              higher than the straight-line number below.
+            </p>
+          </div>
+          <div>
             <label htmlFor="latency-distance" className="text-sm font-medium">
               Distance (km)
             </label>
@@ -41,7 +73,10 @@ export function LatencyCalculator() {
               id="latency-distance"
               className="mt-2"
               value={distance}
-              onChange={(e) => setDistance(e.target.value)}
+              onChange={(e) => {
+                setDistance(e.target.value)
+                setPresetId('custom')
+              }}
             />
           </div>
           <div>
@@ -99,6 +134,44 @@ export function LatencyCalculator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Light in fiber travels at roughly 2/3 the speed of light in a vacuum (about 200 km/ms),
+            so one-way propagation delay is just distance divided by that speed. This is a physical
+            floor, not a typical measurement -- actual round-trip time also includes processing,
+            queuing, and serialization delay at every router and switch along the path, so a real
+            traceroute will always read higher than this number.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to sanity-check whether a latency you're seeing is even physically plausible
+            for a given distance -- if a measured round-trip time is close to this theoretical
+            minimum, the path is about as direct as it can be; if it's dramatically higher,
+            something else (routing detours, congestion, an overloaded middlebox) is adding the
+            difference. The cloud-region presets anchor this to the actual pairs an engineer sizing
+            a multi-region deployment would be comparing.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming a straight-line distance matches the actual fiber route -- submarine cables and
+            terrestrial fiber follow existing infrastructure and geography, not great circles, so
+            real distance (and therefore real latency) usually runs noticeably higher than the
+            straight-line number a map would suggest.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If a real measured latency is far above this calculator's estimate for the same
+            distance, propagation delay probably isn't the bottleneck -- look at queuing (a
+            congested link), processing (an overloaded device in the path), or an inefficient route
+            (traffic taking a longer path than the direct one) instead.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

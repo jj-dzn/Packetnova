@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculatePasswordEntropyBits, generatePassword } from './password'
+import { calculatePasswordEntropyBits, estimateCrackTime, generatePassword } from './password'
 
 const allSets = { uppercase: true, lowercase: true, digits: true, symbols: true }
 
@@ -101,5 +101,35 @@ describe('calculatePasswordEntropyBits', () => {
 
   it('is 0 for a non-positive length', () => {
     expect(calculatePasswordEntropyBits({ length: 0, ...allSets })).toBe(0)
+  })
+})
+
+describe('estimateCrackTime', () => {
+  it('reports a sub-second time for a trivially small keyspace', () => {
+    const estimate = estimateCrackTime(1, 1_000_000_000)
+    expect(estimate.humanReadable).toBe('under a second')
+  })
+
+  it('reports a huge number of years for high entropy at a realistic guess rate', () => {
+    const estimate = estimateCrackTime(128, 1_000_000_000)
+    expect(estimate.seconds).toBeGreaterThan(0)
+    expect(estimate.humanReadable).toMatch(/years$/)
+  })
+
+  it('a slower guess rate takes proportionally longer', () => {
+    const fast = estimateCrackTime(40, 1_000_000_000)
+    const slow = estimateCrackTime(40, 1_000)
+    expect(slow.seconds).toBeGreaterThan(fast.seconds)
+  })
+
+  it('more entropy always takes at least as long to crack', () => {
+    const weak = estimateCrackTime(20)
+    const strong = estimateCrackTime(80)
+    expect(strong.seconds).toBeGreaterThan(weak.seconds)
+  })
+
+  it('treats negative entropy (e.g. no character set selected) as zero, not throwing', () => {
+    expect(() => estimateCrackTime(-5)).not.toThrow()
+    expect(estimateCrackTime(-5).seconds).toBe(0.5 / 1_000_000_000)
   })
 })

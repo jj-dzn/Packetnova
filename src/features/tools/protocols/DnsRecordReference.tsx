@@ -1,31 +1,58 @@
+import { useState } from 'react'
 import { ReferencePageLayout } from '../ReferencePageLayout'
 import { DataTable } from '../../../components/ui/DataTable'
+import { Input } from '../../../components/ui/Input'
 import { dnsRecordTypes, type DnsRecordEntry } from '../../../content/reference/dnsRecordTypes'
 
-const RESOLUTION_STAGES = [
-  { label: 'Root', caption: 'Resolver asks a root server: "who handles .com?"' },
-  { label: 'TLD', caption: 'Root refers the resolver to the .com TLD servers' },
-  {
-    label: 'Authoritative',
-    caption: "TLD refers the resolver to example.com's authoritative server",
-  },
-  { label: 'Answer', caption: 'The authoritative server returns the actual record' },
-]
+const DEFAULT_DOMAIN = 'example.com'
+
+function buildResolutionStages(domain: string) {
+  const trimmed = domain.trim().replace(/\.+$/, '') || DEFAULT_DOMAIN
+  const labels = trimmed.split('.')
+  const tld = labels.length > 1 ? labels[labels.length - 1] : 'com'
+
+  return [
+    { label: 'Root', caption: `Resolver asks a root server: "who handles .${tld}?"` },
+    { label: 'TLD', caption: `Root refers the resolver to the .${tld} TLD servers` },
+    {
+      label: 'Authoritative',
+      caption: `TLD refers the resolver to ${trimmed}'s authoritative server`,
+    },
+    { label: 'Answer', caption: 'The authoritative server returns the actual record' },
+  ]
+}
 
 function ResolutionFlow() {
+  const [domain, setDomain] = useState(DEFAULT_DOMAIN)
+  const stages = buildResolutionStages(domain)
+
   return (
     <div className="mb-8 rounded-lg border border-border bg-surface p-4">
-      <p className="mb-3 text-sm font-medium">
-        How a resolver finds any of the records above (recursive resolution)
-      </p>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm font-medium">
+          How a resolver finds any of the records above (recursive resolution)
+        </p>
+        <div className="flex items-center gap-2">
+          <label htmlFor="dns-flow-domain" className="text-xs text-fg-muted">
+            Domain
+          </label>
+          <Input
+            id="dns-flow-domain"
+            className="w-48"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            spellCheck={false}
+          />
+        </div>
+      </div>
       <div className="flex flex-wrap items-stretch gap-2">
-        {RESOLUTION_STAGES.map((stage, index) => (
+        {stages.map((stage, index) => (
           <div key={stage.label} className="flex items-stretch gap-2">
             <div className="flex w-36 flex-col gap-1 rounded-md border border-accent/30 bg-accent/5 p-2.5">
               <span className="font-mono text-sm font-medium text-accent">{stage.label}</span>
               <span className="text-xs text-fg-muted">{stage.caption}</span>
             </div>
-            {index < RESOLUTION_STAGES.length - 1 && (
+            {index < stages.length - 1 && (
               <span className="flex items-center text-fg-subtle" aria-hidden="true">
                 →
               </span>

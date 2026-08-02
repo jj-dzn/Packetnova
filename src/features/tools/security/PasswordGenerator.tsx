@@ -5,7 +5,11 @@ import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { CopyButton } from '../../../components/ui/CopyButton'
-import { calculatePasswordEntropyBits, generatePassword } from '../../../lib/calculations/password'
+import {
+  calculatePasswordEntropyBits,
+  estimateCrackTime,
+  generatePassword,
+} from '../../../lib/calculations/password'
 
 interface EntropyTier {
   min: number
@@ -60,6 +64,7 @@ export function PasswordGenerator() {
   })
   const tier = entropyTier(entropyBits)
   const entropyPercent = Math.min(100, (entropyBits / ENTROPY_BAR_MAX_BITS) * 100)
+  const crackTime = estimateCrackTime(entropyBits)
 
   return (
     <ToolPageLayout
@@ -126,6 +131,11 @@ export function PasswordGenerator() {
                 style={{ width: `${entropyPercent}%` }}
               />
             </div>
+            <p className="mt-1 text-xs text-fg-subtle">
+              At {crackTime.guessesPerSecond.toLocaleString()} guesses/sec (a realistic offline
+              attack rate against a fast hash), brute-forcing this would take{' '}
+              <span className="font-medium text-fg">{crackTime.humanReadable}</span> on average.
+            </p>
           </div>
           <Button type="button" onClick={regenerate} className="self-start">
             Generate new password
@@ -152,7 +162,11 @@ export function PasswordGenerator() {
             security-sensitive because its output can be predicted. Entropy (shown in bits) measures
             how many possible passwords the current length and character-set settings could produce
             -- more bits means more guesses an attacker needs on average before finding the right
-            one.
+            one. The crack-time estimate turns that bit count into a felt duration: it assumes an
+            attacker finds the answer halfway through an exhaustive search on average, at a fixed
+            guess rate representative of a fast offline attack against a weakly-hashed password --
+            an actual attack could be faster or (against a properly slow password hash) vastly
+            slower.
           </p>
         }
         whenToUseThis={

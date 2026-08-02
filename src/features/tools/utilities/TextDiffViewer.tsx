@@ -72,7 +72,7 @@ export function TextDiffViewer() {
     <ToolPageLayout
       category="Utilities"
       title="Text diff viewer"
-      description="Compare two blocks of text and highlight the differences, line by line or word by word."
+      description="Compare two blocks of text and highlight the differences, line by line or word by word -- handy for diffing two router or switch config snapshots to see exactly what a change touched."
       input={
         <div className="flex flex-col gap-4">
           <div>
