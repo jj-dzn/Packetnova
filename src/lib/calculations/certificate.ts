@@ -30,10 +30,19 @@ const SIGNATURE_ALGORITHM_NAMES: Record<string, string> = {
 
 const SUBJECT_ALT_NAME_OID = '2.5.29.17'
 
+// SHA-1 and MD5-based signature algorithms are deprecated: SHA-1 collisions
+// are practical (the 2017 SHAttered/2020 SHAmbles chosen-prefix attacks),
+// and every major browser/CA stopped trusting SHA-1-signed certificates
+// years ago. Matches by prefix against the resolved algorithm name (e.g.
+// "sha1WithRSAEncryption"), not the raw OID, so it stays correct even if
+// SIGNATURE_ALGORITHM_NAMES gains more entries later.
+const WEAK_SIGNATURE_ALGORITHM_PATTERN = /^(md5|sha1)/i
+
 export interface CertificateInfo {
   version: number
   serialNumber: string
   signatureAlgorithm: string
+  isWeakSignatureAlgorithm: boolean
   issuer: Record<string, string>
   subject: Record<string, string>
   notBefore: Date
@@ -137,6 +146,7 @@ export function parseCertificate(
     const sigOidNode = getChildren(der, signatureAlgNode)[0]
     const sigOid = sigOidNode ? decodeOid(der, sigOidNode) : ''
     const signatureAlgorithm = SIGNATURE_ALGORITHM_NAMES[sigOid] ?? sigOid
+    const isWeakSignatureAlgorithm = WEAK_SIGNATURE_ALGORITHM_PATTERN.test(signatureAlgorithm)
 
     const issuer = parseName(der, issuerNode)
     const subject = parseName(der, subjectNode)
@@ -156,6 +166,7 @@ export function parseCertificate(
         version,
         serialNumber,
         signatureAlgorithm,
+        isWeakSignatureAlgorithm,
         issuer,
         subject,
         notBefore,

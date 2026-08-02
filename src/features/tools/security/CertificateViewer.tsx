@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { SecurityWarning } from '../SecurityWarning'
 import { Badge } from '../../../components/ui/Badge'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import { Pill } from '../../../components/ui/Pill'
@@ -132,6 +133,15 @@ export function CertificateViewer() {
               {selected.result.isNotYetValid && <Badge tone="warning">Not yet valid</Badge>}
               {!selected.result.isExpired && !selected.result.isNotYetValid && (
                 <Badge tone="success">Currently valid</Badge>
+              )}
+              {selected.result.isWeakSignatureAlgorithm && (
+                <SecurityWarning>
+                  This certificate is signed with {selected.result.signatureAlgorithm}, a deprecated
+                  signature algorithm. Practical collision attacks against SHA-1 (and the weaker
+                  MD5) mean every major browser and CA stopped trusting certificates signed this way
+                  years ago -- treat this certificate as untrustworthy even if its validity dates
+                  look fine.
+                </SecurityWarning>
               )}
               <dl>
                 <ResultRow label="Version" value={String(selected.result.version)} />

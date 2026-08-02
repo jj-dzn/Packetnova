@@ -65,4 +65,41 @@ describe('inspectJwt', () => {
     if (!result.ok) return
     expect(result.result.isExpired).toBe(false)
   })
+
+  it('does not flag a normally-signed token as unsigned', () => {
+    const result = inspectJwt(EXAMPLE_TOKEN)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.isUnsigned).toBe(false)
+  })
+
+  it('flags a token with alg "none" as unsigned', () => {
+    const header = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' }))
+    const payload = btoa(JSON.stringify({ sub: 'attacker' }))
+    const token = `${header}.${payload}.`
+    const result = inspectJwt(token)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.isUnsigned).toBe(true)
+  })
+
+  it('flags alg "none" as unsigned regardless of case', () => {
+    const header = btoa(JSON.stringify({ alg: 'None', typ: 'JWT' }))
+    const payload = btoa(JSON.stringify({ sub: 'attacker' }))
+    const token = `${header}.${payload}.`
+    const result = inspectJwt(token)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.isUnsigned).toBe(true)
+  })
+
+  it('flags a token with an empty signature segment as unsigned even if alg is not none', () => {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+    const payload = btoa(JSON.stringify({ sub: 'attacker' }))
+    const token = `${header}.${payload}.`
+    const result = inspectJwt(token)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.isUnsigned).toBe(true)
+  })
 })

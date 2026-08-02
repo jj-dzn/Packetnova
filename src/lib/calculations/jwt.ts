@@ -43,6 +43,14 @@ export interface JwtInspection {
   isExpired: boolean | null
   subject: string | null
   issuer: string | null
+  /** True if this token isn't actually protected by a signature -- either
+   * the header declares alg "none" (the classic forgery bypass: a server
+   * that doesn't independently reject it will accept a token with any
+   * payload an attacker wants), or the signature segment is empty
+   * regardless of what alg claims. Detectable from the token alone, unlike
+   * e.g. algorithm-confusion attacks, which depend on server-side key
+   * configuration this tool has no visibility into. */
+  isUnsigned: boolean
 }
 
 export function inspectJwt(token: string): CalculationResult<JwtInspection> {
@@ -54,17 +62,20 @@ export function inspectJwt(token: string): CalculationResult<JwtInspection> {
 
   const exp = typeof payload.exp === 'number' ? payload.exp : null
   const iat = typeof payload.iat === 'number' ? payload.iat : null
+  const algorithm = typeof header.alg === 'string' ? header.alg : null
 
   return {
     ok: true,
     result: {
-      algorithm: typeof header.alg === 'string' ? header.alg : null,
+      algorithm,
       tokenType: typeof header.typ === 'string' ? header.typ : null,
       issuedAt: iat !== null ? new Date(iat * 1000).toISOString() : null,
       expiresAt: exp !== null ? new Date(exp * 1000).toISOString() : null,
       isExpired: exp !== null ? Date.now() > exp * 1000 : null,
       subject: typeof payload.sub === 'string' ? payload.sub : null,
       issuer: typeof payload.iss === 'string' ? payload.iss : null,
+      isUnsigned:
+        algorithm?.trim().toLowerCase() === 'none' || decoded.result.signature.trim() === '',
     },
   }
 }

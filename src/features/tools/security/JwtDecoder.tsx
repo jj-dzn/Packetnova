@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { SecurityWarning } from '../SecurityWarning'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import { Badge } from '../../../components/ui/Badge'
 import { Pill } from '../../../components/ui/Pill'
-import { decodeJwt, inspectJwt } from '../../../lib/calculations/jwt'
+import { decodeJwt, inspectJwt, type JwtInspection } from '../../../lib/calculations/jwt'
+import type { CalculationResult } from '../../../lib/calculations/result'
 
 const DEFAULT_TOKEN =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
@@ -18,6 +20,7 @@ type Mode = 'raw' | 'summary'
 export function JwtDecoder() {
   const [token, setToken] = useState(DEFAULT_TOKEN)
   const [mode, setMode] = useState<Mode>('raw')
+  const inspection = inspectJwt(token)
 
   return (
     <ToolPageLayout
@@ -49,7 +52,19 @@ export function JwtDecoder() {
           </div>
         </div>
       }
-      result={mode === 'raw' ? <RawResult token={token} /> : <SummaryResult token={token} />}
+      result={
+        <div className="flex flex-col gap-4">
+          {inspection.ok && inspection.result.isUnsigned && (
+            <SecurityWarning>
+              This token is unsigned -- its header declares alg "none", or its signature segment is
+              empty. Anyone could have created this token with any payload they wanted. A server
+              that accepts it without independently rejecting unsigned tokens is exposed to the
+              classic "alg: none" forgery attack.
+            </SecurityWarning>
+          )}
+          {mode === 'raw' ? <RawResult token={token} /> : <SummaryResult inspection={inspection} />}
+        </div>
+      }
     />
   )
 }
@@ -82,8 +97,7 @@ function RawResult({ token }: { token: string }) {
   )
 }
 
-function SummaryResult({ token }: { token: string }) {
-  const calc = inspectJwt(token)
+function SummaryResult({ inspection: calc }: { inspection: CalculationResult<JwtInspection> }) {
   if (!calc.ok) return <p className="text-sm text-danger">{calc.error}</p>
 
   return (

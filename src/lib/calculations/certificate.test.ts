@@ -119,4 +119,57 @@ describe('parseCertificate', () => {
   it('rejects text that is not a PEM certificate', () => {
     expect(parseCertificate('not a certificate').ok).toBe(false)
   })
+
+  it('does not flag a SHA-256-signed certificate as weak', () => {
+    const result = parseCertificate(TEST_CERT)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.isWeakSignatureAlgorithm).toBe(false)
+  })
+})
+
+// A real self-signed certificate generated with:
+//   openssl req -x509 -newkey rsa:2048 -days 365 -nodes -sha1 \
+//     -subj "/C=US/O=PacketNova Test/CN=weak-sig.packetnova.test"
+//
+// Deliberately SHA-1-signed (openssl still supports issuing these, even
+// though no browser/CA trusts them anymore) to verify the weak-signature
+// flag against a real, independently-generated certificate rather than a
+// hand-constructed one.
+const WEAK_SIG_CERT = `-----BEGIN CERTIFICATE-----
+MIIDdTCCAl2gAwIBAgIUQHSS8cWSZZHidKuwefoBB660tEowDQYJKoZIhvcNAQEF
+BQAwSjELMAkGA1UEBhMCVVMxGDAWBgNVBAoMD1BhY2tldE5vdmEgVGVzdDEhMB8G
+A1UEAwwYd2Vhay1zaWcucGFja2V0bm92YS50ZXN0MB4XDTI2MDgwMjE4NDExOVoX
+DTI3MDgwMjE4NDExOVowSjELMAkGA1UEBhMCVVMxGDAWBgNVBAoMD1BhY2tldE5v
+dmEgVGVzdDEhMB8GA1UEAwwYd2Vhay1zaWcucGFja2V0bm92YS50ZXN0MIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy54VsuQKlXYdtvDgr6Iww6Uz8EPz
+2AW2RkI94+bkp6woPNbxjuTjMcUl+ATYOLVOTBD/MNpKl6XZnwroyYSZMCuXe4WH
+KZHihs8Hwh2DslHoEuWyRG4aMtxyaWKl2nzeYLVbgBGn7A3AqDmbosQ6PKZHot6o
+uPNqphPpX0MZDPkiOdS1At2uaWjpSQ9A8GrdNPGrOPxGLWlssDCOa4atxmDZntuR
+KTdu+NmYSi76v35u3aFI1SLjdCsY72PLHEZ7uYgAq20DsJpi0VGu08625+5Y/dYT
+nIO5IrESbJPy66PNz2fSkjXJ+myTRrIFhG8h5PYN+tnrj7Jk5dSSkIpeZQIDAQAB
+o1MwUTAdBgNVHQ4EFgQU17Wcogv9XkQhKTxlB+ClPb1DNgowHwYDVR0jBBgwFoAU
+17Wcogv9XkQhKTxlB+ClPb1DNgowDwYDVR0TAQH/BAUwAwEB/zANBgkqhkiG9w0B
+AQUFAAOCAQEAx1shC0XVHkEKtJAfpMGZlpaHMEEjDfs0a8lDmne++GStAaVw/Mpr
+B6EHYjGVUyBrUuE63TWYEheOTyN1LdwPn47oPvuVJ145piF9PT5VoXgdh4IyQgWT
+UrNGL1O1Zj1Z0q5y91fjZDnTd5TZOKe8y7A2yA0Mybxov2f9QLZQyrMqI32l3kpo
+yIgufm4VoPNNmoJsKbJDv8UdmhOvsdkql3Xugw7AW+xlBSMukTD9OJ7sN0MtoEzg
+B36d2Qfyx4kCue7ms+rsO32K1YZWoLU5mX7NsXHnegcb8GaDF35x2q75JLiq8Ypx
+um1aZ+H/9lBlYPpXPEfXbkEt6qkpB+Gjnw==
+-----END CERTIFICATE-----`
+
+describe('parseCertificate -- weak signature algorithm', () => {
+  it('parses the SHA-1 signature algorithm name', () => {
+    const result = parseCertificate(WEAK_SIG_CERT)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.signatureAlgorithm).toBe('sha1WithRSAEncryption')
+  })
+
+  it('flags a SHA-1-signed certificate as weak', () => {
+    const result = parseCertificate(WEAK_SIG_CERT)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.isWeakSignatureAlgorithm).toBe(true)
+  })
 })
