@@ -2,8 +2,11 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { Pill } from '../../../components/ui/Pill'
+import { SideBySideLineDiff } from './SideBySideLineDiff'
 import {
+  buildAlignedDiffRows,
   computeTextDiff,
+  summarizeAlignedRows,
   summarizeDiff,
   type DiffGranularity,
   type DiffPart,
@@ -29,36 +32,6 @@ function UnifiedDiff({ parts }: { parts: DiffPart[] }) {
   )
 }
 
-// A cheap but useful split view: each column independently keeps the parts
-// relevant to it (unchanged parts in both, removed only on the left, added
-// only on the right) and lets its own retained newlines wrap it -- not a
-// true line-aligned diff (the two columns' line counts can drift apart
-// around a change), but for the common case of small, localized edits the
-// two sides land close enough to compare side by side.
-function SideBySideDiff({ parts }: { parts: DiffPart[] }) {
-  const leftParts = parts.filter((part) => !part.added)
-  const rightParts = parts.filter((part) => !part.removed)
-
-  return (
-    <div className="grid max-h-[28rem] grid-cols-2 gap-2 overflow-auto">
-      <pre className="whitespace-pre-wrap break-words rounded-md border border-border bg-bg p-3 font-mono text-sm">
-        {leftParts.map((part, i) => (
-          <span key={i} className={partClassName(part)}>
-            {part.value}
-          </span>
-        ))}
-      </pre>
-      <pre className="whitespace-pre-wrap break-words rounded-md border border-border bg-bg p-3 font-mono text-sm">
-        {rightParts.map((part, i) => (
-          <span key={i} className={partClassName(part)}>
-            {part.value}
-          </span>
-        ))}
-      </pre>
-    </div>
-  )
-}
-
 export function TextDiffViewer() {
   const [before, setBefore] = useState('subnet mask: 255.255.255.0\ngateway: 10.0.0.1\nvlan: 10\n')
   const [after, setAfter] = useState('subnet mask: 255.255.255.128\ngateway: 10.0.0.1\nvlan: 20\n')
@@ -66,7 +39,9 @@ export function TextDiffViewer() {
   const [view, setView] = useState<View>('unified')
 
   const calc = computeTextDiff(before, after, granularity)
-  const summary = calc.ok ? summarizeDiff(calc.result, granularity) : null
+  const aligned = buildAlignedDiffRows(before, after)
+  const unifiedSummary = calc.ok ? summarizeDiff(calc.result, granularity) : null
+  const alignedSummary = aligned.ok ? summarizeAlignedRows(aligned.result) : null
 
   return (
     <ToolPageLayout
@@ -107,14 +82,21 @@ export function TextDiffViewer() {
         calc.ok ? (
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex gap-2">
-                <Pill active={granularity === 'line'} onClick={() => setGranularity('line')}>
-                  Lines
-                </Pill>
-                <Pill active={granularity === 'word'} onClick={() => setGranularity('word')}>
-                  Words
-                </Pill>
-              </div>
+              {view === 'unified' ? (
+                <div className="flex gap-2">
+                  <Pill active={granularity === 'line'} onClick={() => setGranularity('line')}>
+                    Lines
+                  </Pill>
+                  <Pill active={granularity === 'word'} onClick={() => setGranularity('word')}>
+                    Words
+                  </Pill>
+                </div>
+              ) : (
+                <p className="text-xs text-fg-subtle">
+                  Aligned by line, with the specific words that changed highlighted within each
+                  changed line.
+                </p>
+              )}
               <div className="flex gap-2">
                 <Pill active={view === 'unified'} onClick={() => setView('unified')}>
                   Unified
@@ -124,18 +106,27 @@ export function TextDiffViewer() {
                 </Pill>
               </div>
             </div>
-            {summary && (
-              <p className="text-xs text-fg-muted">
-                <span className="font-medium text-success">+{summary.added}</span>{' '}
-                <span className="font-medium text-danger">-{summary.removed}</span>{' '}
-                {granularity === 'word' ? 'words' : 'lines'} changed
-              </p>
-            )}
+            {view === 'unified'
+              ? unifiedSummary && (
+                  <p className="text-xs text-fg-muted">
+                    <span className="font-medium text-success">+{unifiedSummary.added}</span>{' '}
+                    <span className="font-medium text-danger">-{unifiedSummary.removed}</span>{' '}
+                    {granularity === 'word' ? 'words' : 'lines'} changed
+                  </p>
+                )
+              : alignedSummary && (
+                  <p className="text-xs text-fg-muted">
+                    <span className="font-medium text-success">+{alignedSummary.added}</span>{' '}
+                    <span className="font-medium text-danger">-{alignedSummary.removed}</span>{' '}
+                    <span className="font-medium text-warning">~{alignedSummary.modified}</span>{' '}
+                    lines changed
+                  </p>
+                )}
             {view === 'unified' ? (
               <UnifiedDiff parts={calc.result} />
-            ) : (
-              <SideBySideDiff parts={calc.result} />
-            )}
+            ) : aligned.ok ? (
+              <SideBySideLineDiff before={before} after={after} rows={aligned.result} />
+            ) : null}
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
@@ -145,19 +136,24 @@ export function TextDiffViewer() {
       <ToolEducation
         howItWorks={
           <p>
-            This compares the two blocks of text and shows which lines (or, in word mode, which
-            individual words) were added, removed, or left unchanged. In line mode, a changed line
-            shows up as a removal of the old version plus an addition of the new one rather than an
-            in-place edit; word mode narrows that down to just the words that actually differ inside
-            an otherwise-identical line.
+            Unified mode compares the two blocks of text and shows which lines (or, in word mode,
+            which individual words) were added, removed, or left unchanged, all in one combined
+            stream. Side by side mode instead lines the two versions up on a shared row axis, the
+            way Notepad++'s Compare plugin or a merge tool does -- an inserted or deleted line
+            leaves a blank on the other side at that exact position, rather than letting the two
+            columns drift out of sync, and a changed line highlights just the words that actually
+            differ inside it.
           </p>
         }
         whenToUseThis={
           <p>
             A genuinely useful, on-theme case for a networking toolkit: pasting a device's "before"
             and "after" running-config snapshots to see exactly what a change touched, without
-            manually scanning two long config dumps for what moved. It's equally useful for any
-            other two versions of text you need to compare -- code, prose, structured data.
+            manually scanning two long config dumps for what moved. Side by side mode holds up well
+            even on long snapshots -- each pane keeps its own line numbers and scrolls in lockstep
+            with the other, and each pane's text can be selected and copied entirely independently
+            of the other one. It's equally useful for any other two versions of text you need to
+            compare -- code, prose, structured data.
           </p>
         }
         commonMistakes={
