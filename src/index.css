@@ -336,3 +336,15 @@ body {
   border-color: var(--color-border);
   margin: 2rem 0;
 }
+
+/* A scrollable-but-scrollbar-less element -- used by the text diff viewer's
+   highlight overlay, which must be a genuine scroll container (so its
+   scrollTop/scrollLeft can be driven programmatically to track the
+   transparent textarea layered on top of it) without showing a second,
+   redundant scrollbar next to the textarea's own visible one. */
+.pn-no-scrollbar {
+  scrollbar-width: none;
+}
+.pn-no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

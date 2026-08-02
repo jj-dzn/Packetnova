@@ -159,3 +159,54 @@ export function diffLineWords(left: string, right: string): DiffPart[] {
     removed: Boolean(part.removed),
   }))
 }
+
+export interface OverlayLine {
+  text: string
+  status: 'same' | 'added' | 'removed' | 'modified'
+  /** Only set for 'modified' lines -- both sides of the pair, always in
+   * [before, after] order regardless of which side is being rendered, so
+   * word-level diffing has an unambiguous direction to work from. */
+  modifiedPair?: { beforeText: string; afterText: string }
+}
+
+/**
+ * Each side's own lines, in that side's own real order -- no blank filler
+ * rows, unlike buildAlignedDiffRows. Derived directly from the same aligned
+ * rows (dropping whichever side is null per row) so the two stay
+ * consistent by construction: this is what a directly-editable textarea
+ * needs, since its line count must exactly match its own real text with
+ * nothing invented, but a 'modified' line still carries its counterpart
+ * for word-level highlighting.
+ */
+export function computeOverlayLines(
+  before: string,
+  after: string,
+): { beforeLines: OverlayLine[]; afterLines: OverlayLine[] } {
+  const aligned = buildAlignedDiffRows(before, after)
+  if (!aligned.ok) return { beforeLines: [], afterLines: [] }
+
+  const beforeLines: OverlayLine[] = []
+  const afterLines: OverlayLine[] = []
+
+  for (const row of aligned.result) {
+    const modifiedPair =
+      row.type === 'modified' ? { beforeText: row.leftText!, afterText: row.rightText! } : undefined
+
+    if (row.leftText !== null) {
+      beforeLines.push({
+        text: row.leftText,
+        status: row.type === 'modified' ? 'modified' : row.type === 'same' ? 'same' : 'removed',
+        modifiedPair,
+      })
+    }
+    if (row.rightText !== null) {
+      afterLines.push({
+        text: row.rightText,
+        status: row.type === 'modified' ? 'modified' : row.type === 'same' ? 'same' : 'added',
+        modifiedPair,
+      })
+    }
+  }
+
+  return { beforeLines, afterLines }
+}

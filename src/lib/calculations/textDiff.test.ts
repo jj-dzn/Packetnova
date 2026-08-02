@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildAlignedDiffRows,
   computeCharDiff,
+  computeOverlayLines,
   diffLineWords,
   summarizeAlignedRows,
 } from './textDiff'
@@ -112,5 +113,50 @@ describe('diffLineWords', () => {
     const added = parts.filter((p) => p.added).map((p) => p.value)
     expect(removed).toEqual(['quick'])
     expect(added).toEqual(['slow'])
+  })
+})
+
+describe('computeOverlayLines', () => {
+  it('each side gets only its own real lines -- no blank filler rows', () => {
+    const { beforeLines, afterLines } = computeOverlayLines('a\nb\n', 'a\nx\nb\n')
+    expect(beforeLines).toEqual([
+      { text: 'a', status: 'same', modifiedPair: undefined },
+      { text: 'b', status: 'same', modifiedPair: undefined },
+    ])
+    expect(afterLines).toEqual([
+      { text: 'a', status: 'same', modifiedPair: undefined },
+      { text: 'x', status: 'added', modifiedPair: undefined },
+      { text: 'b', status: 'same', modifiedPair: undefined },
+    ])
+  })
+
+  it('a deleted line only appears (as removed) on the before side', () => {
+    const { beforeLines, afterLines } = computeOverlayLines('a\nb\nc\n', 'a\nc\n')
+    expect(beforeLines.map((l) => l.status)).toEqual(['same', 'removed', 'same'])
+    expect(afterLines.map((l) => l.status)).toEqual(['same', 'same'])
+  })
+
+  it('a modified line carries the same before/after pair on both sides', () => {
+    const { beforeLines, afterLines } = computeOverlayLines('a\nb\nc\n', 'a\nB\nc\n')
+    expect(beforeLines[1]).toEqual({
+      text: 'b',
+      status: 'modified',
+      modifiedPair: { beforeText: 'b', afterText: 'B' },
+    })
+    expect(afterLines[1]).toEqual({
+      text: 'B',
+      status: 'modified',
+      modifiedPair: { beforeText: 'b', afterText: 'B' },
+    })
+  })
+
+  it('returns empty arrays for two empty inputs instead of throwing', () => {
+    expect(computeOverlayLines('', '')).toEqual({ beforeLines: [], afterLines: [] })
+  })
+
+  it('one side empty still produces lines for the other', () => {
+    const { beforeLines, afterLines } = computeOverlayLines('', 'a\nb\n')
+    expect(beforeLines).toEqual([])
+    expect(afterLines.map((l) => l.status)).toEqual(['added', 'added'])
   })
 })

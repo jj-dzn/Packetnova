@@ -14,7 +14,7 @@ export function TextDiffViewer() {
     <ToolPageLayout
       category="Utilities"
       title="Text diff viewer"
-      description="Paste two versions of a text into the boxes below -- the differences highlight directly in place, line-numbered and aligned side by side, the way Notepad++'s Compare plugin or a merge tool shows them. Handy for diffing two router or switch config snapshots to see exactly what a change touched."
+      description="Paste two versions of a text directly into the boxes below -- the differences highlight in place as you type, line-numbered and color-coded the way Notepad++'s Compare plugin or a merge tool shows them. Handy for diffing two router or switch config snapshots to see exactly what a change touched."
       fullWidth={
         <DiffPasteBoard
           before={before}
@@ -27,12 +27,11 @@ export function TextDiffViewer() {
       <ToolEducation
         howItWorks={
           <p>
-            Each box is both the place you paste text and the place the comparison shows up -- click
-            "Edit" (or an empty box) to type or paste, then click away and that same box renders the
-            diff-highlighted view in place. The two sides line up on a shared row axis: an inserted
-            or deleted line leaves a blank on the other side at that exact position instead of
-            letting the two columns drift out of sync, and a changed line highlights just the words
-            that actually differ inside it, not the whole line.
+            Each box is directly typeable and pasteable from the moment the page loads -- no
+            separate edit step. The line-numbered, color-coded comparison you see is rendered live
+            underneath what you're typing, updating on every keystroke: a removed line tints red, an
+            added line tints green, and a line that was edited in place tints amber with just the
+            specific words that changed highlighted inside it, not the whole line.
           </p>
         }
         whenToUseThis={
@@ -40,10 +39,10 @@ export function TextDiffViewer() {
             A genuinely useful, on-theme case for a networking toolkit: pasting a device's "before"
             and "after" running-config snapshots to see exactly what a change touched, without
             manually scanning two long config dumps for what moved. It holds up well even on long
-            snapshots -- both boxes keep their own line numbers and scroll in lockstep with each
-            other, and each box's text can be selected and copied entirely independently of the
-            other one. It's equally useful for any other two versions of text you need to compare --
-            code, prose, structured data.
+            snapshots -- both boxes keep their own line numbers and scroll together, and each box's
+            text can be selected and copied entirely independently of the other one. It's equally
+            useful for any other two versions of text you need to compare -- code, prose, structured
+            data.
           </p>
         }
         commonMistakes={

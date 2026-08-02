@@ -1,10 +1,11 @@
-import { useRef, useState, type UIEvent } from 'react'
+import { useRef, type RefObject, type UIEvent } from 'react'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import {
   buildAlignedDiffRows,
+  computeOverlayLines,
   diffLineWords,
   summarizeAlignedRows,
-  type AlignedDiffRow,
+  type OverlayLine,
 } from '../../../lib/calculations/textDiff'
 
 interface DiffPasteBoardProps {
@@ -16,20 +17,27 @@ interface DiffPasteBoardProps {
 
 type Side = 'left' | 'right'
 
+// Both layers share these exact values so the invisible text in the
+// textarea lines up, character for character, with the visible colored
+// duplicate rendered right underneath it.
 const PANE_HEIGHT = 'h-[28rem]'
+const LINE_HEIGHT_PX = 20
+const GUTTER_WIDTH_PX = 40
+const BASE_PADDING_PX = 12
 
-function rowTone(row: AlignedDiffRow, side: Side): string {
-  if (row.type === 'same') return ''
-  if (row.type === 'modified') return 'bg-warning/10'
-  if (row.type === 'added') return side === 'right' ? 'bg-success/10' : 'bg-fg-subtle/5'
-  return side === 'left' ? 'bg-danger/10' : 'bg-fg-subtle/5' // removed
+function lineTone(status: OverlayLine['status']): string {
+  if (status === 'modified') return 'bg-warning/10'
+  if (status === 'removed') return 'bg-danger/10'
+  if (status === 'added') return 'bg-success/10'
+  return ''
 }
 
-// Only a 'modified' row's two lines are worth diffing against each other --
-// same/added/removed rows are already fully meaningful at the line level,
-// and there's no "other side" of the same content to compare against.
-function ModifiedLineContent({ row, side }: { row: AlignedDiffRow; side: Side }) {
-  const parts = diffLineWords(row.leftText ?? '', row.rightText ?? '')
+// Only a 'modified' line's pair is worth diffing at the word level --
+// same/added/removed lines are already fully meaningful on their own.
+function OverlayLineText({ line, side }: { line: OverlayLine; side: Side }) {
+  if (line.status !== 'modified' || !line.modifiedPair) return <>{line.text}</>
+
+  const parts = diffLineWords(line.modifiedPair.beforeText, line.modifiedPair.afterText)
   const relevant = side === 'left' ? parts.filter((p) => !p.added) : parts.filter((p) => !p.removed)
   const highlightClass = side === 'left' ? 'bg-danger/25' : 'bg-success/25'
 
@@ -44,24 +52,34 @@ function ModifiedLineContent({ row, side }: { row: AlignedDiffRow; side: Side })
   )
 }
 
-function PaneRow({ row, side }: { row: AlignedDiffRow; side: Side }) {
-  const number = side === 'left' ? row.leftNumber : row.rightNumber
-  const text = side === 'left' ? row.leftText : row.rightText
-
+// The visible, colored duplicate of the text sitting directly underneath
+// the transparent textarea -- pointer-events-none so every click/drag/type
+// passes straight through to the real textarea above it. Its own line
+// count always matches the textarea's real line count exactly (no filler
+// rows), which is what keeps this overlay technique from drifting: unlike
+// the read-only comparison view this replaced, there is no room here to
+// pad one side with blank rows, since that would desync the invisible
+// cursor from the visible text it's supposed to be sitting on top of.
+function Overlay({ lines, side }: { lines: OverlayLine[]; side: Side }) {
   return (
-    <div className={`flex ${rowTone(row, side)}`}>
-      <span className="w-10 shrink-0 select-none border-r border-border px-2 py-0.5 text-right font-mono text-xs text-fg-subtle">
-        {number ?? ''}
-      </span>
-      <span className="flex-1 whitespace-pre px-2 py-0.5 font-mono text-xs">
-        {text === null ? (
-          ' '
-        ) : row.type === 'modified' ? (
-          <ModifiedLineContent row={row} side={side} />
-        ) : (
-          text
-        )}
-      </span>
+    <div className="min-w-max">
+      {lines.map((line, i) => (
+        <div
+          key={i}
+          className={`flex whitespace-pre ${lineTone(line.status)}`}
+          style={{ height: LINE_HEIGHT_PX, lineHeight: `${LINE_HEIGHT_PX}px` }}
+        >
+          <span
+            className="shrink-0 select-none pr-2 text-right text-fg-subtle"
+            style={{ width: GUTTER_WIDTH_PX }}
+          >
+            {i + 1}
+          </span>
+          <span>
+            <OverlayLineText line={line} side={side} />
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
@@ -70,115 +88,120 @@ interface PaneProps {
   label: string
   value: string
   onChange: (value: string) => void
-  rows: AlignedDiffRow[]
+  lines: OverlayLine[]
   side: Side
-  scrollRef: React.RefObject<HTMLDivElement | null>
-  onScroll: (event: UIEvent<HTMLDivElement>) => void
+  textareaRef: RefObject<HTMLTextAreaElement | null>
+  overlayRef: RefObject<HTMLDivElement | null>
+  onScroll: (event: UIEvent<HTMLTextAreaElement>) => void
 }
 
-// Each pane is simultaneously the paste target and the diff display --
-// exactly one box per side instead of a raw input box plus a separate
-// read-only comparison box duplicating the same text. Editing and display
-// are two different views of the same underlying state, not two different
-// elements: click "Edit" (or click into an empty pane) to get a plain
-// textarea for typing/pasting, and blurring it renders that same content
-// back as the line-numbered, diff-highlighted view.
-function Pane({ label, value, onChange, rows, side, scrollRef, onScroll }: PaneProps) {
-  const [editing, setEditing] = useState(false)
-  const isEmpty = value === ''
-
+// Each pane is always a real, directly-typeable textarea -- no separate
+// "click Edit first" step -- with the diff-highlighted rendering of that
+// exact same text layered underneath it, so pasting or typing shows the
+// comparison in place instead of requiring a mode switch to see it.
+function Pane({
+  label,
+  value,
+  onChange,
+  lines,
+  side,
+  textareaRef,
+  overlayRef,
+  onScroll,
+}: PaneProps) {
   return (
     <div className="min-w-0">
       <div className="mb-1 flex items-center justify-between">
         <span className="text-xs font-medium text-fg-muted">{label}</span>
-        <div className="flex items-center gap-2">
-          {!editing && !isEmpty && (
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              className="text-xs text-fg-subtle hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              Edit
-            </button>
-          )}
-          {!isEmpty && <CopyButton value={value} label={label} />}
-        </div>
+        {value !== '' && <CopyButton value={value} label={label} />}
       </div>
-      {editing ? (
+      <div
+        className={`relative ${PANE_HEIGHT} overflow-hidden rounded-md border border-border bg-bg`}
+      >
+        <div
+          ref={overlayRef}
+          aria-hidden="true"
+          className="pn-no-scrollbar pointer-events-none absolute inset-0 overflow-auto font-mono text-xs"
+          style={{ padding: BASE_PADDING_PX }}
+        >
+          <Overlay lines={lines} side={side} />
+        </div>
         <textarea
-          autoFocus
+          ref={textareaRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onBlur={() => setEditing(false)}
+          onScroll={onScroll}
+          placeholder="Paste text here..."
           spellCheck={false}
           wrap="off"
-          className={`${PANE_HEIGHT} w-full resize-none rounded-md border border-accent bg-bg p-3 font-mono text-xs text-fg outline-none`}
+          className="absolute inset-0 h-full w-full resize-none overflow-auto whitespace-pre bg-transparent font-mono text-xs text-transparent caret-fg outline-none placeholder:text-fg-subtle"
+          style={{
+            padding: BASE_PADDING_PX,
+            paddingLeft: BASE_PADDING_PX + GUTTER_WIDTH_PX,
+            lineHeight: `${LINE_HEIGHT_PX}px`,
+          }}
         />
-      ) : isEmpty ? (
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className={`${PANE_HEIGHT} flex w-full items-center justify-center rounded-md border border-dashed border-border bg-bg text-sm text-fg-subtle transition-colors hover:border-accent/40 hover:text-fg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent`}
-        >
-          Click to paste text
-        </button>
-      ) : (
-        <div
-          ref={scrollRef}
-          onScroll={onScroll}
-          className={`${PANE_HEIGHT} overflow-auto rounded-md border border-border bg-bg`}
-        >
-          <div className="min-w-max">
-            {rows.map((row, i) => (
-              <PaneRow key={i} row={row} side={side} />
-            ))}
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   )
 }
 
-// A Notepad++/GitHub-style split diff that's also the paste target: both
-// panes render the exact same row list (blanks standing in wherever a line
-// doesn't exist on that side) so they're pixel-aligned without layout
-// trickery, kept in sync while scrolling via scrollTop, and each side owns
-// its own textarea so pasting into one updates its diff highlighting -- and
-// the other pane's, since both are recomputed from the same before/after
-// state -- without disturbing what's in the other box.
+// A Notepad++/GitHub-style split diff that's directly, immediately
+// editable -- pasting into either side updates both panes' highlighting
+// live, with no mode to switch into first. Scroll position is synced two
+// ways: each textarea drives its own overlay underneath it (so the
+// highlighted duplicate always tracks what's actually on screen), and the
+// two textareas drive each other (so the panes stay visually together
+// while reviewing a long diff). Cross-pane sync is best-effort by pixel
+// position rather than by logical line, since -- unlike the read-only view
+// this replaced -- neither side is padded with blank rows to keep line
+// counts matched, which a directly-editable textarea can't have without
+// corrupting the real text.
 export function DiffPasteBoard({
   before,
   after,
   onBeforeChange,
   onAfterChange,
 }: DiffPasteBoardProps) {
-  const leftRef = useRef<HTMLDivElement>(null)
-  const rightRef = useRef<HTMLDivElement>(null)
-  const syncing = useRef(false)
+  const leftTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const rightTextareaRef = useRef<HTMLTextAreaElement>(null)
+  const leftOverlayRef = useRef<HTMLDivElement>(null)
+  const rightOverlayRef = useRef<HTMLDivElement>(null)
+  const syncingPanes = useRef(false)
 
   const aligned = buildAlignedDiffRows(before, after)
-  const rows = aligned.ok ? aligned.result : []
-  const summary = aligned.ok ? summarizeAlignedRows(rows) : null
+  const summary = aligned.ok ? summarizeAlignedRows(aligned.result) : null
+  const { beforeLines, afterLines } = computeOverlayLines(before, after)
 
-  function handleLeftScroll(event: UIEvent<HTMLDivElement>) {
-    if (syncing.current) {
-      syncing.current = false
+  function handleLeftScroll(event: UIEvent<HTMLTextAreaElement>) {
+    const { scrollTop, scrollLeft } = event.currentTarget
+    if (leftOverlayRef.current) {
+      leftOverlayRef.current.scrollTop = scrollTop
+      leftOverlayRef.current.scrollLeft = scrollLeft
+    }
+    if (syncingPanes.current) {
+      syncingPanes.current = false
       return
     }
-    if (rightRef.current) {
-      syncing.current = true
-      rightRef.current.scrollTop = event.currentTarget.scrollTop
+    if (rightTextareaRef.current) {
+      syncingPanes.current = true
+      rightTextareaRef.current.scrollTop = scrollTop
     }
   }
 
-  function handleRightScroll(event: UIEvent<HTMLDivElement>) {
-    if (syncing.current) {
-      syncing.current = false
+  function handleRightScroll(event: UIEvent<HTMLTextAreaElement>) {
+    const { scrollTop, scrollLeft } = event.currentTarget
+    if (rightOverlayRef.current) {
+      rightOverlayRef.current.scrollTop = scrollTop
+      rightOverlayRef.current.scrollLeft = scrollLeft
+    }
+    if (syncingPanes.current) {
+      syncingPanes.current = false
       return
     }
-    if (leftRef.current) {
-      syncing.current = true
-      leftRef.current.scrollTop = event.currentTarget.scrollTop
+    if (leftTextareaRef.current) {
+      syncingPanes.current = true
+      leftTextareaRef.current.scrollTop = scrollTop
     }
   }
 
@@ -196,18 +219,20 @@ export function DiffPasteBoard({
           label="Text 1 (before)"
           value={before}
           onChange={onBeforeChange}
-          rows={rows}
+          lines={beforeLines}
           side="left"
-          scrollRef={leftRef}
+          textareaRef={leftTextareaRef}
+          overlayRef={leftOverlayRef}
           onScroll={handleLeftScroll}
         />
         <Pane
           label="Text 2 (after)"
           value={after}
           onChange={onAfterChange}
-          rows={rows}
+          lines={afterLines}
           side="right"
-          scrollRef={rightRef}
+          textareaRef={rightTextareaRef}
+          overlayRef={rightOverlayRef}
           onScroll={handleRightScroll}
         />
       </div>
