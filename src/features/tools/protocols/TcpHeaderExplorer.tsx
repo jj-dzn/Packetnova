@@ -61,6 +61,20 @@ export function TcpHeaderExplorer() {
     urgentPointer: Number(urgentPointer),
   })
 
+  const liveValues: Record<string, string> | undefined = showBuilder
+    ? {
+        'Source Port': sourcePort,
+        'Destination Port': destPort,
+        'Sequence Number': seqNumber,
+        'Acknowledgment Number': ackNumber,
+        'Data Offset': '5',
+        Flags: calc.hex,
+        'Window Size': windowSize,
+        Checksum: checksum,
+        'Urgent Pointer': urgentPointer,
+      }
+    : undefined
+
   return (
     <ReferencePageLayout
       category="Protocols"
@@ -68,7 +82,11 @@ export function TcpHeaderExplorer() {
       description="Every field in a TCP header, byte by byte, plus a quick flags-byte calculator."
     >
       <div className="mb-8">
-        <HeaderByteDiagram fields={tcpHeaderFields} />
+        <HeaderByteDiagram
+          fields={tcpHeaderFields}
+          values={liveValues}
+          caption={showBuilder ? 'showing live builder values' : undefined}
+        />
       </div>
       <div className="mb-8 grid grid-cols-1 gap-6 rounded-lg border border-border bg-surface p-6 lg:grid-cols-2">
         <div>

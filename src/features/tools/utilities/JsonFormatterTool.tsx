@@ -3,36 +3,42 @@ import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
+import { JsonTreeView } from './JsonTreeView'
+import { Pill } from '../../../components/ui/Pill'
 import { formatJson } from '../../../lib/calculations/jsonFormatter'
 
+function parseForTree(input: string): { ok: true; value: unknown } | { ok: false; error: string } {
+  try {
+    return { ok: true, value: JSON.parse(input) }
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : 'Invalid JSON.' }
+  }
+}
+
 export function JsonFormatterTool() {
-  const [mode, setMode] = useState<'pretty' | 'minify'>('pretty')
+  const [mode, setMode] = useState<'pretty' | 'minify' | 'tree'>('pretty')
   const [input, setInput] = useState('{"name":"PacketNova","tools":["subnet","cidr"],"free":true}')
 
-  const result = formatJson(input, mode)
+  const result = mode === 'tree' ? null : formatJson(input, mode)
+  const treeResult = mode === 'tree' ? parseForTree(input) : null
 
   return (
     <ToolPageLayout
       category="Utilities"
       title="JSON formatter"
-      description="Format, validate, and minify JSON."
+      description="Format, validate, and minify JSON -- or explore it as a syntax-highlighted, foldable tree."
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setMode('pretty')}
-              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'pretty' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
-            >
+            <Pill active={mode === 'pretty'} onClick={() => setMode('pretty')}>
               Pretty
-            </button>
-            <button
-              type="button"
-              onClick={() => setMode('minify')}
-              className={`rounded-md border px-3 py-1.5 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${mode === 'minify' ? 'border-accent text-accent' : 'border-border text-fg-muted'}`}
-            >
+            </Pill>
+            <Pill active={mode === 'minify'} onClick={() => setMode('minify')}>
               Minify
-            </button>
+            </Pill>
+            <Pill active={mode === 'tree'} onClick={() => setMode('tree')}>
+              Explore (tree)
+            </Pill>
           </div>
           <textarea
             value={input}
@@ -44,10 +50,16 @@ export function JsonFormatterTool() {
         </div>
       }
       result={
-        result.ok ? (
+        mode === 'tree' ? (
+          treeResult?.ok ? (
+            <JsonTreeView value={treeResult.value} />
+          ) : (
+            <p className="text-sm text-danger">{treeResult?.error}</p>
+          )
+        ) : result?.ok ? (
           <CopyableTextarea value={result.result} rows={12} />
         ) : (
-          <p className="text-sm text-danger">{result.error}</p>
+          <p className="text-sm text-danger">{result?.error}</p>
         )
       }
     >
@@ -57,15 +69,19 @@ export function JsonFormatterTool() {
             Pretty mode parses the JSON and re-serializes it with consistent indentation, so
             structure that was crammed onto one line becomes readable. Minify does the opposite --
             same data, every unnecessary whitespace character stripped -- which is what you actually
-            want for a value being transmitted, not read by a person.
+            want for a value being transmitted, not read by a person. Explore mode is different from
+            both: it renders the same parsed data as a colored, foldable tree you can click through,
+            for digging into a large or unfamiliar payload rather than reading it top to bottom.
           </p>
         }
         whenToUseThis={
           <p>
-            Reach for this when you've got JSON that's either unreadable (a minified API response
-            you need to inspect) or wasteful (a config file about to be embedded somewhere size
-            matters). Formatting also doubles as validation -- if it parses, it's syntactically
-            correct JSON.
+            Reach for Pretty or Minify when you've got JSON that's either unreadable (a minified API
+            response you need to inspect) or wasteful (a config file about to be embedded somewhere
+            size matters) -- both also double as validation, since a value that parses is
+            syntactically correct JSON. Reach for Explore when the payload is large enough that
+            reading it top to bottom isn't practical and you'd rather collapse the branches you
+            don't care about.
           </p>
         }
         commonMistakes={

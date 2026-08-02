@@ -3,7 +3,7 @@ import { RfcFootnote } from '../RfcFootnote'
 import { HeaderByteDiagram } from '../HeaderByteDiagram'
 import { DataTable } from '../../../components/ui/DataTable'
 import { udpHeaderFields } from '../../../content/reference/udpHeaderFields'
-import type { HeaderField } from '../../../content/reference/tcpHeaderFields'
+import { tcpHeaderFields, type HeaderField } from '../../../content/reference/tcpHeaderFields'
 
 export function UdpHeaderExplorer() {
   return (
@@ -19,9 +19,19 @@ export function UdpHeaderExplorer() {
         overhead per packet, in exchange for the application handling reliability itself if it needs
         it (or not needing it -- DNS, DHCP, and live video all lean on this).
       </p>
-      <div className="mb-8">
-        <HeaderByteDiagram fields={udpHeaderFields} />
+      <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div>
+          <HeaderByteDiagram fields={udpHeaderFields} caption="8 bytes" />
+        </div>
+        <div>
+          <HeaderByteDiagram fields={tcpHeaderFields} caption="20+ bytes" />
+        </div>
       </div>
+      <p className="mb-8 text-xs text-fg-subtle">
+        Same scale, same rendering -- UDP's entire header (left) fits inside just the first row of
+        TCP's (right). Everything in TCP's remaining three rows -- sequence/ack tracking, flags,
+        window size -- is exactly the reliability and flow-control machinery UDP goes without.
+      </p>
       <DataTable<HeaderField>
         columns={[
           { key: 'field', label: 'Field' },

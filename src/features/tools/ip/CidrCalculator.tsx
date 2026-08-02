@@ -3,6 +3,7 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
 import { AddressSpaceBar } from './AddressSpaceBar'
+import { ParentAggregateBar } from './ParentAggregateBar'
 import { BitToggleSandbox } from '../BitToggleSandbox'
 import { Input } from '../../../components/ui/Input'
 import { calculateCidr } from '../../../lib/calculations/cidr'
@@ -69,6 +70,9 @@ export function CidrCalculator() {
               label="Address in binary"
               value={calc.result.ipValue}
               prefixLength={calc.result.prefixLength}
+            />
+            <ParentAggregateBar
+              cidr={`${calc.result.networkAddress}/${calc.result.prefixLength}`}
             />
             <p className="text-xs text-fg-subtle">{calc.result.classification.explanation}</p>
             <div className="border-t border-border pt-4">

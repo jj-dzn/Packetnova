@@ -9,7 +9,9 @@ import type { CalculationResult } from './result'
 export interface WildcardMaskResult {
   prefixLength: number
   subnetMask: string
+  subnetMaskValue: number
   wildcardMask: string
+  wildcardMaskValue: number
 }
 
 const PREFIX_SHORTHAND = /^\/?(\d{1,2})$/
@@ -27,12 +29,15 @@ export function calculateWildcardMask(input: string): CalculationResult<Wildcard
       return { ok: false, error: 'Prefix length must be between 0 and 32.' }
     }
     const mask = prefixLengthToSubnetMask(prefixLength)
+    const wildcardValue = ~mask.value >>> 0
     return {
       ok: true,
       result: {
         prefixLength,
         subnetMask: ipv4ToString(mask.value),
-        wildcardMask: ipv4ToString(~mask.value >>> 0),
+        subnetMaskValue: mask.value,
+        wildcardMask: ipv4ToString(wildcardValue),
+        wildcardMaskValue: wildcardValue,
       },
     }
   }
@@ -47,12 +52,15 @@ export function calculateWildcardMask(input: string): CalculationResult<Wildcard
     return { ok: false, error: `"${trimmed}" is not a valid contiguous subnet mask.` }
   }
 
+  const wildcardValue = ~parsedMask.value >>> 0
   return {
     ok: true,
     result: {
       prefixLength,
       subnetMask: ipv4ToString(parsedMask.value),
-      wildcardMask: ipv4ToString(~parsedMask.value >>> 0),
+      subnetMaskValue: parsedMask.value,
+      wildcardMask: ipv4ToString(wildcardValue),
+      wildcardMaskValue: wildcardValue,
     },
   }
 }

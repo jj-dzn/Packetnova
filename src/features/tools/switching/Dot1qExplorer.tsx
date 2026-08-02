@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BitFieldDiagram } from '../BitFieldDiagram'
+import { FrameFieldStrip } from '../FrameFieldStrip'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { calculateDot1qTag } from '../../../lib/calculations/dot1q'
@@ -93,6 +94,35 @@ export function Dot1qExplorer() {
                   { label: 'VLAN ID', bits: 12, value: calc.result.vlanId },
                 ]}
               />
+            </div>
+            <div>
+              <p className="mb-1 text-xs font-medium text-fg-muted">
+                This tag in context of a full Ethernet frame
+              </p>
+              <FrameFieldStrip
+                segments={[
+                  { label: 'Dest MAC', bytes: 6, detail: 'destination hardware address' },
+                  { label: 'Src MAC', bytes: 6, detail: 'source hardware address' },
+                  {
+                    label: '802.1Q tag',
+                    bytes: 4,
+                    detail: `TPID 0x8100 + this TCI (0x${calc.result.tciHex})`,
+                    highlighted: true,
+                  },
+                  { label: 'EtherType', bytes: 3, detail: 'identifies the payload protocol' },
+                  {
+                    label: 'Payload',
+                    bytes: 18,
+                    detail: 'shown narrower than to scale -- actually 46-1500 bytes',
+                  },
+                  { label: 'FCS', bytes: 4, detail: 'frame check sequence' },
+                ]}
+              />
+              <p className="mt-2 text-xs text-fg-subtle">
+                The tag sits between the source MAC address and the EtherType field -- every switch
+                and NIC on the wire has to recognize the TPID (0x8100) right where EtherType would
+                normally be to know a tag follows before the real EtherType/payload.
+              </p>
             </div>
           </div>
         ) : (

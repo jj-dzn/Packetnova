@@ -22,7 +22,11 @@ export function IpHeaderExplorer() {
       description="Every field in an IPv4 header, byte by byte, plus a quick flags-field calculator."
     >
       <div className="mb-8">
-        <HeaderByteDiagram fields={ipHeaderFields} />
+        <HeaderByteDiagram
+          fields={ipHeaderFields}
+          values={{ Flags: calc.binary }}
+          caption="Flags: live from checkboxes below"
+        />
       </div>
       <div className="mb-8 grid grid-cols-1 gap-6 rounded-lg border border-border bg-surface p-6 lg:grid-cols-2">
         <div>

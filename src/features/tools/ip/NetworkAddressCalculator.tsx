@@ -5,6 +5,7 @@ import { BinaryBreakdown } from './BinaryBreakdown'
 import { AddressSpaceBar } from './AddressSpaceBar'
 import { Input } from '../../../components/ui/Input'
 import { calculateNetworkAddress } from '../../../lib/calculations/networkAddress'
+import { parseIPv4 } from '../../../lib/validation/ip'
 
 export function NetworkAddressCalculator() {
   const [input, setInput] = useState('192.168.1.10/24')
@@ -44,6 +45,9 @@ export function NetworkAddressCalculator() {
               firstUsable={calc.result.firstUsable}
               lastUsable={calc.result.lastUsable}
               usableHosts={calc.result.usableHosts}
+              currentValue={parseIPv4(calc.result.ip)?.value}
+              networkValue={calc.result.networkAddressValue}
+              broadcastValue={parseIPv4(calc.result.broadcastAddress)?.value}
             />
             <BinaryBreakdown
               label="Network address in binary"

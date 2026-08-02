@@ -4,6 +4,7 @@ import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
+import { RangeOverlapDiagram } from '../../diagram/RangeOverlapDiagram'
 import { simulateLpm, type RouteEntry } from '../../../lib/calculations/lpm'
 
 const DEFAULT_ROUTES: RouteEntry[] = [
@@ -99,6 +100,16 @@ export function LpmSimulator() {
               specific route always beats a less specific one, even a /32 static route beats a /0
               default learned from BGP.
             </Aside>
+            <RangeOverlapDiagram
+              destinationIp={destination}
+              routes={calc.result.matches.map((match) => ({
+                cidr: match.cidr,
+                label: match.label,
+                prefixLength: match.prefixLength,
+                matches: match.matches,
+                isWinner: calc.result.winner === match,
+              }))}
+            />
             <div className="overflow-x-auto rounded-md border border-border">
               <table className="w-full text-left text-sm">
                 <thead className="bg-surface">

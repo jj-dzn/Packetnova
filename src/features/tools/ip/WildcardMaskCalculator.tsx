@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
+import { BinaryBreakdown } from './BinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { calculateWildcardMask } from '../../../lib/calculations/wildcardMask'
 
@@ -41,6 +42,14 @@ export function WildcardMaskCalculator() {
               The wildcard mask is the bitwise inverse of the subnet mask -- every bit that's 1 in{' '}
               {calc.result.subnetMask} is 0 in {calc.result.wildcardMask}, and vice versa.
             </p>
+            <div className="flex flex-col gap-2 rounded-md border border-border bg-bg p-3">
+              <BinaryBreakdown label="Subnet mask" value={calc.result.subnetMaskValue} />
+              <div className="h-px bg-border" />
+              <BinaryBreakdown
+                label="Wildcard mask (every bit flipped)"
+                value={calc.result.wildcardMaskValue}
+              />
+            </div>
             <Aside>
               Wildcard masks flip subnet mask logic: a <strong>0</strong> bit means "must match" and
               a <strong>1</strong> bit means "don't care" -- the opposite of a subnet mask, where 1

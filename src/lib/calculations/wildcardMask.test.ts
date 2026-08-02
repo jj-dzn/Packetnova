@@ -12,6 +12,16 @@ describe('calculateWildcardMask', () => {
     }
   })
 
+  it('exposes the subnet and wildcard masks as their bitwise-inverse numeric values', () => {
+    const calc = calculateWildcardMask('255.255.255.0')
+    expect(calc.ok).toBe(true)
+    if (calc.ok) {
+      expect(calc.result.subnetMaskValue).toBe(0xffffff00)
+      expect(calc.result.wildcardMaskValue).toBe(0x000000ff)
+      expect((calc.result.subnetMaskValue ^ calc.result.wildcardMaskValue) >>> 0).toBe(0xffffffff)
+    }
+  })
+
   it('converts a /16 subnet mask to its wildcard mask', () => {
     const calc = calculateWildcardMask('255.255.0.0')
     expect(calc.ok).toBe(true)

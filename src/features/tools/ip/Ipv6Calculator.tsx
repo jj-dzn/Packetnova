@@ -2,10 +2,46 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
+import { Ipv6AnatomyDiagram } from './Ipv6AnatomyDiagram'
 import { Input } from '../../../components/ui/Input'
 import { analyzeIPv6 } from '../../../lib/calculations/ipv6'
 import { calculateIpv6Subnets } from '../../../lib/calculations/ipv6Subnet'
 import { calculateEui64 } from '../../../lib/calculations/eui64'
+
+// Boundaries rounded to the nearest nibble (4 bits) -- see
+// Ipv6AnatomyDiagram's own comment for why that's exact for the prefix
+// lengths that actually occur in practice. When the prefix is already /64
+// or longer there's no room left for a separate subnet ID segment, so this
+// degrades to a simple two-way network-prefix/interface-ID split instead
+// of forcing a three-way split that wouldn't mean anything.
+function buildAnatomySegments(expanded: string, prefixLength: number) {
+  const hex = expanded.replace(/:/g, '')
+  const nibblesOf = (bits: number) => Math.round(bits / 4)
+
+  if (prefixLength >= 64) {
+    const prefixNibbles = nibblesOf(prefixLength)
+    return [
+      { label: 'Network prefix', hexChars: hex.slice(0, prefixNibbles), bits: prefixLength },
+      { label: 'Interface ID', hexChars: hex.slice(prefixNibbles), bits: 128 - prefixLength },
+    ]
+  }
+
+  const globalNibbles = nibblesOf(prefixLength)
+  const subnetEndNibbles = 16 // 64 bits
+  return [
+    {
+      label: 'Global routing prefix',
+      hexChars: hex.slice(0, globalNibbles),
+      bits: prefixLength,
+    },
+    {
+      label: 'Subnet ID',
+      hexChars: hex.slice(globalNibbles, subnetEndNibbles),
+      bits: 64 - prefixLength,
+    },
+    { label: 'Interface ID', hexChars: hex.slice(subnetEndNibbles), bits: 64 },
+  ]
+}
 
 // IPv4 tools already have bit-level breakdowns (BinaryBreakdown); IPv6
 // never did, since laying out all 128 bits flat the same way would be
@@ -105,6 +141,12 @@ export function Ipv6Calculator() {
             </dl>
 
             <HextetBreakdown expanded={calc.result.expanded} />
+
+            {hasBasePrefix && calc.result.prefixLength! > 0 && (
+              <Ipv6AnatomyDiagram
+                segments={buildAnatomySegments(calc.result.expanded, calc.result.prefixLength!)}
+              />
+            )}
 
             {hasBasePrefix && (
               <div className="flex flex-col gap-3 border-t border-border pt-4">

@@ -5,6 +5,7 @@ import { Aside } from '../Aside'
 import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
+import { Select } from '../../../components/ui/Select'
 import { Pill } from '../../../components/ui/Pill'
 import { TopologyCanvas, type TopologyEdge, type TopologyNode } from '../../diagram/TopologyCanvas'
 import {
@@ -12,36 +13,40 @@ import {
   electRootBridge,
   type BridgeCandidate,
   type StpLink,
+  type StpTopologyResult,
 } from '../../../lib/calculations/stp'
 
+// A triangle -- the smallest topology with an actual loop, so it's the
+// smallest one where "designated" and "blocked" mean anything -- rather
+// than the old fixed 4-switch example: this is now the same editable state
+// the visitor can reshape, not a separate illustration bolted on beside it.
 const DEFAULT_BRIDGES: BridgeCandidate[] = [
   { id: 'Switch A', priority: 32768, macAddress: '00:11:22:33:44:55' },
   { id: 'Switch B', priority: 4096, macAddress: 'aa:bb:cc:dd:ee:ff' },
+  { id: 'Switch C', priority: 32768, macAddress: '00:22:33:44:55:66' },
+]
+const DEFAULT_LINKS: StpLink[] = [
+  { from: 'Switch A', to: 'Switch B', cost: 10 },
+  { from: 'Switch B', to: 'Switch C', cost: 10 },
+  { from: 'Switch C', to: 'Switch A', cost: 15 },
 ]
 
-// A small fixed topology (not the editable bridge list above) specifically
-// to demonstrate port roles: a 4-switch ring is the smallest topology that
-// actually has a loop, so it's the smallest one where "designated" and
-// "blocked" mean anything. Costs are asymmetric on purpose, so every
-// switch's shortest path back to the root is unique -- no tie-breaking
-// needed to follow the example.
-const EXAMPLE_BRIDGES: BridgeCandidate[] = [
-  { id: 'A', priority: 4096, macAddress: '00:00:00:00:00:0a' },
-  { id: 'B', priority: 32768, macAddress: '00:00:00:00:00:0b' },
-  { id: 'C', priority: 32768, macAddress: '00:00:00:00:00:0c' },
-  { id: 'D', priority: 32768, macAddress: '00:00:00:00:00:0d' },
-]
-const EXAMPLE_LINKS: StpLink[] = [
-  { from: 'A', to: 'B', cost: 10 },
-  { from: 'B', to: 'C', cost: 10 },
-  { from: 'C', to: 'D', cost: 15 },
-  { from: 'D', to: 'A', cost: 8 },
-]
-const EXAMPLE_POSITIONS: Record<string, { x: number; y: number }> = {
-  A: { x: 75, y: 40 },
-  B: { x: 245, y: 40 },
-  C: { x: 245, y: 180 },
-  D: { x: 75, y: 180 },
+const DIAGRAM_WIDTH = 340
+const DIAGRAM_HEIGHT = 280
+
+function computeCircularPositions(ids: string[]): Record<string, { x: number; y: number }> {
+  const centerX = DIAGRAM_WIDTH / 2
+  const centerY = DIAGRAM_HEIGHT / 2
+  const radius = Math.min(DIAGRAM_WIDTH, DIAGRAM_HEIGHT) / 2 - 55
+  const positions: Record<string, { x: number; y: number }> = {}
+  ids.forEach((id, index) => {
+    const angle = -Math.PI / 2 + (2 * Math.PI * index) / ids.length
+    positions[id] = {
+      x: centerX + radius * Math.cos(angle),
+      y: centerY + radius * Math.sin(angle),
+    }
+  })
+  return positions
 }
 
 function buildStpCliSnippet(bridges: BridgeCandidate[], rootBridgeId: string): string {
@@ -55,16 +60,35 @@ function buildStpCliSnippet(bridges: BridgeCandidate[], rootBridgeId: string): s
 
 export function StpOverview() {
   const [bridges, setBridges] = useState<BridgeCandidate[]>(DEFAULT_BRIDGES)
+  const [links, setLinks] = useState<StpLink[]>(DEFAULT_LINKS)
   const [showCli, setShowCli] = useState(false)
 
   const calc = electRootBridge(bridges)
+  const topologyCalc = computeStpPortRoles(bridges, links)
 
   function updateBridge(index: number, patch: Partial<BridgeCandidate>) {
+    const oldId = bridges[index]?.id
     setBridges((current) => current.map((b, i) => (i === index ? { ...b, ...patch } : b)))
+    if (patch.id !== undefined && oldId !== undefined && patch.id !== oldId) {
+      const newId = patch.id
+      setLinks((current) =>
+        current.map((link) => ({
+          ...link,
+          from: link.from === oldId ? newId : link.from,
+          to: link.to === oldId ? newId : link.to,
+        })),
+      )
+    }
   }
 
   function removeBridge(index: number) {
+    const removedId = bridges[index]?.id
     setBridges((current) => current.filter((_, i) => i !== index))
+    if (removedId !== undefined) {
+      setLinks((current) =>
+        current.filter((link) => link.from !== removedId && link.to !== removedId),
+      )
+    }
   }
 
   function addBridge() {
@@ -78,6 +102,19 @@ export function StpOverview() {
     ])
   }
 
+  function updateLink(index: number, patch: Partial<StpLink>) {
+    setLinks((current) => current.map((l, i) => (i === index ? { ...l, ...patch } : l)))
+  }
+
+  function removeLink(index: number) {
+    setLinks((current) => current.filter((_, i) => i !== index))
+  }
+
+  function addLink() {
+    if (bridges.length < 2) return
+    setLinks((current) => [...current, { from: bridges[0]!.id, to: bridges[1]!.id, cost: 10 }])
+  }
+
   return (
     <>
       <ToolPageLayout
@@ -85,42 +122,100 @@ export function StpOverview() {
         title="STP overview"
         description="Spanning Tree Protocol elects a root bridge by lowest Bridge ID -- priority first, MAC address as the tiebreaker -- then blocks any port that would form a loop to it."
         input={
-          <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium">Bridges</span>
-            {bridges.map((bridge, index) => (
-              <div key={index} className="flex flex-wrap gap-2">
-                <Input
-                  value={bridge.id}
-                  onChange={(e) => updateBridge(index, { id: e.target.value })}
-                  placeholder="Name"
-                  className="min-w-[7rem] flex-1"
-                />
-                <Input
-                  value={bridge.priority}
-                  onChange={(e) => updateBridge(index, { priority: Number(e.target.value) })}
-                  placeholder="Priority"
-                  className="min-w-[7rem] flex-1"
-                />
-                <Input
-                  value={bridge.macAddress}
-                  onChange={(e) => updateBridge(index, { macAddress: e.target.value })}
-                  placeholder="MAC address"
-                  className="min-w-[9rem] flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => removeBridge(index)}
-                  disabled={bridges.length <= 1}
-                  aria-label="Remove bridge"
-                >
-                  &times;
-                </Button>
-              </div>
-            ))}
-            <Button type="button" variant="secondary" onClick={addBridge} className="self-start">
-              + Add bridge
-            </Button>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium">Bridges</span>
+              {bridges.map((bridge, index) => (
+                <div key={index} className="flex flex-wrap gap-2">
+                  <Input
+                    value={bridge.id}
+                    onChange={(e) => updateBridge(index, { id: e.target.value })}
+                    placeholder="Name"
+                    className="min-w-[7rem] flex-1"
+                  />
+                  <Input
+                    value={bridge.priority}
+                    onChange={(e) => updateBridge(index, { priority: Number(e.target.value) })}
+                    placeholder="Priority"
+                    className="min-w-[7rem] flex-1"
+                  />
+                  <Input
+                    value={bridge.macAddress}
+                    onChange={(e) => updateBridge(index, { macAddress: e.target.value })}
+                    placeholder="MAC address"
+                    className="min-w-[9rem] flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => removeBridge(index)}
+                    disabled={bridges.length <= 1}
+                    aria-label="Remove bridge"
+                  >
+                    &times;
+                  </Button>
+                </div>
+              ))}
+              <Button type="button" variant="secondary" onClick={addBridge} className="self-start">
+                + Add bridge
+              </Button>
+            </div>
+            <div className="flex flex-col gap-2 border-t border-border pt-4">
+              <span className="text-sm font-medium">Links</span>
+              {links.map((link, index) => (
+                <div key={index} className="flex flex-wrap gap-2">
+                  <Select
+                    value={link.from}
+                    onChange={(e) => updateLink(index, { from: e.target.value })}
+                    className="min-w-[8rem] flex-1"
+                  >
+                    {bridges.map((bridge) => (
+                      <option key={bridge.id} value={bridge.id}>
+                        {bridge.id}
+                      </option>
+                    ))}
+                  </Select>
+                  <Select
+                    value={link.to}
+                    onChange={(e) => updateLink(index, { to: e.target.value })}
+                    className="min-w-[8rem] flex-1"
+                  >
+                    {bridges.map((bridge) => (
+                      <option key={bridge.id} value={bridge.id}>
+                        {bridge.id}
+                      </option>
+                    ))}
+                  </Select>
+                  <Input
+                    value={link.cost}
+                    onChange={(e) => updateLink(index, { cost: Number(e.target.value) })}
+                    placeholder="Cost"
+                    className="w-20"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => removeLink(index)}
+                    aria-label="Remove link"
+                  >
+                    &times;
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={addLink}
+                disabled={bridges.length < 2}
+                className="self-start"
+              >
+                + Add link
+              </Button>
+              <p className="text-xs text-fg-subtle">
+                Add a redundant link (one that closes a loop back to a bridge already connected) to
+                see a port actually block.
+              </p>
+            </div>
           </div>
         }
         result={
@@ -153,9 +248,11 @@ export function StpOverview() {
           lowest-cost path back to the root) and every network segment gets one designated port. Any
           other port that would create a second path to the root is put into a blocking state --
           traffic-forwarding-wise inactive, but still listening for topology changes. That's how STP
-          keeps a physically redundant, loop-having topology loop-free logically.
+          keeps a physically redundant, loop-having topology loop-free logically. The diagram below
+          runs the exact same election and blocking logic live, on the bridges and links you edit
+          above.
         </p>
-        <PortRoleExample />
+        {topologyCalc.ok && <LiveTopologyDiagram result={topologyCalc.result} />}
         <div className="mt-4 max-w-2xl">
           <Aside>
             Classic STP (802.1D) can take 30-50 seconds to converge after a topology change -- each
@@ -204,36 +301,53 @@ export function StpOverview() {
   )
 }
 
-function PortRoleExample() {
-  const calc = computeStpPortRoles(EXAMPLE_BRIDGES, EXAMPLE_LINKS)
-  if (!calc.ok) return null
-  const { rootBridgeId, ports } = calc.result
+function LiveTopologyDiagram({ result }: { result: StpTopologyResult }) {
+  const { rootBridgeId, ports } = result
+  const bridgeIds = Array.from(new Set(ports.flatMap((port) => [port.bridgeId, port.neighborId])))
+  const positions = computeCircularPositions(bridgeIds.length > 0 ? bridgeIds : [rootBridgeId])
 
   function roleOf(bridgeId: string, neighborId: string) {
     return ports.find((p) => p.bridgeId === bridgeId && p.neighborId === neighborId)?.role
   }
 
-  function linkIsBlocked(link: StpLink) {
-    return roleOf(link.from, link.to) === 'blocked' || roleOf(link.to, link.from) === 'blocked'
+  function linkIsBlocked(from: string, to: string) {
+    return roleOf(from, to) === 'blocked' || roleOf(to, from) === 'blocked'
+  }
+
+  // De-duplicate each undirected link (the algorithm records a port entry
+  // for both ends) down to one edge for drawing.
+  const seenEdges = new Set<string>()
+  const edges: { from: string; to: string }[] = []
+  for (const port of ports) {
+    const key = [port.bridgeId, port.neighborId].sort().join('--')
+    if (seenEdges.has(key)) continue
+    seenEdges.add(key)
+    edges.push({ from: port.bridgeId, to: port.neighborId })
+  }
+
+  if (bridgeIds.length === 0) {
+    return (
+      <p className="mt-6 max-w-2xl text-sm text-fg-subtle">
+        Add at least one link between two bridges to see the live topology diagram.
+      </p>
+    )
   }
 
   return (
     <div className="mt-6 max-w-2xl rounded-lg border border-border bg-surface p-4">
-      <p className="mb-3 text-sm font-medium">
-        A worked example: the same election and blocking on a small 4-switch ring
-      </p>
+      <p className="mb-3 text-sm font-medium">Live topology -- root and blocked ports</p>
       <TopologyCanvas
-        viewWidth={320}
-        viewHeight={244}
+        viewWidth={DIAGRAM_WIDTH}
+        viewHeight={DIAGRAM_HEIGHT}
         className="mx-auto w-full max-w-sm"
-        nodes={EXAMPLE_BRIDGES.map((bridge): TopologyNode => {
-          const pos = EXAMPLE_POSITIONS[bridge.id]!
-          const isRoot = bridge.id === rootBridgeId
+        nodes={bridgeIds.map((id): TopologyNode => {
+          const pos = positions[id]!
+          const isRoot = id === rootBridgeId
           return {
-            id: bridge.id,
+            id,
             x: pos.x,
             y: pos.y,
-            label: bridge.id,
+            label: id,
             icon: 'switch',
             radius: isRoot ? 24 : 20,
             fill: isRoot ? 'var(--color-accent-alt)' : 'var(--color-bg)',
@@ -241,13 +355,14 @@ function PortRoleExample() {
             strokeWidth: isRoot ? 3 : 1.5,
           }
         })}
-        edges={EXAMPLE_LINKS.map((link): TopologyEdge => ({
-          from: link.from,
-          to: link.to,
-          label: link.cost,
-          stroke: linkIsBlocked(link) ? 'var(--color-fg-subtle)' : 'var(--color-accent-alt)',
-          strokeWidth: linkIsBlocked(link) ? 1.5 : 3,
-          dashed: linkIsBlocked(link),
+        edges={edges.map((edge): TopologyEdge => ({
+          from: edge.from,
+          to: edge.to,
+          stroke: linkIsBlocked(edge.from, edge.to)
+            ? 'var(--color-fg-subtle)'
+            : 'var(--color-accent-alt)',
+          strokeWidth: linkIsBlocked(edge.from, edge.to) ? 1.5 : 3,
+          dashed: linkIsBlocked(edge.from, edge.to),
         }))}
       />
       <div className="mt-3 overflow-x-auto">
@@ -288,10 +403,10 @@ function PortRoleExample() {
         </table>
       </div>
       <p className="mt-2 text-xs text-fg-subtle">
-        A-B and D-A both lead directly to the root ({rootBridgeId}), so B and D use those as their
-        root ports. C is two hops from the root either way, but B's path (cost 20) beats D's (cost
-        23), so C's B-facing port becomes its root port -- leaving the C-D link with nothing to do
-        but block, since it's the one connection that would otherwise form a loop.
+        {rootBridgeId} is root (accent-filled, larger). Every other bridge's lowest-cost path back
+        to it becomes a root port; whichever side of each remaining segment sits closer to the root
+        becomes designated; anything left over -- a link that would only create a second path to the
+        root -- blocks.
       </p>
     </div>
   )

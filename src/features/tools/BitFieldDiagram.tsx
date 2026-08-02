@@ -26,8 +26,8 @@ export function BitFieldDiagram({ fields }: BitFieldDiagramProps) {
             className={`flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden border-r border-border px-1 last:border-r-0 ${TINTS[index % TINTS.length]}`}
             title={`${field.label}: ${field.bits} bit${field.bits === 1 ? '' : 's'}, value ${field.value}`}
           >
-            <span className="truncate text-[11px] font-medium">{field.label}</span>
-            <span className="truncate font-mono text-[10px] text-fg-subtle">
+            <span className="block max-w-full truncate text-[11px] font-medium">{field.label}</span>
+            <span className="block max-w-full truncate font-mono text-[10px] text-fg-subtle">
               {field.value.toString(2).padStart(field.bits, '0')}
             </span>
           </div>

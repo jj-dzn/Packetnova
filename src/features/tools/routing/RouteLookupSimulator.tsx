@@ -5,6 +5,7 @@ import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { Button } from '../../../components/ui/Button'
+import { RangeOverlapDiagram } from '../../diagram/RangeOverlapDiagram'
 import { simulateRouteLookup, type RouteLookupEntry } from '../../../lib/calculations/routeLookup'
 import { administrativeDistances } from '../../../content/reference/administrativeDistance'
 
@@ -122,6 +123,16 @@ export function RouteLookupSimulator() {
               only models the AD tiebreak, which is why it's the deciding factor whenever two
               matching routes come from different sources.
             </Aside>
+            <RangeOverlapDiagram
+              destinationIp={destination}
+              routes={calc.result.matches.map((match) => ({
+                cidr: match.cidr,
+                label: match.label,
+                prefixLength: match.prefixLength,
+                matches: match.matches,
+                isWinner: calc.result.winner === match,
+              }))}
+            />
             <div className="overflow-x-auto rounded-md border border-border">
               <table className="w-full text-left text-sm">
                 <thead className="bg-surface">
