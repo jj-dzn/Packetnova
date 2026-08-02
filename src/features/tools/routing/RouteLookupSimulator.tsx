@@ -5,8 +5,13 @@ import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { Button } from '../../../components/ui/Button'
+import { Pill } from '../../../components/ui/Pill'
 import { RangeOverlapDiagram } from '../../diagram/RangeOverlapDiagram'
-import { simulateRouteLookup, type RouteLookupEntry } from '../../../lib/calculations/routeLookup'
+import {
+  simulateRouteLookup,
+  type RouteLookupEntry,
+  type RouteLookupMatch,
+} from '../../../lib/calculations/routeLookup'
 import { administrativeDistances } from '../../../content/reference/administrativeDistance'
 
 const DEFAULT_ROUTES: RouteLookupEntry[] = [
@@ -14,9 +19,48 @@ const DEFAULT_ROUTES: RouteLookupEntry[] = [
   { cidr: '192.168.1.0/24', administrativeDistance: 110, label: 'OSPF' },
 ]
 
+// Maps a route's user-given label to the single-letter code Cisco's
+// `show ip route` uses for that source -- falls back to the label's own
+// first letter for a source this map doesn't recognize, so an unusual
+// label still produces a plausible-looking code instead of nothing.
+const PROTOCOL_CODES: Record<string, string> = {
+  static: 'S',
+  connected: 'C',
+  ospf: 'O',
+  eigrp: 'D',
+  'internal eigrp': 'D',
+  'external eigrp': 'D EX',
+  rip: 'R',
+  bgp: 'B',
+  'internal bgp': 'B',
+  'external bgp': 'B',
+  'is-is': 'i',
+  isis: 'i',
+  igrp: 'I',
+  egp: 'EG',
+}
+
+function protocolCode(label: string): string {
+  return PROTOCOL_CODES[label.trim().toLowerCase()] ?? label.trim()[0]?.toUpperCase() ?? '?'
+}
+
+function buildShowIpRouteSnippet(
+  matches: RouteLookupMatch[],
+  winner: RouteLookupMatch | null,
+): string {
+  return matches
+    .map((match) => {
+      const code = protocolCode(match.label)
+      const line = `${code.padEnd(5)}${match.cidr} [${match.administrativeDistance}/0] via 0.0.0.0`
+      return match === winner ? `${line}  ! installed` : line
+    })
+    .join('\n')
+}
+
 export function RouteLookupSimulator() {
   const [destination, setDestination] = useState('192.168.1.10')
   const [routes, setRoutes] = useState<RouteLookupEntry[]>(DEFAULT_ROUTES)
+  const [showCli, setShowCli] = useState(false)
 
   const calc = simulateRouteLookup(destination, routes)
 
@@ -159,6 +203,16 @@ export function RouteLookupSimulator() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} routing table output (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildShowIpRouteSnippet(calc.result.matches, calc.result.winner)}
+                </pre>
+              )}
             </div>
           </div>
         ) : (

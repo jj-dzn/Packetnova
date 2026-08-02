@@ -70,6 +70,51 @@ const STEP_TO_FIELD: Record<string, string> = {
   'Lowest neighbor IP': 'Neighbor IP',
 }
 
+const ORIGIN_CODE: Record<BgpOrigin, string> = { igp: 'I', egp: 'E', incomplete: '?' }
+
+// Real AS numbers aren't part of the candidate model (only a path
+// *length*), so this fabricates a plausible-looking path of that length --
+// enough to show the shape of a real AS-path line without claiming to know
+// numbers the tool was never given.
+function fakeAsPath(length: number): string {
+  return Array.from({ length }, (_, i) => 65000 + i).join(' ')
+}
+
+function buildCiscoBgpOutput(candidates: BgpCandidate[], result: BgpResult): string {
+  const bestIndex = candidates.findIndex((c) => c.id === result.winnerId)
+  const lines = [
+    'RP/0/RP0/CPU0:router# show bgp ipv4 unicast',
+    `BGP routing table entry`,
+    `Paths: (${candidates.length} available, best #${bestIndex + 1})`,
+  ]
+  candidates.forEach((c, i) => {
+    const isBest = c.id === result.winnerId
+    lines.push(`  Path #${i + 1}: received by speaker 0${isBest ? ', best' : ''}`)
+    lines.push(`    ${fakeAsPath(c.asPathLength)}`)
+    lines.push(`    ${c.neighborIp} from ${c.neighborIp} (${c.routerId})`)
+    lines.push(
+      `      Origin ${c.origin.toUpperCase()}, metric ${c.med}, localpref ${c.localPreference}, weight ${c.weight}, ${c.isEbgp ? 'external' : 'internal'}, valid${isBest ? ', best, group-best' : ''}`,
+    )
+  })
+  return lines.join('\n')
+}
+
+function buildJuniperBgpOutput(candidates: BgpCandidate[], result: BgpResult): string {
+  const lines = [
+    `inet.0: ${candidates.length} destinations, ${candidates.length} routes (${candidates.length} active, 0 holddown, 0 hidden)`,
+    '',
+  ]
+  candidates.forEach((c) => {
+    const isBest = c.id === result.winnerId
+    lines.push(
+      `${isBest ? '*' : ' '}[BGP/170] localpref ${c.localPreference}, weight ${c.weight}, from ${c.routerId}`,
+    )
+    lines.push(`              AS path: ${fakeAsPath(c.asPathLength)} ${ORIGIN_CODE[c.origin]}`)
+    lines.push(`            > to ${c.neighborIp}`)
+  })
+  return lines.join('\n')
+}
+
 const DEFAULT_CANDIDATES: BgpCandidate[] = [
   {
     id: 'Path A',
@@ -122,10 +167,14 @@ function Field({
   )
 }
 
+type CliVendor = 'cisco' | 'juniper'
+
 export function BgpBestPathSelector() {
   const [candidates, setCandidates] = useState<BgpCandidate[]>(DEFAULT_CANDIDATES)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [hoveredStep, setHoveredStep] = useState<string | null>(null)
+  const [showCli, setShowCli] = useState(false)
+  const [cliVendor, setCliVendor] = useState<CliVendor>('cisco')
 
   const calc = selectBgpBestPath(candidates)
   const hoveredTrace =
@@ -347,6 +396,30 @@ export function BgpBestPathSelector() {
                 </div>
               </GuidedMode>
             )}
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                  {showCli ? 'Hide' : 'Show'} route table output (expert)
+                </Pill>
+                {showCli && (
+                  <div className="flex gap-2">
+                    <Pill active={cliVendor === 'cisco'} onClick={() => setCliVendor('cisco')}>
+                      Cisco IOS-XR
+                    </Pill>
+                    <Pill active={cliVendor === 'juniper'} onClick={() => setCliVendor('juniper')}>
+                      Juniper
+                    </Pill>
+                  </div>
+                )}
+              </div>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {cliVendor === 'cisco'
+                    ? buildCiscoBgpOutput(candidates, calc.result)
+                    : buildJuniperBgpOutput(candidates, calc.result)}
+                </pre>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

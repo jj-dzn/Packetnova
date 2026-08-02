@@ -4,11 +4,20 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
 import { CharDiffView } from '../CharDiffView'
+import { Pill } from '../../../components/ui/Pill'
 import { base64Decode, base64Encode } from '../../../lib/calculations/base64'
+import { shellQuote } from '../../../lib/calculations/shellQuote'
+
+function buildBase64CliSnippet(mode: 'encode' | 'decode', input: string): string {
+  return mode === 'encode'
+    ? `echo -n ${shellQuote(input)} | base64`
+    : `echo ${shellQuote(input)} | base64 -d`
+}
 
 export function Base64Tool() {
   const [mode, setMode] = useState<'encode' | 'decode'>('encode')
   const [input, setInput] = useState('Hello, PacketNova!')
+  const [showCli, setShowCli] = useState(false)
 
   const result =
     mode === 'encode' ? { ok: true as const, result: base64Encode(input) } : base64Decode(input)
@@ -50,6 +59,16 @@ export function Base64Tool() {
           <div className="flex flex-col gap-4">
             <CopyableTextarea value={result.result} />
             <CharDiffView before={input} after={result.result} />
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} CLI equivalent (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildBase64CliSnippet(mode, input)}
+                </pre>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{result.error}</p>

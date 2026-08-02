@@ -15,9 +15,16 @@ function parseForTree(input: string): { ok: true; value: unknown } | { ok: false
   }
 }
 
+const JQ_CLI: Record<'pretty' | 'minify' | 'tree', string> = {
+  pretty: 'jq . input.json',
+  minify: 'jq -c . input.json',
+  tree: 'jq . input.json | less',
+}
+
 export function JsonFormatterTool() {
   const [mode, setMode] = useState<'pretty' | 'minify' | 'tree'>('pretty')
   const [input, setInput] = useState('{"name":"PacketNova","tools":["subnet","cidr"],"free":true}')
+  const [showCli, setShowCli] = useState(false)
 
   const result = mode === 'tree' ? null : formatJson(input, mode)
   const treeResult = mode === 'tree' ? parseForTree(input) : null
@@ -50,17 +57,29 @@ export function JsonFormatterTool() {
         </div>
       }
       result={
-        mode === 'tree' ? (
-          treeResult?.ok ? (
-            <JsonTreeView value={treeResult.value} />
+        <div className="flex flex-col gap-4">
+          {mode === 'tree' ? (
+            treeResult?.ok ? (
+              <JsonTreeView value={treeResult.value} />
+            ) : (
+              <p className="text-sm text-danger">{treeResult?.error}</p>
+            )
+          ) : result?.ok ? (
+            <CopyableTextarea value={result.result} rows={12} />
           ) : (
-            <p className="text-sm text-danger">{treeResult?.error}</p>
-          )
-        ) : result?.ok ? (
-          <CopyableTextarea value={result.result} rows={12} />
-        ) : (
-          <p className="text-sm text-danger">{result?.error}</p>
-        )
+            <p className="text-sm text-danger">{result?.error}</p>
+          )}
+          <div>
+            <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+              {showCli ? 'Hide' : 'Show'} jq equivalent (expert)
+            </Pill>
+            {showCli && (
+              <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                {JQ_CLI[mode]}
+              </pre>
+            )}
+          </div>
+        </div>
       }
     >
       <ToolEducation

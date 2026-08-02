@@ -5,12 +5,14 @@ import { ToolEducation } from '../ToolEducation'
 import { Select } from '../../../components/ui/Select'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import { Skeleton } from '../../../components/ui/Skeleton'
+import { Pill } from '../../../components/ui/Pill'
 import {
   computeHash,
   HASH_ALGORITHMS,
   SecureContextRequiredError,
   type HashAlgorithm,
 } from '../../../lib/calculations/hash'
+import { buildHashCliSnippet } from '../../../content/reference/hashCliSnippets'
 
 function AvalancheHash({ hash, previousHash }: { hash: string; previousHash: string | null }) {
   if (!previousHash || previousHash.length !== hash.length) {
@@ -47,6 +49,7 @@ export function HashGenerator() {
   const [previousHash, setPreviousHash] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isComputing, setIsComputing] = useState(false)
+  const [showCli, setShowCli] = useState(false)
   const hashRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -152,14 +155,26 @@ export function HashGenerator() {
         error ? (
           <p className="text-sm text-danger">{error}</p>
         ) : hash ? (
-          <div className="flex items-center justify-between gap-4 border-b border-border py-2">
-            <span className="shrink-0 text-sm text-fg-muted">{algorithm}</span>
-            <span className="flex min-w-0 items-center justify-end gap-1.5">
-              <span className="min-w-0 text-right text-sm">
-                <AvalancheHash hash={hash} previousHash={previousHash} />
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-4 border-b border-border py-2">
+              <span className="shrink-0 text-sm text-fg-muted">{algorithm}</span>
+              <span className="flex min-w-0 items-center justify-end gap-1.5">
+                <span className="min-w-0 text-right text-sm">
+                  <AvalancheHash hash={hash} previousHash={previousHash} />
+                </span>
+                <CopyButton value={hash} label={algorithm} />
               </span>
-              <CopyButton value={hash} label={algorithm} />
-            </span>
+            </div>
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} CLI equivalent (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildHashCliSnippet(algorithm)}
+                </pre>
+              )}
+            </div>
           </div>
         ) : isComputing ? (
           <div className="flex items-center justify-between gap-4 border-b border-border py-2">

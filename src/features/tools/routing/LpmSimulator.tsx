@@ -4,8 +4,9 @@ import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
+import { Pill } from '../../../components/ui/Pill'
 import { RangeOverlapDiagram } from '../../diagram/RangeOverlapDiagram'
-import { simulateLpm, type RouteEntry } from '../../../lib/calculations/lpm'
+import { simulateLpm, type LpmMatch, type RouteEntry } from '../../../lib/calculations/lpm'
 
 const DEFAULT_ROUTES: RouteEntry[] = [
   { cidr: '0.0.0.0/0', label: 'Default' },
@@ -13,9 +14,29 @@ const DEFAULT_ROUTES: RouteEntry[] = [
   { cidr: '192.168.1.0/24', label: 'Specific' },
 ]
 
+// `show ip route <specific-ip>` (as opposed to a full table dump) is where
+// Cisco's own CLI genuinely surfaces the longest-match winner directly --
+// mirroring that specific command's output, not the AD-focused table
+// format RouteLookupSimulator's CLI toggle uses, since AD never enters
+// into this tool's decision at all.
+function buildShowIpRouteDetailSnippet(
+  destination: string,
+  matches: LpmMatch[],
+  winner: LpmMatch | null,
+): string {
+  const lines = [`Routing entry for ${destination}`, '  Routing Descriptor Blocks:']
+  for (const match of matches.filter((m) => m.matches)) {
+    const marker = match === winner ? '* ' : '  '
+    const note = match === winner ? ' (longest match)' : ''
+    lines.push(`  ${marker}${match.cidr}, via directly connected${note}`)
+  }
+  return lines.join('\n')
+}
+
 export function LpmSimulator() {
   const [destination, setDestination] = useState('192.168.1.10')
   const [routes, setRoutes] = useState<RouteEntry[]>(DEFAULT_ROUTES)
+  const [showCli, setShowCli] = useState(false)
 
   const calc = simulateLpm(destination, routes)
 
@@ -134,6 +155,20 @@ export function LpmSimulator() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} routing table output (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildShowIpRouteDetailSnippet(
+                    destination,
+                    calc.result.matches,
+                    calc.result.winner,
+                  )}
+                </pre>
+              )}
             </div>
           </div>
         ) : (

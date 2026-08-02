@@ -19,10 +19,20 @@ const DEFAULT_JSON = JSON.stringify(
   2,
 )
 
+// yq (the Go implementation, mikefarah/yq -- the standard these days,
+// distinct from the older Python jq-wrapper of the same name) expressed
+// per mode, using its -o/--output-format flag for the two conversions.
+const YQ_CLI: Record<Mode, string> = {
+  format: 'yq eval . input.yaml',
+  'yaml-to-json': 'yq eval -o=json . input.yaml',
+  'json-to-yaml': 'yq eval -P input.json',
+}
+
 export function YamlFormatterTool() {
   const [mode, setMode] = useState<Mode>('format')
   const [yamlInput, setYamlInput] = useState(DEFAULT_YAML)
   const [jsonInput, setJsonInput] = useState(DEFAULT_JSON)
+  const [showCli, setShowCli] = useState(false)
 
   function changeMode(next: Mode) {
     setMode(next)
@@ -67,11 +77,23 @@ export function YamlFormatterTool() {
         </div>
       }
       result={
-        result.ok ? (
-          <CopyableTextarea value={result.result} rows={12} />
-        ) : (
-          <p className="text-sm text-danger">{result.error}</p>
-        )
+        <div className="flex flex-col gap-4">
+          {result.ok ? (
+            <CopyableTextarea value={result.result} rows={12} />
+          ) : (
+            <p className="text-sm text-danger">{result.error}</p>
+          )}
+          <div>
+            <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+              {showCli ? 'Hide' : 'Show'} yq equivalent (expert)
+            </Pill>
+            {showCli && (
+              <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                {YQ_CLI[mode]}
+              </pre>
+            )}
+          </div>
+        </div>
       }
     >
       <ToolEducation

@@ -12,6 +12,12 @@ export const dhcpOptions: DhcpOptionEntry[] = [
   { option: 12, name: 'Host Name', description: "Client's host name" },
   { option: 15, name: 'Domain Name', description: "Client's DNS domain suffix" },
   {
+    option: 43,
+    name: 'Vendor Specific Information',
+    description:
+      'Vendor-defined binary data, commonly used to auto-provision VoIP phones and wireless access points during boot',
+  },
+  {
     option: 51,
     name: 'IP Address Lease Time',
     description: 'How long the lease is valid, in seconds',
@@ -40,5 +46,16 @@ export const dhcpOptions: DhcpOptionEntry[] = [
     option: 59,
     name: 'Rebinding Time (T2)',
     description: 'When the client should broadcast to rebind if renewal failed',
+  },
+  {
+    option: 66,
+    name: 'TFTP Server Name',
+    description: 'Hostname or IP of the TFTP server clients should boot or provision from',
+  },
+  {
+    option: 150,
+    name: 'TFTP Server Address',
+    description:
+      'Cisco-proprietary alternative to option 66 -- not in RFC 2132 -- one or more TFTP server IPs, used heavily by Cisco IP phones',
   },
 ]

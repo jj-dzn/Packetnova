@@ -5,12 +5,14 @@ import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
+import { Pill } from '../../../components/ui/Pill'
 import {
   verifyHash,
   HASH_ALGORITHMS,
   SecureContextRequiredError,
   type HashAlgorithm,
 } from '../../../lib/calculations/hash'
+import { buildHashCliSnippet } from '../../../content/reference/hashCliSnippets'
 
 export function HashVerifier() {
   const [text, setText] = useState('Hello, PacketNova!')
@@ -20,6 +22,7 @@ export function HashVerifier() {
   const [matches, setMatches] = useState<boolean | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isComputing, setIsComputing] = useState(false)
+  const [showCli, setShowCli] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -114,6 +117,16 @@ export function HashVerifier() {
             <dl>
               <ResultRow label="Computed" value={computed ?? ''} loading={isComputing} />
             </dl>
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} CLI equivalent (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildHashCliSnippet(algorithm)}
+                </pre>
+              )}
+            </div>
           </div>
         )
       }

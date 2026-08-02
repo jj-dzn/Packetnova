@@ -6,7 +6,9 @@ import { Pill } from '../../../components/ui/Pill'
 import { DeviceIcon } from '../../diagram/DeviceIcons'
 import { calculateVlan } from '../../../lib/calculations/vlan'
 
-function buildVlanCliSnippet(vlanId: number): string {
+type CliVendor = 'cisco' | 'juniper' | 'fortinet'
+
+function buildCiscoVlanCli(vlanId: number): string {
   return [
     `vlan ${vlanId}`,
     ` name VLAN${vlanId}`,
@@ -15,6 +17,40 @@ function buildVlanCliSnippet(vlanId: number): string {
     ' switchport mode access',
     ` switchport access vlan ${vlanId}`,
   ].join('\n')
+}
+
+function buildJuniperVlanCli(vlanId: number): string {
+  return [
+    `set vlans VLAN${vlanId} vlan-id ${vlanId}`,
+    `set interfaces ge-0/0/1 unit 0 family ethernet-switching vlan members VLAN${vlanId}`,
+  ].join('\n')
+}
+
+function buildFortinetVlanCli(vlanId: number): string {
+  return [
+    'config switch vlan',
+    `    edit "VLAN${vlanId}"`,
+    `        set vlanid ${vlanId}`,
+    '    next',
+    'end',
+    'config switch interface',
+    '    edit "port1"',
+    `        set vlan "VLAN${vlanId}"`,
+    '    next',
+    'end',
+  ].join('\n')
+}
+
+const VLAN_CLI_BUILDERS: Record<CliVendor, (vlanId: number) => string> = {
+  cisco: buildCiscoVlanCli,
+  juniper: buildJuniperVlanCli,
+  fortinet: buildFortinetVlanCli,
+}
+
+const VLAN_CLI_LABELS: Record<CliVendor, string> = {
+  cisco: 'Cisco IOS',
+  juniper: 'Juniper Junos',
+  fortinet: 'Fortinet FortiOS',
 }
 
 function SwitchGlyph() {
@@ -94,6 +130,7 @@ function TrunkDiagram({
 export function VlanCalculator() {
   const [vlanId, setVlanId] = useState('100')
   const [showCli, setShowCli] = useState(false)
+  const [cliVendor, setCliVendor] = useState<CliVendor>('cisco')
 
   const calc = calculateVlan(Number(vlanId))
   // A second, illustrative VLAN sharing the same trunk -- distinct from
@@ -138,12 +175,27 @@ export function VlanCalculator() {
               />
             )}
             <div>
-              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
-                {showCli ? 'Hide' : 'Show'} Cisco IOS config (expert)
-              </Pill>
+              <div className="flex flex-wrap items-center gap-2">
+                <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                  {showCli ? 'Hide' : 'Show'} vendor config (expert)
+                </Pill>
+                {showCli && (
+                  <div className="flex gap-2">
+                    {(Object.keys(VLAN_CLI_LABELS) as CliVendor[]).map((vendor) => (
+                      <Pill
+                        key={vendor}
+                        active={cliVendor === vendor}
+                        onClick={() => setCliVendor(vendor)}
+                      >
+                        {VLAN_CLI_LABELS[vendor]}
+                      </Pill>
+                    ))}
+                  </div>
+                )}
+              </div>
               {showCli && (
                 <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
-                  {buildVlanCliSnippet(calc.result.vlanId)}
+                  {VLAN_CLI_BUILDERS[cliVendor](calc.result.vlanId)}
                 </pre>
               )}
             </div>

@@ -6,9 +6,32 @@ import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
 import { lookupMac } from '../../../lib/calculations/macLookup'
 
+// Cisco IOS renders MAC addresses as three dot-separated 16-bit groups
+// (aabb.ccdd.eeff), not the colon-separated bytes this tool otherwise
+// displays -- `show mac address-table` output needs the format an engineer
+// would actually see on a switch, not this tool's own internal convention.
+function toCiscoMacFormat(bytes: number[]): string {
+  const hex = bytes.map((b) => b.toString(16).padStart(2, '0')).join('')
+  return `${hex.slice(0, 4)}.${hex.slice(4, 8)}.${hex.slice(8, 12)}`
+}
+
+function buildMacCliSnippet(bytes: number[]): string {
+  const cisco = toCiscoMacFormat(bytes)
+  return [
+    `Switch# show mac address-table address ${cisco}`,
+    '          Mac Address Table',
+    '-------------------------------------------',
+    '',
+    'Vlan    Mac Address       Type        Ports',
+    '----    -----------       --------    -----',
+    `   1    ${cisco}    DYNAMIC     Gi1/0/1`,
+  ].join('\n')
+}
+
 export function MacAddressLookup() {
   const [input, setInput] = useState('00:00:0c:12:34:56')
   const [showBinary, setShowBinary] = useState(false)
+  const [showCli, setShowCli] = useState(false)
 
   const calc = lookupMac(input)
 
@@ -59,6 +82,16 @@ export function MacAddressLookup() {
                 <div className="mt-3">
                   <MacBinaryBreakdown bytes={calc.result.bytes} />
                 </div>
+              )}
+            </div>
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} mac address-table output (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildMacCliSnippet(calc.result.bytes)}
+                </pre>
               )}
             </div>
           </div>

@@ -2,12 +2,42 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
+import { Pill } from '../../../components/ui/Pill'
+import { CopyButton } from '../../../components/ui/CopyButton'
 import { testRegex, type RegexMatch, type RegexResult } from '../../../lib/calculations/regexTester'
 import type { CalculationResult } from '../../../lib/calculations/result'
 
 const DEBOUNCE_MS = 150
 const EVAL_TIMEOUT_MS = 750
 const GROUP_BREAKDOWN_LIMIT = 200
+
+// Python uses (?P<name>...) for a named group, not JS's (?<name>...) --
+// copying a JS pattern with named groups into Python as-is would be a
+// syntax error, so this rewrites just that one piece of syntax. The
+// negative lookahead excludes (?<= and (?<! (lookbehind), which must stay
+// untouched.
+function toPythonNamedGroups(pattern: string): string {
+  return pattern.replace(/\(\?<(?![=!])/g, '(?P<')
+}
+
+function buildRegexExports(pattern: string, flags: string): { label: string; code: string }[] {
+  const pyFlagParts: string[] = []
+  if (flags.includes('i')) pyFlagParts.push('re.IGNORECASE')
+  if (flags.includes('m')) pyFlagParts.push('re.MULTILINE')
+  if (flags.includes('s')) pyFlagParts.push('re.DOTALL')
+  const pyFlagsArg = pyFlagParts.length > 0 ? `, ${pyFlagParts.join(' | ')}` : ''
+
+  const grepFlags = ['-P', flags.includes('i') ? '-i' : ''].filter(Boolean).join(' ')
+
+  return [
+    { label: 'JavaScript', code: `/${pattern}/${flags}` },
+    {
+      label: 'Python',
+      code: `re.compile(r"${toPythonNamedGroups(pattern)}"${pyFlagsArg})`,
+    },
+    { label: 'grep (PCRE)', code: `grep ${grepFlags} '${pattern}' file.txt` },
+  ]
+}
 
 function renderHighlighted(text: string, matches: RegexMatch[]): ReactNode {
   if (matches.length === 0) return text
@@ -34,6 +64,7 @@ export function RegexTester() {
   const [calc, setCalc] = useState<CalculationResult<RegexResult>>(() =>
     testRegex(pattern, flags, text),
   )
+  const [showExport, setShowExport] = useState(false)
 
   // Evaluated off the main thread with a hard timeout: a pattern like (a+)+$
   // against pathological input can take exponential time inside a single
@@ -174,6 +205,26 @@ export function RegexTester() {
                 )}
               </div>
             )}
+            <div>
+              <Pill active={showExport} onClick={() => setShowExport((v) => !v)}>
+                {showExport ? 'Hide' : 'Show'} copy as JS / Python / grep (expert)
+              </Pill>
+              {showExport && (
+                <div className="mt-3 flex flex-col gap-2">
+                  {buildRegexExports(pattern, flags).map(({ label, code }) => (
+                    <div key={label}>
+                      <div className="mb-1 flex items-center justify-between">
+                        <span className="text-xs font-medium text-fg-muted">{label}</span>
+                        <CopyButton value={code} label={label} />
+                      </div>
+                      <pre className="overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                        {code}
+                      </pre>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>

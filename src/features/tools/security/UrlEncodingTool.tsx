@@ -3,11 +3,26 @@ import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
 import { CharDiffView } from '../CharDiffView'
+import { Pill } from '../../../components/ui/Pill'
 import { urlDecode, urlEncode } from '../../../lib/calculations/urlEncoding'
+import { shellQuote } from '../../../lib/calculations/shellQuote'
+
+function buildUrlEncodingCliSnippet(mode: 'encode' | 'decode', input: string): string {
+  if (mode === 'encode') {
+    return [
+      `curl -Gso /dev/null -w '%{url_effective}\\n' --data-urlencode ${shellQuote(input)} ''`,
+      '',
+      '# or, with Python:',
+      `python3 -c "import urllib.parse; print(urllib.parse.quote(${JSON.stringify(input)}))"`,
+    ].join('\n')
+  }
+  return `python3 -c "import urllib.parse; print(urllib.parse.unquote(${JSON.stringify(input)}))"`
+}
 
 export function UrlEncodingTool() {
   const [mode, setMode] = useState<'encode' | 'decode'>('encode')
   const [input, setInput] = useState('hello world & friends?')
+  const [showCli, setShowCli] = useState(false)
 
   const result =
     mode === 'encode' ? { ok: true as const, result: urlEncode(input) } : urlDecode(input)
@@ -49,6 +64,16 @@ export function UrlEncodingTool() {
           <div className="flex flex-col gap-4">
             <CopyableTextarea value={result.result} />
             <CharDiffView before={input} after={result.result} />
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} CLI equivalent (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildUrlEncodingCliSnippet(mode, input)}
+                </pre>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{result.error}</p>

@@ -2,12 +2,16 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
+import { Pill } from '../../../components/ui/Pill'
 import { formatXml } from '../../../lib/calculations/xmlFormatter'
+
+const XMLLINT_CLI = 'xmllint --format input.xml'
 
 export function XmlFormatterTool() {
   const [input, setInput] = useState(
     '<config><tool name="subnet">enabled</tool><tool name="cidr">enabled</tool></config>',
   )
+  const [showCli, setShowCli] = useState(false)
 
   const result = formatXml(input)
 
@@ -26,11 +30,23 @@ export function XmlFormatterTool() {
         />
       }
       result={
-        result.ok ? (
-          <CopyableTextarea value={result.result} rows={12} />
-        ) : (
-          <p className="text-sm text-danger">{result.error}</p>
-        )
+        <div className="flex flex-col gap-4">
+          {result.ok ? (
+            <CopyableTextarea value={result.result} rows={12} />
+          ) : (
+            <p className="text-sm text-danger">{result.error}</p>
+          )}
+          <div>
+            <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+              {showCli ? 'Hide' : 'Show'} xmllint equivalent (expert)
+            </Pill>
+            {showCli && (
+              <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                {XMLLINT_CLI}
+              </pre>
+            )}
+          </div>
+        </div>
       }
     >
       <ToolEducation

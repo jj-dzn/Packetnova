@@ -4,10 +4,28 @@ import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
 import { BinaryBreakdown } from './BinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
+import { Pill } from '../../../components/ui/Pill'
 import { calculateWildcardMask } from '../../../lib/calculations/wildcardMask'
+import { ipv4ToString, networkAddress, parseIPv4 } from '../../../lib/validation/ip'
+
+// A fixed illustrative host, masked down to whatever prefix the visitor's
+// wildcard mask corresponds to -- gives the CLI lines a concrete, valid
+// network address to show instead of a placeholder like "x.x.x.x".
+const EXAMPLE_HOST = parseIPv4('192.168.1.1')!
+
+function buildWildcardCliSnippet(prefixLength: number, wildcardMask: string): string {
+  const network = ipv4ToString(networkAddress(EXAMPLE_HOST, prefixLength).value)
+  return [
+    `access-list 10 permit ${network} ${wildcardMask}`,
+    '!',
+    'router ospf 1',
+    ` network ${network} ${wildcardMask} area 0`,
+  ].join('\n')
+}
 
 export function WildcardMaskCalculator() {
   const [input, setInput] = useState('255.255.255.0')
+  const [showCli, setShowCli] = useState(false)
   const calc = calculateWildcardMask(input)
 
   return (
@@ -57,6 +75,16 @@ export function WildcardMaskCalculator() {
               <code className="font-mono">network</code> statements both expect wildcard masks, so
               pasting in a subnet mask by mistake will match the wrong hosts without any error.
             </Aside>
+            <div>
+              <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
+                {showCli ? 'Hide' : 'Show'} ACL / OSPF CLI lines (expert)
+              </Pill>
+              {showCli && (
+                <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
+                  {buildWildcardCliSnippet(calc.result.prefixLength, calc.result.wildcardMask)}
+                </pre>
+              )}
+            </div>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
