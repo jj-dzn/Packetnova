@@ -36,7 +36,7 @@ export function TextDiffViewer() {
   const [before, setBefore] = useState('subnet mask: 255.255.255.0\ngateway: 10.0.0.1\nvlan: 10\n')
   const [after, setAfter] = useState('subnet mask: 255.255.255.128\ngateway: 10.0.0.1\nvlan: 20\n')
   const [granularity, setGranularity] = useState<DiffGranularity>('line')
-  const [view, setView] = useState<View>('unified')
+  const [view, setView] = useState<View>('side-by-side')
 
   const calc = computeTextDiff(before, after, granularity)
   const aligned = buildAlignedDiffRows(before, after)
