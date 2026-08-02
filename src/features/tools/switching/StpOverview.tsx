@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
+import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { Pill } from '../../../components/ui/Pill'
@@ -164,6 +165,39 @@ export function StpOverview() {
             seconds in most topologies. Almost every switch shipped today runs RSTP (or MSTP) even
             when it's still labeled "spanning tree."
           </Aside>
+        </div>
+        <div className="mt-6 max-w-2xl">
+          <ToolEducation
+            whenToUseThis={
+              <p>
+                Use this to work out which switch will become root before you deploy a topology, or
+                to understand why a specific switch already holds that role in a network you've
+                inherited. Tuning priority deliberately -- rather than leaving every switch at the
+                default 32768 -- is how real deployments make sure a fast, well-connected core
+                switch ends up as root instead of whichever access switch happens to win the MAC
+                address tiebreak.
+              </p>
+            }
+            commonMistakes={
+              <p>
+                Not setting priority on the switch you actually want as root is the most common
+                real-world STP mistake -- left at defaults, the tiebreak falls to the lowest MAC
+                address, which has no relationship to which switch is best positioned to be the
+                network's core. An access switch in a closet can end up as root purely by MAC
+                address luck, forwarding traffic through a far worse physical path than intended.
+              </p>
+            }
+            troubleshootingTips={
+              <p>
+                If STP elected a root you didn't expect, check that switch's priority first -- it's
+                almost always still at the 32768 default when a network administrator meant to lower
+                it on the intended core switch instead. In production, PortFast (for access ports
+                that will never form a loop) and BPDU Guard (to shut down a port that unexpectedly
+                receives BPDUs) are the near-universal companions to the pure election logic this
+                page covers.
+              </p>
+            }
+          />
         </div>
       </div>
     </>

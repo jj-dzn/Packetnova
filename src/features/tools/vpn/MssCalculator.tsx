@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
-import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { calculateMss } from '../../../lib/calculations/mss'
@@ -101,21 +101,61 @@ export function MssCalculator() {
               -- this is MSS clamping, and it's why the value your OS reports isn't always the value
               a server actually negotiates.
             </p>
-            <Aside>
-              The real-world scenario this explains: a site-to-site VPN where small requests work
-              fine but anything that returns a lot of data (a file download, a large web page) just
-              hangs. The TCP handshake succeeds because SYN packets are tiny, so it looks like the
-              tunnel is up and working -- the problem only shows up once a segment near the full MSS
-              tries to cross it and gets silently dropped. Configuring MSS clamping directly on the
-              tunnel endpoint (rather than hoping Path MTU Discovery's ICMP messages make it through
-              every firewall in between) is the fix network engineers reach for specifically because
-              it doesn't depend on that ICMP path working at all.
-            </Aside>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            MSS is what's left of the MTU after subtracting every header that has to wrap the TCP
+            payload -- the IP header (20 bytes for IPv4, 40 for IPv6, plus any options) and the TCP
+            header itself (20 bytes, plus any options). It's the largest chunk of actual data TCP
+            will put in one segment so the resulting packet fits the link without needing
+            fragmentation.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this when sizing a tunnel or link where the effective MTU is smaller than a normal
+            1500-byte Ethernet link -- VPN tunnels, PPPoE connections, anything adding encapsulation
+            overhead -- to work out what MSS needs to be clamped to so TCP segments actually fit end
+            to end.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming the MSS your OS reports for a connection is the value actually used --
+            middleboxes along the path can clamp it lower during the handshake, and the negotiated
+            value (the lower of what each side offers) is what's actually in effect, not necessarily
+            what either side started with.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            The real-world scenario this explains: a site-to-site VPN where small requests work fine
+            but anything that returns a lot of data (a file download, a large web page) just hangs.
+            The TCP handshake succeeds because SYN packets are tiny, so it looks like the tunnel is
+            up and working -- the problem only shows up once a segment near the full MSS tries to
+            cross it and gets silently dropped. Configuring MSS clamping directly on the tunnel
+            endpoint (rather than hoping Path MTU Discovery's ICMP messages make it through every
+            firewall in between) is the fix network engineers reach for specifically because it
+            doesn't depend on that ICMP path working at all.
+          </p>
+        }
+        relatedReading={
+          <p>
+            MSS is derived from the link MTU --{' '}
+            <Link to="/tools/mtu-calculator" className="text-accent hover:underline">
+              MTU calculator
+            </Link>{' '}
+            walks through that relationship directly, including what happens when a payload doesn't
+            fit.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

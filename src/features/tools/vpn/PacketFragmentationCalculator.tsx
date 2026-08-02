@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
-import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { calculateFragmentation } from '../../../lib/calculations/fragmentation'
 
@@ -101,20 +102,60 @@ export function PacketFragmentationCalculator() {
                 </tbody>
               </table>
             </div>
-            <Aside>
-              This entire calculator is IPv4-specific for a reason: in IPv6, routers never fragment
-              packets in transit at all -- only the originating host is allowed to. A router that
-              receives an IPv6 packet too big for the next link just drops it and sends back an
-              ICMPv6 "Packet Too Big" message instead. A network that quietly relied on in-transit
-              fragmentation as a safety net under IPv4 will see real packet loss the moment it's
-              dual-stacked or moved to IPv6-only, which is why getting Path MTU Discovery working
-              end-to-end matters even more there.
-            </Aside>
           </div>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            A packet larger than the path MTU gets split into multiple fragments, each with its own
+            IP header (which is why fragmentation has real overhead -- every fragment after the
+            first repeats 20 bytes of header for data that was already going to arrive together).
+            Offsets are measured in 8-byte units, so every fragment's payload except the last must
+            be a multiple of 8 bytes -- that alignment requirement is why fragment sizes aren't
+            simply "MTU minus header" evenly divided.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to see exactly how a specific oversized packet would split for a given path MTU
+            -- how many fragments, how much overhead each one adds, and where the offsets land.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming this applies equally to IPv6 is the most common mistake -- it doesn't. This
+            calculator is IPv4-specific for a reason: in IPv6, routers never fragment packets in
+            transit at all, only the originating host is allowed to. A router that receives an IPv6
+            packet too big for the next link just drops it and sends back an ICMPv6 "Packet Too Big"
+            message instead.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            A network that quietly relied on in-transit fragmentation as a safety net under IPv4
+            will see real packet loss the moment it's dual-stacked or moved to IPv6-only, which is
+            why getting Path MTU Discovery working end-to-end matters even more there than it did
+            under IPv4.
+          </p>
+        }
+        relatedReading={
+          <p>
+            See why a packet ended up this size in the first place in the{' '}
+            <Link to="/tools/mtu-calculator" className="text-accent hover:underline">
+              MTU calculator
+            </Link>
+            , or how TCP avoids fragmentation entirely via the{' '}
+            <Link to="/tools/mss-calculator" className="text-accent hover:underline">
+              MSS calculator
+            </Link>
+            .
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

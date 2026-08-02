@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ReferencePageLayout } from '../ReferencePageLayout'
 import { ResultRow } from '../ResultRow'
 import { HeaderByteDiagram } from '../HeaderByteDiagram'
 import { RfcFootnote } from '../RfcFootnote'
 import { Aside } from '../Aside'
+import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
 import { DataTable } from '../../../components/ui/DataTable'
@@ -260,6 +262,50 @@ export function TcpHeaderExplorer() {
         Defined in RFC 793 -- RFC 9293 is the current consolidated specification, folding in decades
         of clarifications and errata without changing the wire format.
       </RfcFootnote>
+      <ToolEducation
+        howItWorks={
+          <p>
+            Every TCP segment carries this 20-byte header (more if options are present) ahead of its
+            payload, identifying the connection (ports), tracking data in flight (sequence and
+            acknowledgment numbers), and controlling behavior (flags, window size). The flags byte
+            above is a live calculator; the full builder constructs an entire minimal header from
+            the fields you enter.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use the flags calculator to check what a specific flag combination looks like on the
+            wire when reading a packet capture. Use the full builder to understand exactly how each
+            field lays out byte-for-byte, or to hand-construct a header for testing.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Misreading the Data Offset field is a classic gotcha: it's a count of 32-bit words, not
+            bytes -- a value of 5 means 5 × 4 = 20 bytes, the minimum header size with no options.
+            Reading it as a raw byte count would make every header look 4× smaller than it actually
+            is. It's easy to overlook because most other length fields in TCP/IP headers (like IP's
+            Total Length) really are byte counts.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If a throughput ceiling doesn't match expected bandwidth on a long or high-latency path,
+            check whether TCP window scaling is actually negotiated and in effect -- without it, the
+            16-bit window field caps a single connection's throughput at window size divided by
+            round-trip time, regardless of how much bandwidth the link actually has.
+          </p>
+        }
+        relatedReading={
+          <p>
+            See this header's fields in motion during connection setup in the{' '}
+            <Link to="/visualizers/tcp-handshake" className="text-accent hover:underline">
+              TCP handshake visualizer
+            </Link>
+            .
+          </p>
+        }
+      />
     </ReferencePageLayout>
   )
 }

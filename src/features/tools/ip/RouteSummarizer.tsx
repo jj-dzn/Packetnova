@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { BinaryBreakdown } from './BinaryBreakdown'
@@ -131,6 +133,52 @@ export function RouteSummarizer() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            This merges adjacent and overlapping input ranges, then finds the smallest set of
+            CIDR-aligned blocks that exactly covers the result -- not just "fewest routes at any
+            cost," since a summary route must cover only real address space, never anything beyond
+            the inputs it's replacing. When a merged span doesn't start on a power-of-2 boundary
+            large enough to hold it, it comes out as more than one output block even though the
+            underlying addresses are perfectly contiguous.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this before configuring static routes or route-redistribution filters for a set of
+            subnets, so a router's routing table (and the update traffic needed to maintain it)
+            stays as small as possible. It's also useful for sanity-checking whether a set of
+            allocated subnets could have been summarized more tightly -- often the answer is
+            "almost, but one subnet is misaligned."
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Expecting any set of contiguous addresses to summarize into exactly one route --
+            alignment, not just contiguity, determines that. Two adjacent /24s only merge into one
+            /23 if the first one starts on an even /23 boundary; the identical two ranges starting
+            one address off would need to stay as two separate routes.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If your routes summarized into more blocks than expected, check the merge map above --
+            it shows exactly which inputs became which output, and a lone unmerged input at an odd
+            boundary is almost always the reason the total didn't collapse further.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Going the other direction -- converting a start/end range into CIDR blocks first?{' '}
+            <Link to="/tools/ip-range-calculator" className="text-accent hover:underline">
+              IP range calculator
+            </Link>{' '}
+            uses this same decomposition logic.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

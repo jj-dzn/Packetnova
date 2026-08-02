@@ -10,9 +10,10 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 
 **Goal:** Close every place a tool assumes vocabulary it never defines, and fix the handful of small "this needs one sentence" gaps found across nearly every category — before any bigger, more structural milestone gets layered on top.
 
-**Why it matters:** Nearly every one of the 48 tools already computes something correct; the audit's single most repeated finding, across all three research passes, was terminology and framing gaps — a tool doing the right math but never stating *why* the number matters, or a field (PCP, Data Offset, AD-vs-metric) presented with zero context for someone encountering it for the first time. Fixing these is cheap, safe, and immediately raises trust before the more structural work in later milestones begins.
+**Why it matters:** Nearly every one of the 48 tools already computes something correct; the audit's single most repeated finding, across all three research passes, was terminology and framing gaps — a tool doing the right math but never stating _why_ the number matters, or a field (PCP, Data Offset, AD-vs-metric) presented with zero context for someone encountering it for the first time. Fixing these is cheap, safe, and immediately raises trust before the more structural work in later milestones begins.
 
 **Features included:**
+
 - ASCII converter: state plainly that it supports full Unicode, not just 7-bit ASCII (the code already does; the UI/description doesn't say so)
 - MAC formatter: echo "detected: Cisco dotted format" (or colon/hyphen) back to the user instead of silently accepting any format
 - UDP header explorer: a one-line TCP-vs-UDP contrast (8 bytes vs. 20+, no reliability/ordering/flow control)
@@ -45,6 +46,7 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 **Why it matters:** This is the single most universal structural gap the audit found — no tool anywhere has all five sections, most have none, and the pieces that do exist (a good `Aside`, a `GuidedMode` closing note) are scattered and inconsistent in shape. This milestone is what turns "a correct calculator" into "a page that actually teaches."
 
 **Features included:**
+
 - Build `ToolEducation`: five collapsible sections, one consistent shape, rendered below the calculator
 - Populate it first on tools with strong existing prose to formalize: MSS calculator, MTU calculator, Packet Fragmentation calculator
 - Populate it on the tools currently at zero: all of Security, all of Utilities, IPv6 calculator, Route Summarizer, IP Range calculator
@@ -71,6 +73,7 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 **Why it matters:** Every one of these primitives is proven — built once, working correctly, used in exactly one or two places today. This is the highest ratio of value delivered to genuinely new engineering required in the whole roadmap, because the hard part (building the primitive) is already done.
 
 **Features included:**
+
 - Wildcard mask calculator: ship `BinaryBreakdown` (still the only IP tool without one) plus a side-by-side subnet-mask-vs-wildcard-mask view with inverted bits flagged
 - IPv6 calculator: a true "anatomy of an address" `BitFieldDiagram` (global routing prefix / subnet ID / interface ID)
 - CIDR calculator: extend the existing bit-toggle sandbox's `AddressSpaceBar` with a second, dimmed parent-aggregate bar (supernetting made visible)
@@ -99,11 +102,12 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 
 ## Q4 — Rich Result Panels
 
-**Goal:** Close the remaining "the answer is a number/table, not a picture or a verdict" gaps in result panels specifically — distinct from Q3's structural diagrams, this is about how each tool's *output* itself is presented.
+**Goal:** Close the remaining "the answer is a number/table, not a picture or a verdict" gaps in result panels specifically — distinct from Q3's structural diagrams, this is about how each tool's _output_ itself is presented.
 
 **Why it matters:** Several tools' entire purpose is a single, high-stakes answer (a hash match, a password strength, a certificate's validity) that's currently presented as quiet table text — a mismatch between the stakes of the answer and how loudly it's shown.
 
 **Features included:**
+
 - Hash verifier: a loud, unmissable green-check/red-X pass/fail state filling the result panel, not a table row
 - Certificate viewer: a validity-lifetime timeline bar (not-before → not-after, "today" marked, remaining-days readout) plus a weak-signature-algorithm (SHA-1) danger banner
 - JWT decoder: an `alg:none`/weak-algorithm danger banner, plus jwt.io-style colored token segments in the input
@@ -138,6 +142,7 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 **Why it matters:** Several tools already prove this works extremely well (MTU calculator's PMTUD black-hole aside, MSS calculator's VPN-hang scenario, Packet Fragmentation's IPv6-migration warning) — this milestone generalizes that same quality of real-world framing to tools that still read as abstract math.
 
 **Features included:**
+
 - Latency calculator: real distance/cloud-region presets (NYC↔London, common cross-region cloud pairs) anchoring the abstract km input
 - Transfer time calculator: file-size presets (a 4K movie, a Linux ISO, a database backup) and an explicit "real transfers rarely sustain 100% of nominal bandwidth" caveat
 - Certificate viewer: an explicit "missing intermediate certificate" real-failure scenario (a very common real-world TLS troubleshooting case, and now buildable since chain parsing already ships)
@@ -168,6 +173,7 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 **Why it matters:** The pattern is de-risked — it already shipped, already works, and is well-integrated on Subnet calculator, VLAN calculator, STP overview, and TCP header explorer. This milestone is a rollout of a known-good pattern plus real content, not new interaction design.
 
 **Features included:**
+
 - BGP path comparison: a toggle rendering the winner + trace as literal Cisco IOS-XR / Juniper `show route`-style output
 - Wildcard mask calculator: ACL and OSPF `network` statement CLI lines
 - MAC address lookup: `show mac address-table` CLI framing
@@ -201,6 +207,7 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 **Why it matters:** This is close to the highest value-to-effort ratio in the entire roadmap. No new component, no new logic — just wiring existing links and populating an existing prop. It's also what makes the site read as one connected product instead of 48 independent pages.
 
 **Features included:**
+
 - Mutual links across CIDR, Subnet, Network Address, Broadcast, and Wildcard Mask calculators (five tools, all currently unlinked to each other)
 - VLAN calculator ↔ 802.1Q tag explorer
 - MAC address lookup ↔ MAC formatter
@@ -235,11 +242,12 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 **Why it matters:** Three genuinely good, on-theme animations already exist and prove the pattern works. The gap now is coverage and consistency, not invention.
 
 **Features included:**
+
 - Transfer time calculator: a live progress-bar animation scaled to transfer time — the single most conspicuous "why doesn't this tool have one too" gap, given its two closest siblings (Latency, Fragmentation) both already do
 - Password generator: a length slider wired live to the already-shipped entropy bar, replacing the current free-text length input
 - Hash generator: swap its raw button mode toggle for the shared `Pill` component used everywhere else — currently the one inconsistent holdout
 - CIDR calculator: a smooth transition on the bit-toggle sandbox's supernetting visual (built in Q3) when a bit flips
-- Broadcast calculator: animate the binary breakdown's host bits flipping from the input's actual bits to all-1s, showing *why* the broadcast address is what it is
+- Broadcast calculator: animate the binary breakdown's host bits flipping from the input's actual bits to all-1s, showing _why_ the broadcast address is what it is
 
 **Estimated effort:** Medium — individually small additions, each extending an animation vocabulary that already exists rather than inventing a new one.
 
@@ -262,6 +270,7 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 **Why it matters:** The site's accessibility baseline is genuinely good where `useStepPlayer` is involved; the risk is specifically in components built outside that infrastructure.
 
 **Features included:**
+
 - Verify Latency calculator's packet-travel CSS animation is properly gated by `prefers-reduced-motion`/`motion-safe:` at the stylesheet level — this component sits outside the `useStepPlayer` infrastructure that guarantees this everywhere else, and the audit could not confirm it from the component alone
 - Mobile ergonomics pass on the densest forms specifically: BGP path comparison's advanced-attribute candidate cards, STP overview's bridge/link editor, LPM/Route lookup simulators' route-table rows
 - Confirm `DataTable`'s search is fully keyboard-operable and screen-reader-announced across all 7 tables that use it
@@ -289,6 +298,7 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 **Why it matters:** Everything in Milestones 1-9 closes a gap. This milestone is different: each item here is something most competing free networking-tool sites simply don't attempt at all, deliberately sequenced last so it can build on the scaffolding (diagram primitives, education sections, expert-mode pattern) the rest of the roadmap puts in place.
 
 **Features included:**
+
 - STP overview: the editable bridge/link list drives its own live port-role topology diagram, not just the fixed example — the algorithm and diagram primitive already exist and already work together for the fixed case, making this the single highest-leverage remaining item in all of Switching
 - MAC address lookup: expand the OUI vendor reference set from 5 entries to a few hundred common vendors (Apple, Intel, Dell, HP, Ubiquiti, TP-Link, etc.) — a content investment, not a feature build, and the highest-trust-payoff item in the entire audit
 - Regex tester: named-capture-group support plus a plain-English, token-by-token pattern explainer ("one or more digits, then a literal space") — genuinely rare among free regex testers
@@ -355,7 +365,7 @@ Ten milestones, sequential and dependency-ordered like every other track in this
 
 ### The 5 flagship enhancements
 
-1. **The completed Educational Layer (Q2).** The one deliverable that changes what PacketNova fundamentally *is* — from "a correct calculator" to "a page that teaches" — across all 48 tools at once, not one at a time.
+1. **The completed Educational Layer (Q2).** The one deliverable that changes what PacketNova fundamentally _is_ — from "a correct calculator" to "a page that teaches" — across all 48 tools at once, not one at a time.
 2. **STP's live, editable port-role topology (Q10).** The clearest "no free competitor does this" moment in the entire roadmap, and the algorithm plus diagram primitive already exist — it's a composition, not a from-scratch build.
 3. **The generalized vendor CLI/expert-mode system (Q6).** Turns PacketNova from "a learning site" into "a tool a working engineer keeps open," extending a pattern already proven on 4 tools to the other 44.
 4. **MAC address lookup's expanded OUI database (Q10).** The single highest-trust-payoff, content-not-engineering investment in the whole audit — fixes the most visible limitation of an otherwise well-built tool.

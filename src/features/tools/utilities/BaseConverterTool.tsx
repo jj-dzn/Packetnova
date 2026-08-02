@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { BitToggleSandbox } from '../BitToggleSandbox'
 import { Input } from '../../../components/ui/Input'
@@ -120,6 +121,41 @@ export function BaseConverterTool() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Every base represents the same underlying quantity, just grouped differently -- binary
+            groups by powers of 2, hex groups by powers of 16 (conveniently, exactly 4 binary bits
+            per hex digit, which is why hex is the natural shorthand for binary data), decimal by
+            powers of 10. Converting between them doesn't change the value, only how it's written.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            This comes up constantly in networking and low-level work: reading a subnet mask or MAC
+            address byte in hex, converting a flags field between its bit pattern and decimal value,
+            or just sanity-checking a number a tool printed in an unfamiliar base.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            This converter is unsigned only -- it has no concept of negative numbers or two's
+            complement representation, so a "negative" result isn't something it can express; large
+            unsigned values and negative signed values that happen to share a bit pattern will not
+            convert the way a signed-integer context (like a CPU register) would interpret them.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If a conversion looks wrong, double check the "from base" selector matches what you
+            actually typed -- entering a hex value like "1a" while "Decimal" is still selected will
+            either error or misinterpret the digits. The bit-toggle sandbox above disappears above
+            32-bit values (0xFFFFFFFF) since it's specifically a 32-bit visualization, not a limit
+            on the converter itself.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

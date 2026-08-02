@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
 import { testRegex, type RegexMatch, type RegexResult } from '../../../lib/calculations/regexTester'
 import type { CalculationResult } from '../../../lib/calculations/result'
@@ -174,6 +175,45 @@ export function RegexTester() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            The pattern runs against your sample text in a Web Worker with a hard timeout, not
+            directly on the page -- some patterns paired with certain input can take exponential
+            time to evaluate (catastrophic backtracking), which would otherwise freeze the whole
+            tab. Every match found gets highlighted inline, and any capture groups inside a match
+            are broken out separately below.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to build or debug a pattern against real sample data before dropping it into
+            code -- validating an input format, extracting a substring, or confirming a pattern
+            matches (or deliberately doesn't match) edge cases you care about.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Greedy quantifiers (<code className="font-mono">.*</code>) matching far more than
+            intended is the single most common regex surprise -- they consume as much as possible
+            before backtracking, which can grab across multiple delimiters you meant to stop at. The
+            lazy variant (<code className="font-mono">.*?</code>) stops at the first match instead.
+            Forgetting to escape special characters like <code className="font-mono">.</code>,{' '}
+            <code className="font-mono">(</code>, or <code className="font-mono">$</code> when you
+            mean them literally is another frequent source of patterns that "match too much."
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If evaluation times out, the pattern likely has nested quantifiers over the same
+            characters (a classic shape: <code className="font-mono">(a+)+</code>) -- try rewriting
+            it to avoid the ambiguity, or shorten the sample text to narrow down which part triggers
+            it. If a group shows "did not participate," that group was inside an alternation or
+            optional part of the pattern that this particular match didn't take.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

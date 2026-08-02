@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
+import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
 import { DataTable } from '../../../components/ui/DataTable'
 import { calculateOspfCost } from '../../../lib/calculations/ospfCost'
@@ -86,6 +88,57 @@ export function MetricComparisonTool() {
           ]}
           rows={routingMetrics}
         />
+        <div className="mt-6 max-w-2xl">
+          <ToolEducation
+            howItWorks={
+              <p>
+                Every routing protocol needs some number to decide "which path is better" when more
+                than one exists to the same destination. Each one defines that number differently --
+                RIP simply counts hops, OSPF uses bandwidth-derived cost, EIGRP combines bandwidth
+                and delay into a composite value, and BGP doesn't use a single metric at all,
+                deciding instead through a sequence of path attributes.
+              </p>
+            }
+            whenToUseThis={
+              <p>
+                Use the calculator above to work out an interface's actual OSPF cost given your
+                network's reference bandwidth. Use the table to understand what a metric from a
+                different protocol actually represents when you're reading a routing table that
+                mixes sources.
+              </p>
+            }
+            commonMistakes={
+              <p>
+                Comparing OSPF cost directly against EIGRP's composite metric as if a smaller number
+                always means a better path across protocols -- it doesn't, because they're not the
+                same unit. Metric only matters within a single protocol; when a router learns the
+                same route from two different protocols, administrative distance (not metric) is
+                what decides between them.
+              </p>
+            }
+            troubleshootingTips={
+              <p>
+                If OSPF cost isn't differentiating between links the way you'd expect, check whether
+                the reference bandwidth is still at its classic default -- on modern high-bandwidth
+                links, many interfaces floor out at the same minimum cost and become
+                indistinguishable to OSPF until the reference bandwidth is raised.
+              </p>
+            }
+            relatedReading={
+              <p>
+                See how administrative distance (not metric) breaks ties between routes from
+                different sources in the{' '}
+                <Link
+                  to="/tools/administrative-distance-reference"
+                  className="text-accent hover:underline"
+                >
+                  Administrative distance reference
+                </Link>
+                .
+              </p>
+            }
+          />
+        </div>
       </div>
     </>
   )

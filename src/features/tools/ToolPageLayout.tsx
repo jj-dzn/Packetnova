@@ -12,6 +12,9 @@ interface ToolPageLayoutProps {
   input: ReactNode
   result: ReactNode
   related?: RelatedLink[]
+  /** Optional content rendered below the input/result grid -- e.g. a
+   * ToolEducation block. Most tools don't pass this yet. */
+  children?: ReactNode
 }
 
 export function ToolPageLayout({
@@ -21,6 +24,7 @@ export function ToolPageLayout({
   input,
   result,
   related,
+  children,
 }: ToolPageLayoutProps) {
   const breadcrumbSchema = useBreadcrumbSchema('Tools', '/tools', title)
   const embedded = useIsScenarioEmbed()
@@ -43,6 +47,7 @@ export function ToolPageLayout({
         <div className="rounded-lg border border-border bg-surface p-6">{input}</div>
         <div className="rounded-lg border border-border bg-surface p-6">{result}</div>
       </div>
+      {children}
     </div>
   )
 }

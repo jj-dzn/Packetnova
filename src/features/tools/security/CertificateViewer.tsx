@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { SecurityWarning } from '../SecurityWarning'
 import { Badge } from '../../../components/ui/Badge'
@@ -176,6 +178,54 @@ export function CertificateViewer() {
           )}
         </div>
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            An X.509 certificate binds a public key to an identity (a domain name, an organization)
+            and is itself signed by a certificate authority vouching for that binding. This parses
+            the certificate's ASN.1/DER structure directly in your browser -- nothing is uploaded or
+            verified against a live CA -- so it reads what the certificate claims about itself
+            without confirming a chain of trust up to a root your browser already recognizes.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to inspect a certificate you already have: checking an expiry date before it
+            catches you off guard, confirming which domains a certificate actually covers via its
+            Subject Alternative Names, or debugging a TLS handshake failure by seeing exactly what a
+            server or client is presenting. Paste a full chain (leaf, intermediates, root) to see
+            how each certificate in it relates to the next.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Deploying a leaf certificate without its intermediate certificates is one of the most
+            common real-world TLS failures -- browsers that don't already have the intermediate
+            cached can't build a trust path to the root, even though the certificate itself is
+            perfectly valid. If a chain you paste here doesn't clearly link leaf through root by
+            issuer/subject, that's very likely the same problem a real client would hit.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If a certificate fails to parse, confirm you've pasted the full PEM block including the
+            "-----BEGIN CERTIFICATE-----" and "-----END CERTIFICATE-----" lines, with no extra
+            characters mixed in from copying out of a browser's certificate viewer. For a chain,
+            paste the blocks back-to-back in leaf-to-root order -- that's the order this tool
+            expects and the order most servers send them in.
+          </p>
+        }
+        relatedReading={
+          <p>
+            This certificate would have been presented during a{' '}
+            <Link to="/visualizers/tls-handshake" className="text-accent hover:underline">
+              TLS handshake
+            </Link>
+            {" -- see the exchange it's actually part of."}
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

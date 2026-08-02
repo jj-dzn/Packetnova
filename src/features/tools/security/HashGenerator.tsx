@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { Select } from '../../../components/ui/Select'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import { Skeleton } from '../../../components/ui/Skeleton'
@@ -170,6 +172,54 @@ export function HashGenerator() {
           </p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            A hash function takes any input -- a word, a file, a gigabyte of video -- and produces a
+            fixed-length "fingerprint" of it. The same input always produces the same hash, changing
+            even one byte produces a completely different hash (the avalanche effect demonstrated
+            above), and there's no way to run the process backwards to recover the original input
+            from the hash alone.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to verify that a file wasn't corrupted or tampered with -- hash it yourself and
+            compare against a checksum the publisher already gave you (an ISO image, an installer, a
+            downloaded package). Don't use raw hashes like these to store passwords: they're fast by
+            design, which is exactly wrong for password storage -- a dedicated password-hashing
+            function (bcrypt, scrypt, Argon2) that's deliberately slow is what actually belongs
+            there.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Treating MD5 or SHA-1 as secure for anything beyond casual integrity checks -- both have
+            practical collision attacks and shouldn't be relied on where an adversary could benefit
+            from forging a match. Confusing hashing with encryption: a hash can't be decrypted
+            because it was never encrypted, it's a one-way summary, not a reversible transformation.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If your hash doesn't match a published checksum, check for trailing whitespace or a
+            trailing newline in whatever you pasted, confirm you copied the entire hash (a single
+            missing character will never match), and make sure text mode and file mode are actually
+            hashing the same bytes -- a text file with different line endings (CRLF vs. LF) hashes
+            differently even though it "looks" identical.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Got a hash to check instead of generate?{' '}
+            <Link to="/tools/hash-verifier" className="text-accent hover:underline">
+              Hash verifier
+            </Link>{' '}
+            does the comparison for you.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

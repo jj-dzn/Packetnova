@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
@@ -116,6 +118,51 @@ export function HashVerifier() {
           </dl>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            This recomputes the hash of what you typed using the algorithm you picked, then compares
+            it character-for-character against the expected hash you pasted in (case and surrounding
+            whitespace are ignored, since those differ harmlessly between tools and platforms
+            without meaning anything about the actual content). A match means the two inputs are
+            byte-for-byte identical; anything else means they aren't.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            The most common real use: you downloaded a file (an ISO, an installer, a release
+            archive) and the publisher listed a checksum next to it. Hash the file yourself and
+            paste their published value in here -- a match means what you got is exactly what they
+            built, not something corrupted in transit or swapped out by someone in between.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Comparing a hash computed with one algorithm against an expected value that was
+            published for a different one -- a SHA-256 hash will never match a published MD5
+            checksum, even for identical content, because they're different functions entirely.
+            Always confirm which algorithm the expected hash was actually generated with before
+            assuming a mismatch means something's wrong with the file.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If a hash you expect to match doesn't, first double-check the algorithm selector matches
+            what the checksum was published as. If that's right, the mismatch is real -- re-download
+            the file rather than trusting a copy that failed verification.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Need to generate a hash instead of check one?{' '}
+            <Link to="/tools/hash-generator" className="text-accent hover:underline">
+              Hash generator
+            </Link>{' '}
+            computes hashes from text or a file directly.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

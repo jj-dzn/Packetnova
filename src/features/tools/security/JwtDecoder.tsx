@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { SecurityWarning } from '../SecurityWarning'
 import { Aside } from '../Aside'
@@ -74,7 +76,57 @@ export function JwtDecoder() {
           {mode === 'raw' ? <RawResult token={token} /> : <SummaryResult inspection={inspection} />}
         </div>
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            A JWT is three base64url segments -- header, payload, signature -- joined by dots.
+            Decoding the header and payload is just reversing that encoding, which is public and
+            reversible by design; that's why this tool can show you the contents without ever
+            touching a server. The signature is the part that actually proves the token wasn't
+            tampered with, and verifying it requires the issuer's secret or public key, which this
+            tool deliberately never asks for or has.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to inspect what's actually inside a token you already have -- debugging why an
+            API call is being rejected, checking an expiry claim, or confirming a token has the
+            claims your application expects. It's not a substitute for real verification: a backend
+            deciding whether to trust a token must check the signature against the correct key, not
+            just look at what the payload claims.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Treating a decoded-but-unverified payload as trustworthy -- anyone can construct a JWT
+            with any header and payload they like; only a valid signature check (which this tool
+            doesn't perform) proves it came from who it claims to. Also worth knowing: "iat", "exp",
+            and "nbf" are Unix timestamps in seconds, not milliseconds, a common off-by-1000x
+            mistake when comparing them against JavaScript's millisecond-based{' '}
+            <code className="font-mono">Date.now()</code>.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If pasting a token here fails to decode, check for accidental whitespace or line breaks
+            introduced by copying from a terminal or log line -- JWTs are single unbroken strings.
+            If a token looks valid here but your application still rejects it, the problem is almost
+            always signature verification or an expired/not-yet-valid timestamp, not the encoding
+            itself.
+          </p>
+        }
+        relatedReading={
+          <p>
+            JWT segments are base64url, the same encoding used by many URL-safe tokens --{' '}
+            <Link to="/tools/base64-encode-decode" className="text-accent hover:underline">
+              Base64 encode/decode
+            </Link>{' '}
+            covers the standard variant.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }
 

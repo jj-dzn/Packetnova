@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
 import { base64Decode, base64Encode } from '../../../lib/calculations/base64'
 
@@ -49,6 +51,51 @@ export function Base64Tool() {
           <p className="text-sm text-danger">{result.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Base64 maps every 3 bytes of input to 4 printable ASCII characters, using a 64-symbol
+            alphabet (A-Z, a-z, 0-9, plus two more) that's safe to put inside text-based formats
+            like JSON, XML, or an email body without anything getting misinterpreted as a control
+            character or breaking the surrounding syntax.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Reach for this whenever binary-ish data needs to travel through something that only
+            reliably handles text: embedding an image as a data URI, attaching a file to an email,
+            or putting binary content inside a JSON field. It's not for hiding data from anyone --
+            decoding requires no key, just this exact reverse operation.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming Base64 provides any confidentiality -- it doesn't, and treating it as a
+            lightweight "encryption" is a real, recurring security mistake. Also worth knowing: JWTs
+            and other URL-embedded tokens use a variant called base64url, which swaps two characters
+            ("+"/"/" become "-"/"_") and drops padding so the result is safe inside a URL -- pasting
+            one of those into a standard Base64 tool won't decode cleanly.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If decoding fails, check whether the input is actually base64url (JWTs, some
+            URL-embedded tokens) rather than standard Base64 -- the character substitutions and
+            missing padding are the usual culprit. Trailing whitespace or a line break copied along
+            with the text can also break decoding.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Working with a JWT specifically? The{' '}
+            <Link to="/tools/jwt-decoder" className="text-accent hover:underline">
+              JWT decoder
+            </Link>{' '}
+            handles the base64url variant and the token structure directly.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

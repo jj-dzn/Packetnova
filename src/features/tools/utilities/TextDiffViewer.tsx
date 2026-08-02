@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { computeTextDiff } from '../../../lib/calculations/textDiff'
 
 export function TextDiffViewer() {
@@ -65,6 +66,40 @@ export function TextDiffViewer() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            This compares the two blocks of text line by line and shows which lines were added,
+            removed, or left unchanged -- an unchanged line means both blocks contain it in the same
+            place; a changed line shows up as a removal of the old version plus an addition of the
+            new one, rather than an in-place edit.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            A genuinely useful, on-theme case for a networking toolkit: pasting a device's "before"
+            and "after" running-config snapshots to see exactly what a change touched, without
+            manually scanning two long config dumps for what moved. It's equally useful for any
+            other two versions of text you need to compare -- code, prose, structured data.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Comparing at the line level only means a single-word change inside an
+            otherwise-identical line shows the entire line as removed-then-added, not just the
+            changed word -- if a diff looks noisier than the actual edit was, that's why; read the
+            full removed/added pair as one change, not two unrelated ones.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If two lines that look identical still show as changed, check for invisible differences
+            -- trailing whitespace, different line-ending characters, or a stray tab where you
+            expect a space. Those are byte-different even when they render the same on screen.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

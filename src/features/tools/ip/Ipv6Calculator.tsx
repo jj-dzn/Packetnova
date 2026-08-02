@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { analyzeIPv6 } from '../../../lib/calculations/ipv6'
@@ -179,6 +180,46 @@ export function Ipv6Calculator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            IPv6 addresses are 128 bits, written as eight 16-bit hextets in hex. "Compressed" form
+            drops leading zeros in each group and collapses one run of all-zero groups into "::";
+            "expanded" form writes every hextet out in full -- both represent the exact same
+            address, and this tool converts between them automatically. EUI-64/SLAAC generation
+            (only meaningful on an exact /64) derives a 64-bit interface ID from a MAC address by
+            splitting it, inserting "fffe" in the middle, and flipping the universal/local bit.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use the expand/compress conversion whenever you need to read or type out an address in
+            the form a particular context expects. Use subnetting to plan how a larger allocated
+            block splits into smaller assigned prefixes. Use EUI-64 when you need to predict or
+            verify a device's SLAAC-derived address from its MAC, though note that many modern OSes
+            use IPv6 privacy extensions instead of EUI-64 by default, so a device's actual address
+            may not match this calculation.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            "::" can only appear once in a compressed address -- it represents exactly one run of
+            zero groups, and using it twice would make the expansion ambiguous (there'd be no way to
+            know how many zero groups each "::" stood for). Also easy to miss: a link-local address
+            (fe80::/10) is only valid on its own local segment and isn't globally routable, unlike
+            most of the other address types this tool classifies.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If EUI-64 generation is unavailable, check that the prefix is exactly /64 -- the
+            interface-ID split only makes sense at that boundary. If a generated SLAAC address
+            doesn't match what a real device shows, that device is very likely using privacy
+            extensions (a randomized interface ID) rather than EUI-64.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

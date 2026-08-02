@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { CopyButton } from '../../../components/ui/CopyButton'
@@ -140,6 +142,55 @@ export function PasswordGenerator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Every character is chosen using the browser's cryptographically secure random number
+            generator (<code className="font-mono">crypto.getRandomValues</code>), not{' '}
+            <code className="font-mono">Math.random</code>, which isn't safe for anything
+            security-sensitive because its output can be predicted. Entropy (shown in bits) measures
+            how many possible passwords the current length and character-set settings could produce
+            -- more bits means more guesses an attacker needs on average before finding the right
+            one.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to generate a fresh, unique password for a new account or service -- reusing
+            passwords across sites is what turns one breach into many, since a leaked password gets
+            tried against every other account tied to that email. Pair generated passwords with a
+            password manager rather than trying to remember them; a password strong enough to resist
+            guessing is, by design, not meant to be memorable.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Choosing a short length to make a password "easier to type" undermines the entire point
+            -- length contributes far more entropy than character-set variety, so a longer
+            all-lowercase password can be stronger than a short one mixing every character class.
+            Reusing a generated password across multiple accounts is another common mistake that
+            defeats the purpose of generating a unique one in the first place.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If a service rejects a generated password for containing "invalid characters," it's
+            almost always the symbol set -- try regenerating with symbols disabled, since some
+            legacy login forms reject a narrower set of special characters than this tool allows by
+            default.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Need to hash a password for storage instead of generating one to remember?{' '}
+            <Link to="/tools/hash-generator" className="text-accent hover:underline">
+              Hash generator
+            </Link>{' '}
+            explains why raw hashes shouldn't be used for that either.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
-import { Aside } from '../Aside'
 import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { Input } from '../../../components/ui/Input'
 import { calculateMtu, type MtuResult } from '../../../lib/calculations/mtu'
@@ -175,22 +175,65 @@ export function MtuCalculator() {
                   to work out the segment size that fits in one packet from the start.
                 </p>
               )}
-              <Aside>
-                The classic real-world version of this: a GRE or IPsec tunnel interface left at the
-                default 1500-byte MTU even though the tunnel's own overhead means it can't actually
-                carry 1500 bytes of payload. Traffic seems fine at first -- small packets and the
-                TCP handshake go through -- until something sends a full-size packet, gets silently
-                dropped, and there's no obvious error, just a connection that "hangs." That's
-                usually a Path MTU Discovery black hole: a firewall along the path is dropping the
-                ICMP "fragmentation needed" message that's supposed to tell the sender to shrink its
-                packets.
-              </Aside>
             </div>
           </GuidedMode>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Effective MTU is the link's advertised MTU minus whatever overhead sits between your
+            traffic and the wire -- tunnel headers, VLAN tags, anything else wrapping the packet.
+            Fits/doesn't-fit compares your payload against that effective number, not the raw link
+            MTU, since the raw number overstates what's actually available once encapsulation is
+            accounted for.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this whenever a link's real usable payload size is in question -- sizing a tunnel
+            interface's MTU correctly, or working out why traffic across a specific path behaves
+            differently from traffic on a plain 1500-byte Ethernet segment.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Leaving a tunnel interface at the default 1500-byte MTU without accounting for the
+            tunnel's own encapsulation overhead is the single most common version of this mistake --
+            the interface claims a size it can't actually deliver once its own headers are added.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            The classic real-world symptom: a GRE or IPsec tunnel interface left at the default
+            1500-byte MTU even though the tunnel's own overhead means it can't actually carry 1500
+            bytes of payload. Traffic seems fine at first -- small packets and the TCP handshake go
+            through -- until something sends a full-size packet, gets silently dropped, and there's
+            no obvious error, just a connection that "hangs." That's usually a Path MTU Discovery
+            black hole: a firewall along the path is dropping the ICMP "fragmentation needed"
+            message that's supposed to tell the sender to shrink its packets.
+          </p>
+        }
+        relatedReading={
+          <p>
+            See the segment-size side of this directly in the{' '}
+            <Link to="/tools/mss-calculator" className="text-accent hover:underline">
+              MSS calculator
+            </Link>
+            , or watch fragmentation actually happen in the{' '}
+            <Link
+              to="/tools/packet-fragmentation-calculator"
+              className="text-accent hover:underline"
+            >
+              Packet fragmentation calculator
+            </Link>
+            .
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

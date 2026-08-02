@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { ReferencePageLayout } from '../ReferencePageLayout'
 import { ResultRow } from '../ResultRow'
 import { RfcFootnote } from '../RfcFootnote'
+import { ToolEducation } from '../ToolEducation'
 import { HeaderByteDiagram } from '../HeaderByteDiagram'
 import { DataTable } from '../../../components/ui/DataTable'
 import { calculateIpFlags, type IpFlags } from '../../../lib/calculations/ipFlags'
@@ -82,6 +83,46 @@ export function IpHeaderExplorer() {
         rows={ipHeaderFields}
       />
       <RfcFootnote>Defined in RFC 791.</RfcFootnote>
+      <ToolEducation
+        howItWorks={
+          <p>
+            Every IPv4 packet carries this 20-byte header (more with options) ahead of its payload,
+            recording where it's from, where it's going, how long it has left to live, and whether
+            it's part of a fragmented set. The flags calculator above shows exactly how DF and MF
+            combine into the 3-bit flags field alongside the 13-bit Fragment Offset.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to look up what a specific field means when reading a packet capture, or to
+            check how the DF/MF flags combine into the byte you're seeing on the wire.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Treating TTL as a countdown timer rather than what it actually is -- a hop-count safety
+            net. It's decremented by one at every router, not once per second; a packet stuck in a
+            routing loop dies after a fixed number of hops regardless of how much real time has
+            passed, which is the entire reason the field exists.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If a destination reports "TTL exceeded" or a traceroute stalls, that's this exact field
+            hitting zero -- almost always a routing loop or a path with more real hops than
+            expected, not a timing issue.
+          </p>
+        }
+        relatedReading={
+          <p>
+            A TTL expiry is what triggers the ICMP Time Exceeded message covered in the{' '}
+            <Link to="/tools/icmp-explorer" className="text-accent hover:underline">
+              ICMP explorer
+            </Link>
+            .
+          </p>
+        }
+      />
     </ReferencePageLayout>
   )
 }

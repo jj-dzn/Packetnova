@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { asciiCodesToText, textToAscii } from '../../../lib/calculations/asciiConverter'
 
 export function AsciiConverterTool() {
@@ -85,6 +86,41 @@ export function AsciiConverterTool() {
           <p className="text-sm text-danger">{backward!.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Every character has a numeric code point behind it -- the original 7-bit ASCII table
+            covers just 128 of them (English letters, digits, basic punctuation), while Unicode
+            extends the same idea to over a million, covering every script and symbol in common use,
+            including emoji. This tool reads and writes full Unicode code points, not just the
+            original 128-character ASCII range its name refers to.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Use this to see exactly what numeric value sits behind a character (useful when
+            debugging encoding issues, building a protocol that references character codes, or just
+            satisfying curiosity about what a symbol actually "is" to a computer), or to reconstruct
+            text from a list of codes you're staring at in a log or spec.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming one character always equals one byte -- true only within the original 7-bit
+            ASCII range. Outside it, a character's UTF-8 byte representation can take 2, 3, or even
+            4 bytes for a single code point, so "code point count" and "byte length" are different
+            numbers the moment non-ASCII text is involved.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If codes-to-text produces unexpected characters, double check each number is a valid
+            Unicode code point (0 to 1,114,111) and that you're not accidentally mixing in a byte
+            value from a different encoding, which won't map to the same character.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

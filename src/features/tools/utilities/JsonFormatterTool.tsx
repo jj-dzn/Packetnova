@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
 import { formatJson } from '../../../lib/calculations/jsonFormatter'
 
@@ -48,6 +50,51 @@ export function JsonFormatterTool() {
           <p className="text-sm text-danger">{result.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Pretty mode parses the JSON and re-serializes it with consistent indentation, so
+            structure that was crammed onto one line becomes readable. Minify does the opposite --
+            same data, every unnecessary whitespace character stripped -- which is what you actually
+            want for a value being transmitted, not read by a person.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Reach for this when you've got JSON that's either unreadable (a minified API response
+            you need to inspect) or wasteful (a config file about to be embedded somewhere size
+            matters). Formatting also doubles as validation -- if it parses, it's syntactically
+            correct JSON.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            The most common reasons JSON fails to parse: a trailing comma after the last item in an
+            object or array (valid in JavaScript object literals, invalid in JSON), single quotes
+            instead of double quotes around strings and keys, and unquoted keys -- all three are
+            accepted by JavaScript's own object syntax but rejected by strict JSON, which is a
+            frequent source of confusion when copying from JS source code.
+          </p>
+        }
+        troubleshootingTips={
+          <p>
+            If validation fails, check the exact position the error message points to -- it's almost
+            always the character right before or after a comma, quote, or bracket, not somewhere
+            else in the document. Working with a large payload is easier if you narrow down the
+            broken section first by testing smaller chunks.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Need to convert between formats?{' '}
+            <Link to="/tools/yaml-formatter" className="text-accent hover:underline">
+              YAML formatter
+            </Link>{' '}
+            converts YAML to and from JSON directly.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }
