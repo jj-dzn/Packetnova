@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { simulateLpm, type RouteEntry } from '../../../lib/calculations/lpm'
@@ -91,6 +92,13 @@ export function LpmSimulator() {
                 value={calc.result.winner ? calc.result.winner.label : 'No match'}
               />
             </dl>
+            <Aside>
+              Longest prefix match always wins, full stop -- it's the first and only thing that
+              decides which route matches, and it's checked before anything else about a route (its
+              source, its administrative distance, how it was learned) ever comes into play. A more
+              specific route always beats a less specific one, even a /32 static route beats a /0
+              default learned from BGP.
+            </Aside>
             <div className="overflow-x-auto rounded-md border border-border">
               <table className="w-full text-left text-sm">
                 <thead className="bg-surface">

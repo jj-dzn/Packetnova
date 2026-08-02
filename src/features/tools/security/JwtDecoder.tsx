@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { SecurityWarning } from '../SecurityWarning'
+import { Aside } from '../Aside'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import { Badge } from '../../../components/ui/Badge'
 import { Pill } from '../../../components/ui/Pill'
@@ -54,6 +55,14 @@ export function JwtDecoder() {
       }
       result={
         <div className="flex flex-col gap-4">
+          <Aside>
+            The token itself is three base64url-encoded segments joined by dots -- base64url, not
+            standard base64, so "+" and "/" are replaced with "-" and "_" and padding is dropped,
+            which is why it won't decode cleanly in a plain base64 tool. Inside the header and
+            payload, "alg" is the signing algorithm, "typ" is almost always "JWT", and "iat" (issued
+            at), "exp" (expires), and "nbf" (not valid before) are all Unix timestamps in seconds,
+            not milliseconds.
+          </Aside>
           {inspection.ok && inspection.result.isUnsigned && (
             <SecurityWarning>
               This token is unsigned -- its header declares alg "none", or its signature segment is

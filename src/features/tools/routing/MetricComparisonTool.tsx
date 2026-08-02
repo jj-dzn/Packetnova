@@ -18,7 +18,7 @@ export function MetricComparisonTool() {
       <ToolPageLayout
         category="Routing"
         title="Metric comparison tool"
-        description="Routing metrics aren't directly comparable across protocols -- this covers how each one is calculated, plus a quick OSPF cost calculator."
+        description="Routing metrics aren't directly comparable across protocols: an OSPF cost of 10 and an EIGRP composite metric of 10 don't mean anything relative to each other -- they're not even the same unit. This covers how each protocol calculates its own metric, plus a quick OSPF cost calculator below."
         input={
           <div className="flex flex-col gap-4">
             <div>
@@ -71,6 +71,13 @@ export function MetricComparisonTool() {
       />
       <div className="pb-12">
         <h2 className="mb-4 text-lg font-semibold">How each protocol measures distance</h2>
+        <p className="mb-4 max-w-2xl text-sm text-fg-muted">
+          The cost calculated above is OSPF's answer specifically -- inverse bandwidth, scaled by
+          the reference bandwidth you set. Every other protocol below answers the same underlying
+          question ("how far is this route?") with a completely different formula and a
+          differently-scaled number, which is exactly why you can't compare a "cost" from one row to
+          a "metric" from another.
+        </p>
         <DataTable<MetricInfo>
           columns={[
             { key: 'protocol', label: 'Protocol' },

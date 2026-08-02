@@ -14,7 +14,7 @@ export function Base64Tool() {
     <ToolPageLayout
       category="Security"
       title="Base64 encode/decode"
-      description="Encode or decode Base64 text instantly."
+      description="Encode or decode Base64 text instantly -- this is encoding, not encryption. Base64 has no key and no secret; anyone can decode it back to the original text just as easily as this tool did, so it's for safely transporting binary-ish data through text-only channels, not for hiding it."
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

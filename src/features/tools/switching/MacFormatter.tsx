@@ -34,6 +34,9 @@ export function MacFormatter() {
       result={
         calc.ok ? (
           <div className="flex flex-col gap-3">
+            <p className="text-xs text-fg-subtle">
+              Detected: <span className="text-fg-muted">{calc.result.detectedFormat}</span> input
+            </p>
             <dl>
               <ResultRow label="Colon" value={calc.result.colon} />
               <ResultRow label="Hyphen" value={calc.result.hyphen} />

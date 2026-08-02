@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
+import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { Button } from '../../../components/ui/Button'
@@ -113,6 +114,14 @@ export function RouteLookupSimulator() {
               />
               <ResultRow label="Decided by" value={calc.result.decidedBy ?? 'N/A'} />
             </dl>
+            <Aside>
+              Administrative distance breaks ties between routes learned from different sources --
+              static, OSPF, BGP -- lower AD wins, regardless of how good any of those routes
+              actually are. Metric breaks ties within a single source, when that source itself
+              offers more than one path (e.g. two OSPF routes with different costs). This simulator
+              only models the AD tiebreak, which is why it's the deciding factor whenever two
+              matching routes come from different sources.
+            </Aside>
             <div className="overflow-x-auto rounded-md border border-border">
               <table className="w-full text-left text-sm">
                 <thead className="bg-surface">
