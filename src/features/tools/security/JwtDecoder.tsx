@@ -30,6 +30,10 @@ export function JwtDecoder() {
       category="Security"
       title="JWT decoder"
       description="Decode a JWT's header and payload, or switch to a summary of its claims -- entirely client-side, and without verifying the signature."
+      related={[
+        { to: '/tools/base64-encode-decode', label: 'Base64 encode/decode' },
+        { to: '/tools/url-encode-decode', label: 'URL encode/decode' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

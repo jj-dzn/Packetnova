@@ -34,6 +34,10 @@ export function JsonFormatterTool() {
       category="Utilities"
       title="JSON formatter"
       description="Format, validate, and minify JSON -- or explore it as a syntax-highlighted, foldable tree."
+      related={[
+        { to: '/tools/yaml-formatter', label: 'YAML formatter' },
+        { to: '/tools/xml-formatter', label: 'XML formatter' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

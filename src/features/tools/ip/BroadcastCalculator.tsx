@@ -15,6 +15,12 @@ export function BroadcastCalculator() {
       category="IP"
       title="Broadcast calculator"
       description="Find the broadcast address for any IP and subnet mask, and see the broadcast domain in binary."
+      related={[
+        { to: '/tools/cidr-calculator', label: 'CIDR calculator' },
+        { to: '/tools/subnet-calculator', label: 'Subnet calculator' },
+        { to: '/tools/network-address-calculator', label: 'Network address calculator' },
+        { to: '/tools/wildcard-mask-calculator', label: 'Wildcard mask calculator' },
+      ]}
       input={
         <div>
           <label htmlFor="broadcast-input" className="text-sm font-medium">

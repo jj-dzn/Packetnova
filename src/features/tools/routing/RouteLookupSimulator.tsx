@@ -90,6 +90,13 @@ export function RouteLookupSimulator() {
       category="Routing"
       title="Route lookup simulator"
       description="Step through how a router picks the next hop: longest prefix match first, administrative distance only as a tiebreaker."
+      related={[
+        {
+          to: '/tools/administrative-distance-reference',
+          label: 'Administrative distance reference',
+        },
+        { to: '/scenarios/routing-black-hole', label: 'Scenario: Routing black hole' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div>

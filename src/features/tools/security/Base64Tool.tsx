@@ -27,6 +27,10 @@ export function Base64Tool() {
       category="Security"
       title="Base64 encode/decode"
       description="Encode or decode Base64 text instantly -- this is encoding, not encryption. Base64 has no key and no secret; anyone can decode it back to the original text just as easily as this tool did, so it's for safely transporting binary-ish data through text-only channels, not for hiding it."
+      related={[
+        { to: '/tools/url-encode-decode', label: 'URL encode/decode' },
+        { to: '/tools/jwt-decoder', label: 'JWT decoder' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

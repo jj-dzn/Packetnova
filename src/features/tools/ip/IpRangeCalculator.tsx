@@ -17,6 +17,7 @@ export function IpRangeCalculator() {
       category="IP"
       title="IP range calculator"
       description="Convert a start and end IP address into the minimal set of CIDR blocks that cover it exactly."
+      related={[{ to: '/tools/route-summarizer', label: 'Route summarizer' }]}
       input={
         <div className="flex flex-col gap-4">
           <div>

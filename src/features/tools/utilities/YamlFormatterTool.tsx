@@ -52,6 +52,10 @@ export function YamlFormatterTool() {
       category="Utilities"
       title="YAML formatter"
       description="Format and validate YAML, or convert between YAML and JSON."
+      related={[
+        { to: '/tools/json-formatter', label: 'JSON formatter' },
+        { to: '/tools/xml-formatter', label: 'XML formatter' },
+      ]}
       input={
         <div className="flex flex-col gap-3">
           <div className="flex flex-wrap gap-2">

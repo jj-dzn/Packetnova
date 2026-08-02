@@ -16,6 +16,12 @@ export function NetworkAddressCalculator() {
       category="IP"
       title="Network address calculator"
       description="Find the network address for any IP and subnet -- and what kind of address it is."
+      related={[
+        { to: '/tools/cidr-calculator', label: 'CIDR calculator' },
+        { to: '/tools/subnet-calculator', label: 'Subnet calculator' },
+        { to: '/tools/broadcast-calculator', label: 'Broadcast calculator' },
+        { to: '/tools/wildcard-mask-calculator', label: 'Wildcard mask calculator' },
+      ]}
       input={
         <div>
           <label htmlFor="network-input" className="text-sm font-medium">

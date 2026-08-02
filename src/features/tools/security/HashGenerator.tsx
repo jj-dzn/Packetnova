@@ -100,6 +100,7 @@ export function HashGenerator() {
       category="Security"
       title="Hash generator"
       description="Generate MD5, SHA-1, SHA-256, SHA-384, or SHA-512 hashes from text or a file -- entirely in your browser, nothing uploaded."
+      related={[{ to: '/tools/hash-verifier', label: 'Hash verifier' }]}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

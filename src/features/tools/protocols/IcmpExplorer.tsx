@@ -9,6 +9,7 @@ export function IcmpExplorer() {
       category="Protocols"
       title="ICMP explorer"
       description="Look up ICMP types and what they actually mean."
+      related={[{ to: '/tools/ip-header-explorer', label: 'IP header explorer' }]}
     >
       <DataTable<IcmpEntry>
         searchPlaceholder="Search by type, name, or description..."

@@ -40,6 +40,7 @@ export function DhcpOptionsReference() {
       category="Protocols"
       title="DHCP options reference"
       description="Look up DHCP option numbers and their meaning."
+      related={[{ to: '/visualizers/dhcp-dora-sequence', label: 'DHCP DORA sequence visualizer' }]}
     >
       <DhcpCliExample />
       <DataTable<DhcpOptionEntry>

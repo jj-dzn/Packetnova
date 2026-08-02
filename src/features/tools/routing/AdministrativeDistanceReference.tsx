@@ -33,6 +33,10 @@ export function AdministrativeDistanceReference() {
       category="Routing"
       title="Administrative distance reference"
       description="Default administrative distance for every routing source -- lower always wins when a router learns the same network from multiple sources."
+      related={[
+        { to: '/tools/route-lookup-simulator', label: 'Route lookup simulator' },
+        { to: '/scenarios/routing-black-hole', label: 'Scenario: Routing black hole' },
+      ]}
     >
       <DataTable<AdEntry>
         searchPlaceholder="Search by routing source..."

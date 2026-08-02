@@ -18,6 +18,12 @@ export function CidrCalculator() {
       category="IP"
       title="CIDR calculator"
       description="Break down any CIDR block into its network address, broadcast address, subnet mask, and usable host range."
+      related={[
+        { to: '/tools/subnet-calculator', label: 'Subnet calculator' },
+        { to: '/tools/network-address-calculator', label: 'Network address calculator' },
+        { to: '/tools/broadcast-calculator', label: 'Broadcast calculator' },
+        { to: '/tools/wildcard-mask-calculator', label: 'Wildcard mask calculator' },
+      ]}
       input={
         <div>
           <label htmlFor="cidr-input" className="text-sm font-medium">

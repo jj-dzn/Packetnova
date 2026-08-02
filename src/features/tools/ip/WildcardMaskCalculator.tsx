@@ -33,6 +33,12 @@ export function WildcardMaskCalculator() {
       category="IP"
       title="Wildcard mask calculator"
       description="Convert a subnet mask to its wildcard mask for ACLs and OSPF."
+      related={[
+        { to: '/tools/cidr-calculator', label: 'CIDR calculator' },
+        { to: '/tools/subnet-calculator', label: 'Subnet calculator' },
+        { to: '/tools/network-address-calculator', label: 'Network address calculator' },
+        { to: '/tools/broadcast-calculator', label: 'Broadcast calculator' },
+      ]}
       input={
         <div>
           <label htmlFor="wildcard-input" className="text-sm font-medium">

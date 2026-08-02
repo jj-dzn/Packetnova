@@ -48,6 +48,7 @@ export function RouteSummarizer() {
       category="IP"
       title="Route summarizer"
       description="Paste a list of IPs or CIDR blocks and find the smallest set of aggregate routes that covers them."
+      related={[{ to: '/tools/ip-range-calculator', label: 'IP range calculator' }]}
       input={
         <div>
           <label htmlFor="route-summary-input" className="text-sm font-medium">

@@ -120,6 +120,12 @@ export function SubnetCalculator() {
       category="IP"
       title="Subnet calculator"
       description="Split a network into equal-sized subnets, or allocate variable-length (VLSM) subnets sized to what each one actually needs."
+      related={[
+        { to: '/tools/cidr-calculator', label: 'CIDR calculator' },
+        { to: '/tools/network-address-calculator', label: 'Network address calculator' },
+        { to: '/tools/broadcast-calculator', label: 'Broadcast calculator' },
+        { to: '/tools/wildcard-mask-calculator', label: 'Wildcard mask calculator' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

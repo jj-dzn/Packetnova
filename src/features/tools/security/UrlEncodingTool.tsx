@@ -32,6 +32,10 @@ export function UrlEncodingTool() {
       category="Security"
       title="URL encode/decode"
       description="Encode or decode URL-safe (percent-encoded) text instantly."
+      related={[
+        { to: '/tools/base64-encode-decode', label: 'Base64 encode/decode' },
+        { to: '/tools/jwt-decoder', label: 'JWT decoder' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

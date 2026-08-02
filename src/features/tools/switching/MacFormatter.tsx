@@ -17,6 +17,7 @@ export function MacFormatter() {
       category="Switching"
       title="MAC formatter"
       description="Convert a MAC address between colon, hyphen, and Cisco dotted-quad notation."
+      related={[{ to: '/tools/mac-address-lookup', label: 'MAC address lookup' }]}
       input={
         <div>
           <label htmlFor="mac-format-input" className="text-sm font-medium">

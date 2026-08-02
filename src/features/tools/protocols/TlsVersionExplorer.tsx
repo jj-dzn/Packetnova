@@ -8,7 +8,11 @@ export function TlsVersionExplorer() {
       category="Protocols"
       title="TLS version explorer"
       description="Compare TLS versions and see what changed between them."
-      related={[{ to: '/visualizers/tls-handshake', label: 'TLS handshake visualizer' }]}
+      related={[
+        { to: '/visualizers/tls-handshake', label: 'TLS handshake visualizer' },
+        { to: '/tools/certificate-viewer', label: 'Certificate viewer' },
+        { to: '/tools/hash-generator', label: 'Hash generator' },
+      ]}
     >
       <DataTable<TlsVersionEntry>
         searchPlaceholder="Search by version or status..."

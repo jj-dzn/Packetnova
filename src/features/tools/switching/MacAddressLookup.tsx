@@ -40,6 +40,7 @@ export function MacAddressLookup() {
       category="Switching"
       title="MAC address lookup"
       description="Break a MAC address down into its OUI and NIC-specific portion, and check a small set of well-known vendor OUIs."
+      related={[{ to: '/tools/mac-formatter', label: 'MAC formatter' }]}
       input={
         <div>
           <label htmlFor="mac-lookup-input" className="text-sm font-medium">
