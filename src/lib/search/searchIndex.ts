@@ -2,10 +2,9 @@ import Fuse from 'fuse.js'
 import { toolCategories } from '../../content/reference/tools'
 import { visualizers } from '../../content/reference/visualizers'
 import { scenarios } from '../../content/reference/scenarios'
-import { blogPosts } from '../blog/posts'
 
 export interface SearchItem {
-  type: 'tool' | 'visualizer' | 'scenario' | 'blog'
+  type: 'tool' | 'visualizer' | 'scenario'
   title: string
   description: string
   category: string
@@ -44,21 +43,10 @@ function buildScenarioSearchItems(): SearchItem[] {
   }))
 }
 
-function buildBlogSearchItems(): SearchItem[] {
-  return blogPosts.map((post) => ({
-    type: 'blog' as const,
-    title: post.title,
-    description: post.description,
-    category: 'Blog',
-    href: `/blog/${post.slug}`,
-  }))
-}
-
 export const searchItems: SearchItem[] = [
   ...buildToolSearchItems(),
   ...buildVisualizerSearchItems(),
   ...buildScenarioSearchItems(),
-  ...buildBlogSearchItems(),
 ]
 
 export const searchIndex = new Fuse<SearchItem>(searchItems, {

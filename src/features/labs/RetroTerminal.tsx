@@ -12,7 +12,7 @@ const BOOT_LINES = [
   '[  OK  ] Establishing subspace uplink...',
   '[  OK  ] Loading packet manifest...',
   '[  OK  ] Calibrating starfield...',
-  '[  OK  ] Mounting /tools /visualizers /blog...',
+  '[  OK  ] Mounting /tools /visualizers /scenarios...',
   '',
   'Welcome to PacketNova OS v1.0.',
   "Type 'help' to see what this thing does.",
@@ -57,7 +57,7 @@ function runCommand(raw: string): string[] {
     case 'whoami':
       return ['guest (probably a networking nerd)']
     case 'ls':
-      return ['tools/  visualizers/  blog/  labs/  coffee.exe']
+      return ['tools/  visualizers/  scenarios/  labs/  coffee.exe']
     case 'about':
     case 'nova':
       return [

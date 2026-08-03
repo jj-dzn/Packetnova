@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { getPageMeta } from './pageMeta'
 import { toolCategories } from '../../content/reference/tools'
 import { visualizers } from '../../content/reference/visualizers'
-import { blogPosts } from '../blog/posts'
 
 describe('getPageMeta', () => {
   it('gives the homepage a site-wide title and description', () => {
@@ -15,7 +14,6 @@ describe('getPageMeta', () => {
     for (const path of [
       '/tools',
       '/visualizers',
-      '/blog',
       '/search',
       '/labs',
       '/labs/ping-pet',
@@ -55,14 +53,7 @@ describe('getPageMeta', () => {
     expect(meta.description).toBe(tcp.description)
   })
 
-  it("uses a blog post's real title and description for its page", () => {
-    const post = blogPosts.find((p) => p.slug === 'understanding-mtu')!
-    const meta = getPageMeta('/blog/understanding-mtu')
-    expect(meta.title).toBe(`${post.title} - PacketNova`)
-    expect(meta.description).toBe(post.description)
-  })
-
-  it('every live tool, visualizer, and post resolves to a real title (no fallback leaking through)', () => {
+  it('every live tool and visualizer resolves to a real title (no fallback leaking through)', () => {
     for (const category of toolCategories) {
       for (const tool of category.tools) {
         if (!tool.slug) continue
@@ -75,16 +66,11 @@ describe('getPageMeta', () => {
       const meta = getPageMeta(`/visualizers/${visualizer.slug}`)
       expect(meta.title).toBe(`${visualizer.name} - PacketNova`)
     }
-    for (const post of blogPosts) {
-      const meta = getPageMeta(`/blog/${post.slug}`)
-      expect(meta.title).toBe(`${post.title} - PacketNova`)
-    }
   })
 
   it('falls back to a not-found title for an unknown slug', () => {
     expect(getPageMeta('/tools/does-not-exist').title).toBe('Page not found - PacketNova')
     expect(getPageMeta('/visualizers/does-not-exist').title).toBe('Page not found - PacketNova')
-    expect(getPageMeta('/blog/does-not-exist').title).toBe('Page not found - PacketNova')
   })
 
   it('falls back to a not-found title for a completely unmatched path', () => {

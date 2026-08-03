@@ -2,9 +2,8 @@
 // match ToolPageLayout/VisualizerPageLayout/ReferencePageLayout's actual
 // structure (badge, heading, description, content box) rather than a
 // generic spinner, specifically to minimize the layout shift between this
-// placeholder and the real content it gets swapped for -- a lesson learned
-// from BlogPostBody's Suspense boundary, where a poorly-matched fallback
-// height showed up as a real (if small) CLS hit in Lighthouse.
+// placeholder and the real content it gets swapped for -- a poorly-matched
+// fallback height shows up as a real (if small) CLS hit in Lighthouse.
 //
 // Two stacked boxes, not one: ToolPageLayout (the most common of the three
 // shared layouts across the ~70 lazy routes) renders an input panel and a

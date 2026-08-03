@@ -1,7 +1,6 @@
 import { toolCategories } from '../../content/reference/tools'
 import { visualizers } from '../../content/reference/visualizers'
 import { scenarios } from '../../content/reference/scenarios'
-import { blogPosts } from '../blog/posts'
 
 export interface PageMeta {
   title: string
@@ -30,13 +29,9 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     title: `Scenarios - ${SITE_TITLE}`,
     description: 'Guided troubleshooting labs that chain real tools and visualizers together.',
   },
-  '/blog': {
-    title: `Blog - ${SITE_TITLE}`,
-    description: 'Networking write-ups -- practical, accurate, no fluff.',
-  },
   '/search': {
     title: `Search - ${SITE_TITLE}`,
-    description: "Search PacketNova's tools, visualizers, and blog posts.",
+    description: "Search PacketNova's tools, visualizers, and scenarios.",
   },
   '/labs': {
     title: `Labs - ${SITE_TITLE}`,
@@ -123,11 +118,11 @@ function findToolBySlug(slug: string) {
 }
 
 // Derives per-page <title>/description from the route path against the
-// same content data (tools.ts, visualizers.ts, blog posts) every listing
-// page already uses -- rather than hand-adding a meta call to each of the
-// ~65 individual tool/visualizer/post page components (tedious, and every
-// future one would have to remember it too), this one lookup stays correct
-// automatically as content is added.
+// same content data (tools.ts, visualizers.ts) every listing page already
+// uses -- rather than hand-adding a meta call to each of the ~65 individual
+// tool/visualizer page components (tedious, and every future one would
+// have to remember it too), this one lookup stays correct automatically as
+// content is added.
 export function getPageMeta(pathname: string): PageMeta {
   const staticMeta = STATIC_PAGES[pathname]
   if (staticMeta) return staticMeta
@@ -151,12 +146,6 @@ export function getPageMeta(pathname: string): PageMeta {
     const scenario = scenarios.find((s) => s.slug === scenarioMatch[1])
     if (scenario)
       return { title: `${scenario.title} - ${SITE_TITLE}`, description: scenario.symptom }
-  }
-
-  const blogMatch = /^\/blog\/([^/]+)$/.exec(pathname)
-  if (blogMatch) {
-    const post = blogPosts.find((p) => p.slug === blogMatch[1])
-    if (post) return { title: `${post.title} - ${SITE_TITLE}`, description: post.description }
   }
 
   return NOT_FOUND_META

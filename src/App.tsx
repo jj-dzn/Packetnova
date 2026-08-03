@@ -7,8 +7,6 @@ import { AboutPage } from './pages/AboutPage'
 import { ToolsPage } from './pages/ToolsPage'
 import { VisualizersPage } from './pages/VisualizersPage'
 import { ScenariosPage } from './pages/ScenariosPage'
-import { BlogPage } from './pages/BlogPage'
-import { BlogPostPage } from './pages/BlogPostPage'
 import { SearchPage } from './pages/SearchPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { LabsPage } from './pages/LabsPage'
@@ -465,8 +463,6 @@ function App() {
               path="/scenarios/vlan-misconfiguration"
               element={<VlanMisconfigurationScenario />}
             />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/labs" element={<LabsPage />} />
             <Route path="/labs/ping-pet" element={<PingPet />} />
             <Route path="/labs/ip-zodiac" element={<IpZodiac />} />
