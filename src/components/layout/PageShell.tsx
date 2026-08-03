@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { Nav } from './Nav'
 import { Footer } from './Footer'
 import { useSyncDocumentMeta } from '../../hooks/useSyncDocumentMeta'
 import { useKonamiCode } from '../../hooks/useKonamiCode'
+import { useFocusMainOnNavigate } from '../../hooks/useFocusMainOnNavigate'
 
 interface PageShellProps {
   children: ReactNode
@@ -29,7 +30,9 @@ export function PageShell({ children }: PageShellProps) {
   useSyncDocumentMeta()
   const navigate = useNavigate()
   const location = useLocation()
+  const mainRef = useRef<HTMLElement | null>(null)
   useKonamiCode(() => navigate('/terminal'))
+  useFocusMainOnNavigate(mainRef)
 
   // The retro terminal easter egg takes over the full viewport instead of
   // sitting inside the normal Nav/Footer chrome -- it's meant to feel like
@@ -37,7 +40,9 @@ export function PageShell({ children }: PageShellProps) {
   if (location.pathname === '/terminal') {
     return (
       <div className="min-h-screen bg-bg text-fg">
-        <PageTransition pathname={location.pathname}>{children}</PageTransition>
+        <main ref={mainRef} tabIndex={-1} className="outline-none">
+          <PageTransition pathname={location.pathname}>{children}</PageTransition>
+        </main>
       </div>
     )
   }
@@ -45,7 +50,11 @@ export function PageShell({ children }: PageShellProps) {
   return (
     <div className="flex min-h-screen flex-col bg-bg text-fg">
       <Nav />
-      <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 sm:px-6 lg:px-8">
+      <main
+        ref={mainRef}
+        tabIndex={-1}
+        className="mx-auto w-full max-w-[1200px] flex-1 px-4 outline-none sm:px-6 lg:px-8"
+      >
         <PageTransition pathname={location.pathname}>{children}</PageTransition>
       </main>
       <Footer />

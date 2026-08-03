@@ -6,6 +6,7 @@ import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { calculateTransferTime } from '../../../lib/calculations/transferTime'
 import { transferSizePresets } from '../../../content/reference/transferSizePresets'
+import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion'
 
 function formatDuration(totalSeconds: number): string {
   if (totalSeconds < 60) return `${totalSeconds.toFixed(1)} s`
@@ -38,6 +39,7 @@ export function TransferTimeCalculator() {
   const [sizeMB, setSizeMB] = useState('100')
   const [bandwidth, setBandwidth] = useState('100')
   const [presetId, setPresetId] = useState('custom')
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   const calc = calculateTransferTime(Number(sizeMB), Number(bandwidth))
 
@@ -113,12 +115,16 @@ export function TransferTimeCalculator() {
               <div className="h-3 overflow-hidden rounded-full border border-border bg-bg">
                 <div
                   key={`${sizeMB}-${bandwidth}`}
-                  style={{
-                    animationName: 'pn-progress-fill',
-                    animationDuration: `${progressAnimationDuration(calc.result.seconds)}ms`,
-                    animationTimingFunction: 'linear',
-                    animationFillMode: 'forwards',
-                  }}
+                  style={
+                    prefersReducedMotion
+                      ? { width: '100%' }
+                      : {
+                          animationName: 'pn-progress-fill',
+                          animationDuration: `${progressAnimationDuration(calc.result.seconds)}ms`,
+                          animationTimingFunction: 'linear',
+                          animationFillMode: 'forwards',
+                        }
+                  }
                   className="h-full rounded-full bg-accent"
                 />
               </div>

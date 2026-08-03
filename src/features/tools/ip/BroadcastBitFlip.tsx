@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ipv4ToBinaryOctets } from '../../../lib/formatting/binary'
+import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion'
 
 interface BroadcastBitFlipProps {
   label: string
@@ -20,15 +21,19 @@ export function BroadcastBitFlip({
   broadcastValue,
   prefixLength,
 }: BroadcastBitFlipProps) {
+  const prefersReducedMotion = usePrefersReducedMotion()
   // Remounted via a `key` on the parent tied to the same inputs, so the
-  // initial `false` below is a fresh start every time those inputs change
-  // rather than something this effect needs to reset by hand.
-  const [flipped, setFlipped] = useState(false)
+  // initial value below is a fresh start every time those inputs change
+  // rather than something this effect needs to reset by hand. Under
+  // reduced motion, skip straight to the flipped (final) state instead of
+  // delaying and flashing into it.
+  const [flipped, setFlipped] = useState(prefersReducedMotion)
 
   useEffect(() => {
+    if (prefersReducedMotion) return
     const timer = setTimeout(() => setFlipped(true), FLIP_DELAY_MS)
     return () => clearTimeout(timer)
-  }, [])
+  }, [prefersReducedMotion])
 
   const inputOctets = ipv4ToBinaryOctets(inputValue)
   const broadcastOctets = ipv4ToBinaryOctets(broadcastValue)
@@ -49,7 +54,7 @@ export function BroadcastBitFlip({
                 <span
                   key={bitIndex}
                   className={`${isNetworkBit ? 'text-accent' : 'text-fg-subtle'} ${
-                    isChangingBit && flipped ? 'animate-pn-avalanche-flash' : ''
+                    isChangingBit && flipped ? 'motion-safe:animate-pn-avalanche-flash' : ''
                   }`}
                 >
                   {displayedBit}

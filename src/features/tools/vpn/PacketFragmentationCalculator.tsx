@@ -67,7 +67,7 @@ export function PacketFragmentationCalculator() {
                     flexBasis: 0,
                     animationDelay: `${(fragment.index - 1) * 90}ms`,
                   }}
-                  className="animate-pn-fragment-peel flex min-w-0 items-center justify-center overflow-hidden rounded-sm border border-accent/40 bg-accent/10 px-1 text-center font-mono text-[11px] text-accent"
+                  className="motion-safe:animate-pn-fragment-peel flex min-w-0 items-center justify-center overflow-hidden rounded-sm border border-accent/40 bg-accent/10 px-1 text-center font-mono text-[11px] text-accent"
                 >
                   <span className="truncate">#{fragment.index}</span>
                 </div>

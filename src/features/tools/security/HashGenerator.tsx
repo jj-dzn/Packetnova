@@ -25,7 +25,9 @@ function AvalancheHash({ hash, previousHash }: { hash: string; previousHash: str
         <span
           key={i}
           className={
-            char !== previousHash[i] ? 'animate-pn-avalanche-flash text-accent' : undefined
+            char !== previousHash[i]
+              ? 'motion-safe:animate-pn-avalanche-flash text-accent'
+              : undefined
           }
         >
           {char}

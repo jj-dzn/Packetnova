@@ -43,8 +43,19 @@ export function DataTable<T>({
         placeholder={searchPlaceholder}
         aria-label={searchPlaceholder}
       />
+      {/* Screen readers only pick up text changes inside a live region that
+          was already present before the change -- a region that gets
+          mounted with its first message already in place is unreliable, so
+          this stays in the DOM at all times and only the visible summary
+          below is conditional. */}
+      <p aria-live="polite" className="sr-only">
+        {query &&
+          (filteredRows.length === 0
+            ? `No matches for "${query}"`
+            : `${filteredRows.length} of ${rows.length} row${rows.length === 1 ? '' : 's'} match`)}
+      </p>
       {query && (
-        <p aria-live="polite" className="text-xs text-fg-subtle">
+        <p aria-hidden="true" className="text-xs text-fg-subtle">
           {filteredRows.length === 0
             ? `No matches for "${query}"`
             : `${filteredRows.length} of ${rows.length} row${rows.length === 1 ? '' : 's'} match`}

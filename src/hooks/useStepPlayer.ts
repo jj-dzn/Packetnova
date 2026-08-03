@@ -1,23 +1,7 @@
 import { useEffect, useState, type KeyboardEvent } from 'react'
+import { usePrefersReducedMotion } from './usePrefersReducedMotion'
 
 const AUTO_ADVANCE_MS = 1600
-
-function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(
-    () =>
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-  )
-
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const handler = () => setReduced(query.matches)
-    query.addEventListener('change', handler)
-    return () => query.removeEventListener('change', handler)
-  }, [])
-
-  return reduced
-}
 
 export interface StepPlayer {
   step: number

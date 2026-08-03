@@ -6,6 +6,7 @@ import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { calculateLatency } from '../../../lib/calculations/latency'
 import { latencyPresets } from '../../../content/reference/latencyPresets'
+import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion'
 
 const MIN_TRAVEL_ANIM_MS = 400
 const MAX_TRAVEL_ANIM_MS = 2500
@@ -27,6 +28,7 @@ export function LatencyCalculator() {
   const [distance, setDistance] = useState('1000')
   const [speed, setSpeed] = useState('200')
   const [presetId, setPresetId] = useState('custom')
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   const calc = calculateLatency(Number(distance), Number(speed))
 
@@ -110,13 +112,17 @@ export function LatencyCalculator() {
               <div className="relative h-6 rounded-full border border-border bg-bg">
                 <div
                   key={`${distance}-${speed}`}
-                  style={{
-                    animationName: 'pn-packet-slide-right',
-                    animationDuration: `${travelAnimationDuration(calc.result.oneWayMs)}ms`,
-                    animationTimingFunction: 'ease-in-out',
-                    animationFillMode: 'forwards',
-                    left: '4%',
-                  }}
+                  style={
+                    prefersReducedMotion
+                      ? { left: '96%' }
+                      : {
+                          animationName: 'pn-packet-slide-right',
+                          animationDuration: `${travelAnimationDuration(calc.result.oneWayMs)}ms`,
+                          animationTimingFunction: 'ease-in-out',
+                          animationFillMode: 'forwards',
+                          left: '4%',
+                        }
+                  }
                   className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_8px_var(--color-accent)]"
                 />
               </div>
