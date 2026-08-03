@@ -196,6 +196,15 @@
   }
 }
 
+@keyframes pn-progress-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
 :root {
   --pn-bg: #f8f9fc;
   --pn-surface: #ffffff;

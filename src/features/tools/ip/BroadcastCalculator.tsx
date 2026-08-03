@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
-import { BinaryBreakdown } from './BinaryBreakdown'
+import { BroadcastBitFlip } from './BroadcastBitFlip'
 import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { calculateBroadcast } from '../../../lib/calculations/broadcast'
+import { parseIPv4 } from '../../../lib/validation/ip'
 
 export function BroadcastCalculator() {
   const [input, setInput] = useState('192.168.1.10/24')
@@ -45,9 +46,11 @@ export function BroadcastCalculator() {
               <ResultRow label="Subnet mask" value={calc.result.subnetMask} />
               <ResultRow label="Wildcard mask" value={calc.result.wildcardMask} />
             </dl>
-            <BinaryBreakdown
+            <BroadcastBitFlip
+              key={`${calc.result.ip}/${calc.result.prefixLength}`}
               label="Broadcast address in binary -- host bits are all 1s"
-              value={calc.result.broadcastAddressValue}
+              inputValue={parseIPv4(calc.result.ip)?.value ?? calc.result.broadcastAddressValue}
+              broadcastValue={calc.result.broadcastAddressValue}
               prefixLength={calc.result.prefixLength}
             />
             <p className="text-xs text-fg-subtle">

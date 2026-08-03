@@ -56,7 +56,7 @@ export function ParentAggregateBar({ cidr }: ParentAggregateBarProps) {
       </p>
       <div className="relative mt-1 h-8 overflow-hidden rounded-md border border-border bg-fg-subtle/5">
         <div
-          className="absolute top-0 h-full border-x border-accent bg-accent/25"
+          className="absolute top-0 h-full border-x border-accent bg-accent/25 transition-all duration-300 ease-out"
           style={{ left: `${leftPercent}%`, width: `${widthPercent}%` }}
           title={`${cidr} -- this block`}
         />

@@ -17,6 +17,23 @@ function formatDuration(totalSeconds: number): string {
   return `${hours}h ${minutes}m ${seconds}s`
 }
 
+const MIN_PROGRESS_ANIM_MS = 400
+const MAX_PROGRESS_ANIM_MS = 2500
+// Real transfer times span milliseconds to hours -- this maps that range
+// onto an animation duration a human can actually watch, while still
+// keeping "longer bar fill" mean "genuinely slower transfer" within the
+// mapped range. Anything at or beyond the ceiling just animates at the
+// slowest rate rather than trying to represent the real duration 1:1.
+const ANIM_SCALE_CEILING_S = 30
+
+function progressAnimationDuration(seconds: number): number {
+  const clamped = Math.min(Math.max(seconds, 0), ANIM_SCALE_CEILING_S)
+  return (
+    MIN_PROGRESS_ANIM_MS +
+    (clamped / ANIM_SCALE_CEILING_S) * (MAX_PROGRESS_ANIM_MS - MIN_PROGRESS_ANIM_MS)
+  )
+}
+
 export function TransferTimeCalculator() {
   const [sizeMB, setSizeMB] = useState('100')
   const [bandwidth, setBandwidth] = useState('100')
@@ -88,6 +105,28 @@ export function TransferTimeCalculator() {
               <ResultRow label="Transfer time" value={formatDuration(calc.result.seconds)} />
               <ResultRow label="Seconds (exact)" value={calc.result.seconds.toFixed(2)} />
             </dl>
+            <div>
+              <div className="mb-1 flex justify-between font-mono text-[10px] text-fg-subtle">
+                <span>0%</span>
+                <span>100%</span>
+              </div>
+              <div className="h-3 overflow-hidden rounded-full border border-border bg-bg">
+                <div
+                  key={`${sizeMB}-${bandwidth}`}
+                  style={{
+                    animationName: 'pn-progress-fill',
+                    animationDuration: `${progressAnimationDuration(calc.result.seconds)}ms`,
+                    animationTimingFunction: 'linear',
+                    animationFillMode: 'forwards',
+                  }}
+                  className="h-full rounded-full bg-accent"
+                />
+              </div>
+              <p className="mt-1 text-xs text-fg-subtle">
+                Animation is scaled for visibility, not to real time -- a longer fill here always
+                means a genuinely longer transfer.
+              </p>
+            </div>
             <p className="text-xs text-fg-subtle">
               This is the theoretical best case at the full bandwidth you entered. Real transfers
               rarely sustain 100% of nominal bandwidth -- TCP overhead, a connection that hasn't

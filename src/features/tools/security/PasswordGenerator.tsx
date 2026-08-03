@@ -83,6 +83,16 @@ export function PasswordGenerator() {
               value={length}
               onChange={(e) => setLength(e.target.value)}
             />
+            <input
+              type="range"
+              aria-label="Password length, drag to explore"
+              min={4}
+              max={64}
+              step={1}
+              value={Math.min(64, Math.max(4, Number(length) || 4))}
+              onChange={(e) => setLength(e.target.value)}
+              className="mt-3 w-full accent-accent"
+            />
           </div>
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-2 text-sm">
