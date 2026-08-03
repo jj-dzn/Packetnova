@@ -5,6 +5,7 @@ import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import { testRegex, type RegexMatch, type RegexResult } from '../../../lib/calculations/regexTester'
+import { explainPattern } from '../../../lib/calculations/regexExplainer'
 import type { CalculationResult } from '../../../lib/calculations/result'
 
 const DEBOUNCE_MS = 150
@@ -65,6 +66,7 @@ export function RegexTester() {
     testRegex(pattern, flags, text),
   )
   const [showExport, setShowExport] = useState(false)
+  const [showExplanation, setShowExplanation] = useState(false)
 
   // Evaluated off the main thread with a hard timeout: a pattern like (a+)+$
   // against pathological input can take exponential time inside a single
@@ -166,6 +168,25 @@ export function RegexTester() {
             <p className="whitespace-pre-wrap break-words rounded-md border border-border bg-bg p-3 text-sm">
               {renderHighlighted(text, calc.result.matches)}
             </p>
+            <div>
+              <Pill active={showExplanation} onClick={() => setShowExplanation((v) => !v)}>
+                {showExplanation ? 'Hide' : 'Show'} plain-English explanation
+              </Pill>
+              {showExplanation && (
+                <ol className="mt-3 flex flex-col gap-1 rounded-md border border-border bg-bg p-3 text-xs">
+                  {explainPattern(pattern).map((token, i) => (
+                    <li
+                      key={i}
+                      style={{ paddingLeft: `${token.depth}rem` }}
+                      className="flex flex-wrap items-baseline gap-x-2"
+                    >
+                      <span className="shrink-0 font-mono text-accent">{token.raw}</span>
+                      <span className="text-fg-muted">{token.description}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
             {calc.result.matches.some((match) => match.groups.length > 0) && (
               <div className="flex flex-col gap-2">
                 <p className="text-sm font-medium text-fg-muted">Capture groups</p>
@@ -240,7 +261,9 @@ export function RegexTester() {
             tab. Every match found gets highlighted inline, and any capture groups inside a match
             are broken out separately below -- a group written as{' '}
             <code className="font-mono">(?&lt;name&gt;...)</code> shows its name next to its number
-            in that breakdown, instead of just a bare index.
+            in that breakdown, instead of just a bare index. The plain-English explanation walks the
+            pattern itself piece by piece -- each quantifier, character class, and group gets its
+            own line, in the order it appears, indented to show what's nested inside what.
           </p>
         }
         whenToUseThis={

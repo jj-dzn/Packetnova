@@ -39,7 +39,7 @@ export function MacAddressLookup() {
     <ToolPageLayout
       category="Switching"
       title="MAC address lookup"
-      description="Break a MAC address down into its OUI and NIC-specific portion, and check a small set of well-known vendor OUIs."
+      description="Break a MAC address down into its OUI and NIC-specific portion, and check it against a curated set of well-known vendor OUIs."
       related={[{ to: '/tools/mac-formatter', label: 'MAC formatter' }]}
       input={
         <div>
@@ -61,10 +61,7 @@ export function MacAddressLookup() {
             <dl>
               <ResultRow label="OUI" value={calc.result.oui} />
               <ResultRow label="NIC-specific" value={calc.result.nicSpecific} />
-              <ResultRow
-                label="Vendor"
-                value={calc.result.vendor ?? 'Not in our small reference set'}
-              />
+              <ResultRow label="Vendor" value={calc.result.vendor ?? 'Not in our reference set'} />
               <ResultRow label="Multicast?" value={calc.result.isMulticast ? 'Yes' : 'No'} />
               <ResultRow
                 label="Locally administered?"
@@ -72,8 +69,9 @@ export function MacAddressLookup() {
               />
             </dl>
             <p className="text-xs text-fg-subtle">
-              Vendor lookup covers a small, individually-verified set of well-known OUIs, not the
-              full ~50,000-entry IEEE registry.
+              Vendor lookup covers a curated, individually-verified set of ~230 well-known OUIs --
+              major networking, computing, mobile, and IoT vendors -- not the full ~50,000-entry
+              IEEE registry.
             </p>
             <div>
               <Pill active={showBinary} onClick={() => setShowBinary((v) => !v)}>

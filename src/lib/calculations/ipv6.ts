@@ -84,6 +84,17 @@ function classify(values: number[]): string {
   if ((first & 0xff00) === 0xff00) return 'Multicast'
   if (first === 0x2001 && second === 0x0db8) return 'Documentation address (RFC 3849)'
   if (values.slice(0, 5).every((v) => v === 0) && values[5] === 0xffff) return 'IPv4-mapped address'
+  // Well-known NAT64 prefix (RFC 6052) -- a NAT64 gateway synthesizes
+  // addresses in this /96 to represent IPv4-only destinations to
+  // IPv6-only clients, embedding the IPv4 address in the last 32 bits.
+  if (values.slice(0, 4).every((v, i) => v === [0x0064, 0xff9b, 0, 0][i]))
+    return 'NAT64 well-known prefix (RFC 6052)'
+  // 6to4 (RFC 3056): the next 32 bits after the fixed 2002::/16 prefix
+  // encode the tunnel endpoint's own public IPv4 address.
+  if (first === 0x2002) return '6to4 tunneling address (RFC 3056)'
+  // Teredo (RFC 4380): a UDP/IPv4 NAT-traversal tunnel -- unlike 6to4, the
+  // embedded IPv4 fields are XORed with 0xffffffff, not stored plainly.
+  if (first === 0x2001 && second === 0x0000) return 'Teredo tunneling address (RFC 4380)'
   if ((first & 0xe000) === 0x2000) return 'Global unicast'
   return 'Other / reserved'
 }

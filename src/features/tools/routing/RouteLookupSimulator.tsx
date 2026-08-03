@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
+import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
 import { Button } from '../../../components/ui/Button'
 import { Pill } from '../../../components/ui/Pill'
 import { RangeOverlapDiagram } from '../../diagram/RangeOverlapDiagram'
+import { EliminationSteps, type Candidate } from '../../visualizers/EliminationSteps'
 import {
   simulateRouteLookup,
   type RouteLookupEntry,
@@ -55,6 +57,74 @@ function buildShowIpRouteSnippet(
       return match === winner ? `${line}  ! installed` : line
     })
     .join('\n')
+}
+
+// Two-stage decision tree: longest prefix match always runs first and
+// decides outright whenever it isn't a tie, with administrative distance
+// only ever entering the picture to break a tie at that longest prefix --
+// reuses the same EliminationSteps/GuidedMode pairing already proven on
+// the BGP tool, just with a different (much shorter) chain of steps.
+function buildRouteLookupGuidedSteps(matches: RouteLookupMatch[]): GuidedStep[] {
+  const candidates: Candidate[] = matches.map((match, i) => ({
+    id: String(i),
+    label: match.label,
+    detail: `${match.cidr} · AD ${match.administrativeDistance}`,
+  }))
+  const allIds = candidates.map((c) => c.id)
+  const matchingIndexed = matches
+    .map((match, i) => ({ match, id: String(i) }))
+    .filter((m) => m.match.matches)
+  const matchingIds = matchingIndexed.map((m) => m.id)
+
+  const steps: { title: string; description: string; remainingIds: string[] }[] = [
+    {
+      title: 'All configured routes',
+      description: `${matches.length} route${matches.length === 1 ? '' : 's'} configured. First, check which ones even contain the destination.`,
+      remainingIds: allIds,
+    },
+    {
+      title: 'Does the route contain the destination?',
+      description:
+        matchingIds.length === 0
+          ? 'None of these routes contain the destination -- there is no match.'
+          : `${matchingIds.length} of ${matches.length} route${matches.length === 1 ? '' : 's'} contain the destination address.`,
+      remainingIds: matchingIds,
+    },
+  ]
+
+  if (matchingIndexed.length > 0) {
+    const longestPrefix = Math.max(...matchingIndexed.map((m) => m.match.prefixLength))
+    const longest = matchingIndexed.filter((m) => m.match.prefixLength === longestPrefix)
+    const longestIds = longest.map((m) => m.id)
+
+    steps.push({
+      title: 'Longest prefix match: keep only the most specific',
+      description:
+        longest.length === 1
+          ? `Only one route matches at the longest prefix length, /${longestPrefix} -- it wins outright, administrative distance is never even considered.`
+          : `${longest.length} routes are tied at the longest prefix length, /${longestPrefix} -- longest prefix match alone can't break this tie.`,
+      remainingIds: longestIds,
+    })
+
+    if (longest.length > 1) {
+      const winner = longest.reduce((best, current) =>
+        current.match.administrativeDistance < best.match.administrativeDistance ? current : best,
+      )
+      steps.push({
+        title: 'Administrative distance breaks the tie',
+        description: `${longest.length} routes tied on prefix length -- the lowest administrative distance wins. ${winner.match.label} (AD ${winner.match.administrativeDistance}) takes it.`,
+        remainingIds: [winner.id],
+      })
+    }
+  }
+
+  return steps.map((step, index) => ({
+    title: step.title,
+    description: step.description,
+    content: (
+      <EliminationSteps candidates={candidates} step={step} isFinal={index === steps.length - 1} />
+    ),
+  }))
 }
 
 export function RouteLookupSimulator() {
@@ -184,33 +254,44 @@ export function RouteLookupSimulator() {
                 isWinner: calc.result.winner === match,
               }))}
             />
-            <div className="overflow-x-auto rounded-md border border-border">
-              <table className="w-full text-left text-sm">
-                <thead className="bg-surface">
-                  <tr className="border-b border-border">
-                    <th className="px-3 py-2 font-medium text-fg-muted">Route</th>
-                    <th className="px-3 py-2 font-medium text-fg-muted">Prefix</th>
-                    <th className="px-3 py-2 font-medium text-fg-muted">AD</th>
-                    <th className="px-3 py-2 font-medium text-fg-muted">Matches?</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {calc.result.matches.map((match, index) => (
-                    <tr
-                      key={index}
-                      className={`border-b border-border font-mono last:border-b-0 ${
-                        calc.result.winner === match ? 'bg-accent/10' : ''
-                      }`}
-                    >
-                      <td className="px-3 py-2">{match.label}</td>
-                      <td className="px-3 py-2">/{match.prefixLength}</td>
-                      <td className="px-3 py-2">{match.administrativeDistance}</td>
-                      <td className="px-3 py-2">{match.matches ? 'Yes' : 'No'}</td>
+            <GuidedMode
+              steps={buildRouteLookupGuidedSteps(calc.result.matches)}
+              closingNote={
+                <>
+                  Longest prefix match always decides between routes to different network sizes --
+                  administrative distance only ever breaks a tie between routes to the exact same
+                  network. A router never considers AD first and LPM second.
+                </>
+              }
+            >
+              <div className="overflow-x-auto rounded-md border border-border">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-surface">
+                    <tr className="border-b border-border">
+                      <th className="px-3 py-2 font-medium text-fg-muted">Route</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">Prefix</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">AD</th>
+                      <th className="px-3 py-2 font-medium text-fg-muted">Matches?</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {calc.result.matches.map((match, index) => (
+                      <tr
+                        key={index}
+                        className={`border-b border-border font-mono last:border-b-0 ${
+                          calc.result.winner === match ? 'bg-accent/10' : ''
+                        }`}
+                      >
+                        <td className="px-3 py-2">{match.label}</td>
+                        <td className="px-3 py-2">/{match.prefixLength}</td>
+                        <td className="px-3 py-2">{match.administrativeDistance}</td>
+                        <td className="px-3 py-2">{match.matches ? 'Yes' : 'No'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </GuidedMode>
             <div>
               <Pill active={showCli} onClick={() => setShowCli((v) => !v)}>
                 {showCli ? 'Hide' : 'Show'} routing table output (expert)

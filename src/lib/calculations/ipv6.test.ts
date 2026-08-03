@@ -78,6 +78,26 @@ describe('analyzeIPv6', () => {
     if (calc.ok) expect(calc.result.addressType).toBe('Global unicast')
   })
 
+  it('classifies a NAT64 well-known-prefix address', () => {
+    // 192.0.2.33 embedded in the RFC 6052 well-known prefix.
+    const calc = analyzeIPv6('64:ff9b::c000:221')
+    expect(calc.ok).toBe(true)
+    if (calc.ok) expect(calc.result.addressType).toBe('NAT64 well-known prefix (RFC 6052)')
+  })
+
+  it('classifies a 6to4 address', () => {
+    // 2002:c000:0204:: -- 192.0.2.4 encoded in the next 32 bits after 2002::/16.
+    const calc = analyzeIPv6('2002:c000:204::1')
+    expect(calc.ok).toBe(true)
+    if (calc.ok) expect(calc.result.addressType).toBe('6to4 tunneling address (RFC 3056)')
+  })
+
+  it('classifies a Teredo address', () => {
+    const calc = analyzeIPv6('2001:0000:4136:e378:8000:63bf:3fff:fdd2')
+    expect(calc.ok).toBe(true)
+    if (calc.ok) expect(calc.result.addressType).toBe('Teredo tunneling address (RFC 4380)')
+  })
+
   it('parses a prefix length', () => {
     const calc = analyzeIPv6('2001:db8::/32')
     expect(calc.ok).toBe(true)
