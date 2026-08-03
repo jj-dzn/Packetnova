@@ -44,7 +44,7 @@ function splitLines(value: string): string[] {
 }
 
 /**
- * A Notepad++-style side-by-side alignment: every row is a position on a
+ * A merge-tool-style side-by-side alignment: every row is a position on a
  * shared line-number axis for both sides, so the two panes stay in lockstep
  * even after an insertion or deletion -- the side missing a line at that
  * position gets a blank cell instead of the whole column drifting out of
@@ -149,9 +149,9 @@ export function summarizeAlignedRows(rows: AlignedDiffRow[]) {
 }
 
 /** Word-level diff between two individual lines -- used to highlight just
- * the words that changed within a 'modified' aligned row, the same way
- * Notepad++'s compare plugin highlights sub-line changes instead of
- * tinting the whole line as one opaque block. */
+ * the words that changed within a 'modified' aligned row, the same way a
+ * merge tool highlights sub-line changes instead of tinting the whole
+ * line as one opaque block. */
 export function diffLineWords(left: string, right: string): DiffPart[] {
   return diffWords(left, right).map((part) => ({
     value: part.value,

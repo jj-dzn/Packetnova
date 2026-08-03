@@ -14,7 +14,7 @@ export function TextDiffViewer() {
     <ToolPageLayout
       category="Utilities"
       title="Text diff viewer"
-      description="Paste two versions of a text directly into the boxes below -- the differences highlight in place as you type, line-numbered and color-coded the way Notepad++'s Compare plugin or a merge tool shows them. Handy for diffing two router or switch config snapshots to see exactly what a change touched."
+      description="Paste two versions of a text directly into the boxes below -- the differences highlight in place as you type, line-numbered and color-coded like a merge tool. Handy for diffing two router or switch config snapshots to see exactly what a change touched."
       fullWidth={
         <DiffPasteBoard
           before={before}

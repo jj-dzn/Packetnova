@@ -146,9 +146,9 @@ function Pane({
   )
 }
 
-// A Notepad++/GitHub-style split diff that's directly, immediately
-// editable -- pasting into either side updates both panes' highlighting
-// live, with no mode to switch into first. Scroll position is synced two
+// A GitHub-style split diff that's directly, immediately editable --
+// pasting into either side updates both panes' highlighting live, with no
+// mode to switch into first. Scroll position is synced two
 // ways: each textarea drives its own overlay underneath it (so the
 // highlighted duplicate always tracks what's actually on screen), and the
 // two textareas drive each other (so the panes stay visually together
