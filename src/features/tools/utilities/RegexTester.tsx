@@ -7,6 +7,7 @@ import { CopyButton } from '../../../components/ui/CopyButton'
 import { testRegex, type RegexMatch, type RegexResult } from '../../../lib/calculations/regexTester'
 import { explainPattern } from '../../../lib/calculations/regexExplainer'
 import type { CalculationResult } from '../../../lib/calculations/result'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 const DEBOUNCE_MS = 150
 const EVAL_TIMEOUT_MS = 750
@@ -59,9 +60,9 @@ function renderHighlighted(text: string, matches: RegexMatch[]): ReactNode {
 }
 
 export function RegexTester() {
-  const [pattern, setPattern] = useState('#(?<id>\\d+)')
-  const [flags, setFlags] = useState('g')
-  const [text, setText] = useState('Order #123 shipped, invoice #456 pending.')
+  const [pattern, setPattern] = useUrlState('pattern', '#(?<id>\\d+)')
+  const [flags, setFlags] = useUrlState('flags', 'g')
+  const [text, setText] = useUrlState('text', 'Order #123 shipped, invoice #456 pending.')
   const [calc, setCalc] = useState<CalculationResult<RegexResult>>(() =>
     testRegex(pattern, flags, text),
   )

@@ -4,11 +4,15 @@ import { Button } from '../ui/Button'
 import { SearchBar } from '../ui/SearchBar'
 import { Mascot } from '../ui/Mascot'
 import { useDarkMode } from '../../hooks/useDarkMode'
+import { openCommandPalette } from '../../lib/commandPalette'
+
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
 
 const navLinks = [
   { to: '/tools', label: 'Tools' },
   { to: '/visualizers', label: 'Visualizers' },
   { to: '/scenarios', label: 'Scenarios' },
+  { to: '/journey', label: 'Journey' },
   { to: '/labs', label: 'Labs' },
 ]
 
@@ -72,6 +76,15 @@ export function Nav() {
 
         <div className="hidden items-center gap-3 md:flex">
           <SearchBar className="w-48 lg:w-64" />
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            aria-label="Open command palette"
+            className="hidden items-center gap-1.5 rounded-md border border-border px-2.5 py-2 text-xs text-fg-subtle transition-colors hover:border-accent/40 hover:text-fg lg:flex"
+          >
+            <kbd className="font-sans">{isMac ? '⌘' : 'Ctrl'}</kbd>
+            <kbd className="font-sans">K</kbd>
+          </button>
           <Button variant="secondary" onClick={toggleTheme} aria-label="Toggle color theme">
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </Button>

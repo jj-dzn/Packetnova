@@ -7,6 +7,7 @@ import { Input } from '../../../components/ui/Input'
 import { analyzeIPv6 } from '../../../lib/calculations/ipv6'
 import { calculateIpv6Subnets } from '../../../lib/calculations/ipv6Subnet'
 import { calculateEui64 } from '../../../lib/calculations/eui64'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 // Boundaries rounded to the nearest nibble (4 bits) -- see
 // Ipv6AnatomyDiagram's own comment for why that's exact for the prefix
@@ -94,7 +95,7 @@ function HextetBreakdown({ expanded }: { expanded: string }) {
 }
 
 export function Ipv6Calculator() {
-  const [input, setInput] = useState('2001:0db8:0000:0000:0000:ff00:0042:8329/64')
+  const [input, setInput] = useUrlState('addr', '2001:0db8:0000:0000:0000:ff00:0042:8329/64')
   const [newPrefixInput, setNewPrefixInput] = useState('80')
   const [macInput, setMacInput] = useState('00:1A:2B:3C:4D:5E')
   const calc = analyzeIPv6(input)

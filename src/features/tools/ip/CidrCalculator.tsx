@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
@@ -8,9 +7,10 @@ import { BitToggleSandbox } from '../BitToggleSandbox'
 import { Input } from '../../../components/ui/Input'
 import { calculateCidr } from '../../../lib/calculations/cidr'
 import { ipv4ToString, parseIPv4 } from '../../../lib/validation/ip'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 export function CidrCalculator() {
-  const [input, setInput] = useState('192.168.1.0/24')
+  const [input, setInput] = useUrlState('cidr', '192.168.1.0/24')
   const calc = calculateCidr(input)
 
   return (

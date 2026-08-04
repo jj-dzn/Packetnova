@@ -5,6 +5,7 @@ import { MacBinaryBreakdown } from './MacBinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
 import { lookupMac } from '../../../lib/calculations/macLookup'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 // Cisco IOS renders MAC addresses as three dot-separated 16-bit groups
 // (aabb.ccdd.eeff), not the colon-separated bytes this tool otherwise
@@ -29,7 +30,7 @@ function buildMacCliSnippet(bytes: number[]): string {
 }
 
 export function MacAddressLookup() {
-  const [input, setInput] = useState('00:00:0c:12:34:56')
+  const [input, setInput] = useUrlState('mac', '00:00:0c:12:34:56')
   const [showBinary, setShowBinary] = useState(false)
   const [showCli, setShowCli] = useState(false)
 

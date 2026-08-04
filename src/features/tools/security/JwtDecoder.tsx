@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
@@ -10,6 +9,7 @@ import { Badge } from '../../../components/ui/Badge'
 import { Pill } from '../../../components/ui/Pill'
 import { decodeJwt, inspectJwt, type JwtInspection } from '../../../lib/calculations/jwt'
 import type { CalculationResult } from '../../../lib/calculations/result'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 const DEFAULT_TOKEN =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
@@ -21,8 +21,9 @@ type Mode = 'raw' | 'summary'
 // header/payload JSON vs. a summarized claims view), so a mode toggle over
 // one input replaces what used to be two near-duplicate pages.
 export function JwtDecoder() {
-  const [token, setToken] = useState(DEFAULT_TOKEN)
-  const [mode, setMode] = useState<Mode>('raw')
+  const [token, setToken] = useUrlState('token', DEFAULT_TOKEN)
+  const [modeParam, setMode] = useUrlState('mode', 'raw')
+  const mode: Mode = modeParam === 'summary' ? 'summary' : 'raw'
   const inspection = inspectJwt(token)
 
   return (

@@ -1,9 +1,9 @@
 import { Hero } from './home/Hero'
+import { ContinueWhereYouLeftOff } from './home/ContinueWhereYouLeftOff'
 import { PopularTools } from './home/PopularTools'
 import { FeaturedVisualizers } from './home/FeaturedVisualizers'
 import { WhyPacketNova } from './home/WhyPacketNova'
 import { LabsTeaser } from './home/LabsTeaser'
-import { Newsletter } from './home/Newsletter'
 import { StructuredData } from '../components/seo/StructuredData'
 import { SITE_URL } from '../lib/seo/pageMeta'
 
@@ -26,11 +26,11 @@ export function HomePage() {
     <div className="flex flex-col divide-y divide-border">
       <StructuredData data={WEBSITE_SCHEMA} />
       <Hero />
+      <ContinueWhereYouLeftOff />
       <LabsTeaser />
       <PopularTools />
       <FeaturedVisualizers />
       <WhyPacketNova />
-      <Newsletter />
     </div>
   )
 }

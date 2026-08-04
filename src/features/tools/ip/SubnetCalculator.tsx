@@ -13,6 +13,7 @@ import {
   type VlsmRequest,
 } from '../../../lib/calculations/vlsm'
 import { ipv4ToString, parseCIDR, prefixLengthToSubnetMask } from '../../../lib/validation/ip'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 function buildEqualCliSnippet(subnets: SubnetInfo[], mask: string): string {
   return subnets
@@ -87,7 +88,7 @@ type Mode = 'equal' | 'vlsm'
 
 export function SubnetCalculator() {
   const [mode, setMode] = useState<Mode>('equal')
-  const [cidrInput, setCidrInput] = useState('192.168.1.0/24')
+  const [cidrInput, setCidrInput] = useUrlState('cidr', '192.168.1.0/24')
   const [showCli, setShowCli] = useState(false)
 
   const [newPrefixInput, setNewPrefixInput] = useState('26')

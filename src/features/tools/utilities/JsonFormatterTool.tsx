@@ -6,6 +6,7 @@ import { CopyableTextarea } from '../CopyableTextarea'
 import { JsonTreeView } from './JsonTreeView'
 import { Pill } from '../../../components/ui/Pill'
 import { formatJson } from '../../../lib/calculations/jsonFormatter'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 function parseForTree(input: string): { ok: true; value: unknown } | { ok: false; error: string } {
   try {
@@ -21,9 +22,16 @@ const JQ_CLI: Record<'pretty' | 'minify' | 'tree', string> = {
   tree: 'jq . input.json | less',
 }
 
+const VALID_JSON_MODES = new Set(['pretty', 'minify', 'tree'])
+
 export function JsonFormatterTool() {
-  const [mode, setMode] = useState<'pretty' | 'minify' | 'tree'>('pretty')
-  const [input, setInput] = useState('{"name":"PacketNova","tools":["subnet","cidr"],"free":true}')
+  const [modeParam, setMode] = useUrlState('mode', 'pretty')
+  const mode = (VALID_JSON_MODES.has(modeParam) ? modeParam : 'pretty') as
+    'pretty' | 'minify' | 'tree'
+  const [input, setInput] = useUrlState(
+    'json',
+    '{"name":"PacketNova","tools":["subnet","cidr"],"free":true}',
+  )
   const [showCli, setShowCli] = useState(false)
 
   const result = mode === 'tree' ? null : formatJson(input, mode)

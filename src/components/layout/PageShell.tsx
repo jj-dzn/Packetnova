@@ -2,6 +2,7 @@ import { useRef, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { Nav } from './Nav'
 import { Footer } from './Footer'
+import { CommandPalette } from '../ui/CommandPalette'
 import { useSyncDocumentMeta } from '../../hooks/useSyncDocumentMeta'
 import { useKonamiCode } from '../../hooks/useKonamiCode'
 import { useFocusMainOnNavigate } from '../../hooks/useFocusMainOnNavigate'
@@ -58,6 +59,7 @@ export function PageShell({ children }: PageShellProps) {
         <PageTransition pathname={location.pathname}>{children}</PageTransition>
       </main>
       <Footer />
+      <CommandPalette />
     </div>
   )
 }

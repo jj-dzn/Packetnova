@@ -7,6 +7,7 @@ import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
 import { calculateWildcardMask } from '../../../lib/calculations/wildcardMask'
 import { ipv4ToString, networkAddress, parseIPv4 } from '../../../lib/validation/ip'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 // A fixed illustrative host, masked down to whatever prefix the visitor's
 // wildcard mask corresponds to -- gives the CLI lines a concrete, valid
@@ -24,7 +25,7 @@ function buildWildcardCliSnippet(prefixLength: number, wildcardMask: string): st
 }
 
 export function WildcardMaskCalculator() {
-  const [input, setInput] = useState('255.255.255.0')
+  const [input, setInput] = useUrlState('mask', '255.255.255.0')
   const [showCli, setShowCli] = useState(false)
   const calc = calculateWildcardMask(input)
 

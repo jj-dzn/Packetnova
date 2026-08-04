@@ -1,8 +1,11 @@
 import type { ReactNode } from 'react'
+import { useLocation } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { RelatedLinks, type RelatedLink } from '../../components/ui/RelatedLinks'
+import { BookmarkButton } from '../../components/ui/BookmarkButton'
 import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
+import { useRecordVisit } from '../../hooks/useRecentlyViewed'
 import { useIsScenarioEmbed } from '../scenarios/ScenarioEmbedContext'
 
 interface ReferencePageLayoutProps {
@@ -23,12 +26,18 @@ export function ReferencePageLayout({
   const breadcrumbSchema = useBreadcrumbSchema('Tools', '/tools', title)
   const embedded = useIsScenarioEmbed()
   const Heading = embedded ? 'h3' : 'h1'
+  const { pathname } = useLocation()
+
+  useRecordVisit(embedded ? null : { href: pathname, title, category })
 
   return (
     <div className={embedded ? '' : 'py-12'}>
       {!embedded && <StructuredData data={breadcrumbSchema} />}
       <div className="mb-8">
-        <Badge tone="accent">{category}</Badge>
+        <div className="flex items-center justify-between gap-3">
+          <Badge tone="accent">{category}</Badge>
+          {!embedded && <BookmarkButton item={{ href: pathname, title, category }} />}
+        </div>
         <Heading
           className={embedded ? 'mt-3 text-lg font-semibold' : 'mt-3 text-2xl font-semibold'}
         >

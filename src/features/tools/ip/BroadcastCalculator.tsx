@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BroadcastBitFlip } from './BroadcastBitFlip'
@@ -6,9 +5,10 @@ import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
 import { calculateBroadcast } from '../../../lib/calculations/broadcast'
 import { parseIPv4 } from '../../../lib/validation/ip'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 export function BroadcastCalculator() {
-  const [input, setInput] = useState('192.168.1.10/24')
+  const [input, setInput] = useUrlState('cidr', '192.168.1.10/24')
   const calc = calculateBroadcast(input)
 
   return (

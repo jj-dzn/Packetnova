@@ -5,9 +5,10 @@ import { MacBinaryBreakdown } from './MacBinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
 import { formatMacAddress } from '../../../lib/calculations/macFormat'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 export function MacFormatter() {
-  const [input, setInput] = useState('00:1a:2b:3c:4d:5e')
+  const [input, setInput] = useUrlState('mac', '00:1a:2b:3c:4d:5e')
   const [showBinary, setShowBinary] = useState(false)
 
   const calc = formatMacAddress(input)

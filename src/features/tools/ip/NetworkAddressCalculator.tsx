@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
@@ -6,9 +5,10 @@ import { AddressSpaceBar } from './AddressSpaceBar'
 import { Input } from '../../../components/ui/Input'
 import { calculateNetworkAddress } from '../../../lib/calculations/networkAddress'
 import { parseIPv4 } from '../../../lib/validation/ip'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 export function NetworkAddressCalculator() {
-  const [input, setInput] = useState('192.168.1.10/24')
+  const [input, setInput] = useUrlState('cidr', '192.168.1.10/24')
   const calc = calculateNetworkAddress(input)
 
   return (

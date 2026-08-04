@@ -7,6 +7,7 @@ import { CharDiffView } from '../CharDiffView'
 import { Pill } from '../../../components/ui/Pill'
 import { base64Decode, base64Encode } from '../../../lib/calculations/base64'
 import { shellQuote } from '../../../lib/calculations/shellQuote'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 function buildBase64CliSnippet(mode: 'encode' | 'decode', input: string): string {
   return mode === 'encode'
@@ -15,8 +16,9 @@ function buildBase64CliSnippet(mode: 'encode' | 'decode', input: string): string
 }
 
 export function Base64Tool() {
-  const [mode, setMode] = useState<'encode' | 'decode'>('encode')
-  const [input, setInput] = useState('Hello, PacketNova!')
+  const [modeParam, setMode] = useUrlState('mode', 'encode')
+  const mode: 'encode' | 'decode' = modeParam === 'decode' ? 'decode' : 'encode'
+  const [input, setInput] = useUrlState('text', 'Hello, PacketNova!')
   const [showCli, setShowCli] = useState(false)
 
   const result =

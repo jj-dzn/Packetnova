@@ -5,6 +5,7 @@ import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
 import { DeviceIcon } from '../../diagram/DeviceIcons'
 import { calculateVlan } from '../../../lib/calculations/vlan'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 type CliVendor = 'cisco' | 'juniper' | 'fortinet'
 
@@ -128,7 +129,7 @@ function TrunkDiagram({
 }
 
 export function VlanCalculator() {
-  const [vlanId, setVlanId] = useState('100')
+  const [vlanId, setVlanId] = useUrlState('vlan', '100')
   const [showCli, setShowCli] = useState(false)
   const [cliVendor, setCliVendor] = useState<CliVendor>('cisco')
 

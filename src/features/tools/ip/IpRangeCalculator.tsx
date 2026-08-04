@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
@@ -6,10 +5,11 @@ import { ResultRow } from '../ResultRow'
 import { RangeBlocksBar } from './RangeBlocksBar'
 import { Input } from '../../../components/ui/Input'
 import { calculateIpRange } from '../../../lib/calculations/ipRange'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 export function IpRangeCalculator() {
-  const [startInput, setStartInput] = useState('192.168.1.10')
-  const [endInput, setEndInput] = useState('192.168.1.20')
+  const [startInput, setStartInput] = useUrlState('start', '192.168.1.10')
+  const [endInput, setEndInput] = useUrlState('end', '192.168.1.20')
   const calc = calculateIpRange(startInput, endInput)
 
   return (
