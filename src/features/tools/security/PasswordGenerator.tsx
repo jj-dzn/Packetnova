@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
+import { ResultRow } from '../ResultRow'
+import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { Input } from '../../../components/ui/Input'
 import { Button } from '../../../components/ui/Button'
 import { CopyButton } from '../../../components/ui/CopyButton'
@@ -10,6 +12,69 @@ import {
   estimateCrackTime,
   generatePassword,
 } from '../../../lib/calculations/password'
+
+// Mirrors the CHARSETS sizes in password.ts (26/26/10/18) -- kept here as
+// plain numbers rather than importing the actual charset strings, since
+// only their lengths matter for walking through the entropy formula.
+const CHARSET_SIZES = { uppercase: 26, lowercase: 26, digits: 10, symbols: 18 }
+
+function buildEntropySteps(options: {
+  length: number
+  uppercase: boolean
+  lowercase: boolean
+  digits: boolean
+  symbols: boolean
+  entropyBits: number
+}): GuidedStep[] {
+  const parts = [
+    options.uppercase && `${CHARSET_SIZES.uppercase} uppercase`,
+    options.lowercase && `${CHARSET_SIZES.lowercase} lowercase`,
+    options.digits && `${CHARSET_SIZES.digits} digits`,
+    options.symbols && `${CHARSET_SIZES.symbols} symbols`,
+  ].filter((part): part is string => Boolean(part))
+  const charsetSize =
+    (options.uppercase ? CHARSET_SIZES.uppercase : 0) +
+    (options.lowercase ? CHARSET_SIZES.lowercase : 0) +
+    (options.digits ? CHARSET_SIZES.digits : 0) +
+    (options.symbols ? CHARSET_SIZES.symbols : 0)
+  const bitsPerChar = charsetSize > 0 ? Math.log2(charsetSize) : 0
+
+  return [
+    {
+      title: '1. Add up the character pool',
+      description:
+        parts.length > 0
+          ? `Every checked character class contributes its own characters to the pool each position is drawn from: ${parts.join(' + ')}.`
+          : 'No character class is selected -- there is no pool to draw from.',
+      content: (
+        <ResultRow
+          label={parts.join(' + ') || 'none'}
+          value={`${charsetSize} possible characters`}
+        />
+      ),
+    },
+    {
+      title: '2. log2(pool size) = bits per character',
+      description: `Each character drawn from a ${charsetSize}-character pool carries log2(${charsetSize}) bits of randomness -- roughly the number of yes/no guesses it'd take to pin down which one it is.`,
+      content: (
+        <ResultRow
+          label={`log2(${charsetSize})`}
+          value={`${bitsPerChar.toFixed(2)} bits/character`}
+        />
+      ),
+    },
+    {
+      title: '3. Multiply by length',
+      description: `${options.length} independent characters, each contributing ${bitsPerChar.toFixed(2)} bits -- entropy adds up linearly with length, which is why length matters more than character variety.`,
+      content: (
+        <ResultRow
+          label={`${options.length} × ${bitsPerChar.toFixed(2)}`}
+          value={`${options.entropyBits.toFixed(1)} bits total`}
+        />
+      ),
+    },
+  ]
+}
 
 interface EntropyTier {
   min: number
@@ -128,25 +193,36 @@ export function PasswordGenerator() {
               Symbols (!@#$...)
             </label>
           </div>
-          <div>
-            <div className="flex items-center justify-between text-xs text-fg-muted">
-              <span>Entropy</span>
-              <span className="font-mono">
-                {entropyBits.toFixed(1)} bits -- {tier.label}
-              </span>
+          <GuidedMode
+            steps={buildEntropySteps({
+              length: Number(length),
+              uppercase,
+              lowercase,
+              digits,
+              symbols,
+              entropyBits,
+            })}
+          >
+            <div>
+              <div className="flex items-center justify-between text-xs text-fg-muted">
+                <span>Entropy</span>
+                <span className="font-mono">
+                  {entropyBits.toFixed(1)} bits -- {tier.label}
+                </span>
+              </div>
+              <div className="mt-1 h-2 overflow-hidden rounded-full bg-border">
+                <div
+                  className={`h-full rounded-full transition-[width] duration-300 ease-out ${tier.barClass}`}
+                  style={{ width: `${entropyPercent}%` }}
+                />
+              </div>
+              <p className="mt-1 text-xs text-fg-subtle">
+                At {crackTime.guessesPerSecond.toLocaleString()} guesses/sec (a realistic offline
+                attack rate against a fast hash), brute-forcing this would take{' '}
+                <span className="font-medium text-fg">{crackTime.humanReadable}</span> on average.
+              </p>
             </div>
-            <div className="mt-1 h-2 overflow-hidden rounded-full bg-border">
-              <div
-                className={`h-full rounded-full transition-[width] duration-300 ease-out ${tier.barClass}`}
-                style={{ width: `${entropyPercent}%` }}
-              />
-            </div>
-            <p className="mt-1 text-xs text-fg-subtle">
-              At {crackTime.guessesPerSecond.toLocaleString()} guesses/sec (a realistic offline
-              attack rate against a fast hash), brute-forcing this would take{' '}
-              <span className="font-medium text-fg">{crackTime.humanReadable}</span> on average.
-            </p>
-          </div>
+          </GuidedMode>
           <Button type="button" onClick={regenerate} className="self-start">
             Generate new password
           </Button>

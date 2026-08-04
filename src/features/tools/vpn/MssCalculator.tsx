@@ -3,9 +3,46 @@ import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
+import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
-import { calculateMss } from '../../../lib/calculations/mss'
+import { calculateMss, type MssResult } from '../../../lib/calculations/mss'
+
+// A subtraction chain, one header at a time -- MSS isn't one formula so
+// much as "start with the MTU and keep taking bites out of it," and seeing
+// each bite named (which header, how many bytes) is what makes the final
+// number make sense instead of just appearing.
+function buildMssSteps(result: MssResult): GuidedStep[] {
+  const afterIp = result.mtu - result.ipHeaderBytes
+
+  return [
+    {
+      title: '1. Start with the MTU',
+      description: `The full frame budget available on this link -- every byte a single packet is allowed to be.`,
+      content: <ResultRow label="MTU" value={`${result.mtu} bytes`} />,
+    },
+    {
+      title: '2. Subtract the IP header',
+      description: `${result.ipHeaderBytes} bytes of IP header (including any IP options) have to wrap the segment -- that space is never available for TCP payload.`,
+      content: (
+        <ResultRow
+          label={`${result.mtu} - ${result.ipHeaderBytes}`}
+          value={`${afterIp} bytes remaining`}
+        />
+      ),
+    },
+    {
+      title: "3. Subtract the TCP header -- what's left is MSS",
+      description: `The TCP header (including any TCP options) takes another ${result.tcpHeaderBytes} bytes. Whatever's left over is the largest chunk of actual data one segment can carry.`,
+      content: (
+        <ResultRow
+          label={`${afterIp} - ${result.tcpHeaderBytes}`}
+          value={`${result.mss} bytes = MSS`}
+        />
+      ),
+    },
+  ]
+}
 
 export function MssCalculator() {
   const [mtu, setMtu] = useState('1500')
@@ -82,26 +119,28 @@ export function MssCalculator() {
       }
       result={
         calc.ok ? (
-          <div className="flex flex-col gap-4">
-            <dl>
-              <ResultRow label="IP header" value={`${calc.result.ipHeaderBytes} bytes`} />
-              <ResultRow label="TCP header" value={`${calc.result.tcpHeaderBytes} bytes`} />
-              <ResultRow label="MSS" value={`${calc.result.mss} bytes`} />
-            </dl>
-            <p className="text-xs text-fg-subtle">
-              This is what fits given a {calc.result.mtu}-byte MTU. If a router somewhere along the
-              path has a smaller MTU, it can clamp the MSS announced during the TCP handshake below{' '}
-              {calc.result.mss} bytes so segments never need{' '}
-              <Link
-                to="/tools/packet-fragmentation-calculator"
-                className="text-accent hover:underline"
-              >
-                IP fragmentation
-              </Link>{' '}
-              -- this is MSS clamping, and it's why the value your OS reports isn't always the value
-              a server actually negotiates.
-            </p>
-          </div>
+          <GuidedMode steps={buildMssSteps(calc.result)}>
+            <div className="flex flex-col gap-4">
+              <dl>
+                <ResultRow label="IP header" value={`${calc.result.ipHeaderBytes} bytes`} />
+                <ResultRow label="TCP header" value={`${calc.result.tcpHeaderBytes} bytes`} />
+                <ResultRow label="MSS" value={`${calc.result.mss} bytes`} />
+              </dl>
+              <p className="text-xs text-fg-subtle">
+                This is what fits given a {calc.result.mtu}-byte MTU. If a router somewhere along
+                the path has a smaller MTU, it can clamp the MSS announced during the TCP handshake
+                below {calc.result.mss} bytes so segments never need{' '}
+                <Link
+                  to="/tools/packet-fragmentation-calculator"
+                  className="text-accent hover:underline"
+                >
+                  IP fragmentation
+                </Link>{' '}
+                -- this is MSS clamping, and it's why the value your OS reports isn't always the
+                value a server actually negotiates.
+              </p>
+            </div>
+          </GuidedMode>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )

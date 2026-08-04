@@ -2,11 +2,38 @@ import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
+import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
-import { calculateLatency } from '../../../lib/calculations/latency'
+import { calculateLatency, type LatencyResult } from '../../../lib/calculations/latency'
 import { latencyPresets } from '../../../content/reference/latencyPresets'
 import { usePrefersReducedMotion } from '../../../hooks/usePrefersReducedMotion'
+
+function buildLatencySteps(result: LatencyResult): GuidedStep[] {
+  return [
+    {
+      title: '1. Divide distance by propagation speed',
+      description: `${result.distanceKm.toLocaleString()} km, traveling at ${result.propagationSpeedKmPerMs} km/ms -- that's how far the signal covers in one millisecond.`,
+      content: (
+        <ResultRow
+          label={`${result.distanceKm.toLocaleString()} km / ${result.propagationSpeedKmPerMs} km/ms`}
+          value={`${result.oneWayMs.toFixed(2)} ms one-way`}
+        />
+      ),
+    },
+    {
+      title: '2. Double it for the round trip',
+      description:
+        'A request has to travel there and the response has to travel back -- the same distance, twice.',
+      content: (
+        <ResultRow
+          label={`${result.oneWayMs.toFixed(2)} ms × 2`}
+          value={`${result.roundTripMs.toFixed(2)} ms round trip`}
+        />
+      ),
+    },
+  ]
+}
 
 const MIN_TRAVEL_ANIM_MS = 400
 const MAX_TRAVEL_ANIM_MS = 2500
@@ -99,43 +126,45 @@ export function LatencyCalculator() {
       }
       result={
         calc.ok ? (
-          <div className="flex flex-col gap-4">
-            <dl>
-              <ResultRow label="One-way" value={`${calc.result.oneWayMs.toFixed(2)} ms`} />
-              <ResultRow label="Round trip" value={`${calc.result.roundTripMs.toFixed(2)} ms`} />
-            </dl>
-            <div>
-              <div className="mb-1 flex justify-between font-mono text-[10px] text-fg-subtle">
-                <span>Source</span>
-                <span>Destination</span>
+          <GuidedMode steps={buildLatencySteps(calc.result)}>
+            <div className="flex flex-col gap-4">
+              <dl>
+                <ResultRow label="One-way" value={`${calc.result.oneWayMs.toFixed(2)} ms`} />
+                <ResultRow label="Round trip" value={`${calc.result.roundTripMs.toFixed(2)} ms`} />
+              </dl>
+              <div>
+                <div className="mb-1 flex justify-between font-mono text-[10px] text-fg-subtle">
+                  <span>Source</span>
+                  <span>Destination</span>
+                </div>
+                <div className="relative h-6 rounded-full border border-border bg-bg">
+                  <div
+                    key={`${distance}-${speed}`}
+                    style={
+                      prefersReducedMotion
+                        ? { left: '96%' }
+                        : {
+                            animationName: 'pn-packet-slide-right',
+                            animationDuration: `${travelAnimationDuration(calc.result.oneWayMs)}ms`,
+                            animationTimingFunction: 'ease-in-out',
+                            animationFillMode: 'forwards',
+                            left: '4%',
+                          }
+                    }
+                    className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_8px_var(--color-accent)]"
+                  />
+                </div>
+                <p className="mt-1 text-xs text-fg-subtle">
+                  Animation is scaled for visibility, not to real time -- a longer bar of travel
+                  here always means a genuinely longer one-way delay.
+                </p>
               </div>
-              <div className="relative h-6 rounded-full border border-border bg-bg">
-                <div
-                  key={`${distance}-${speed}`}
-                  style={
-                    prefersReducedMotion
-                      ? { left: '96%' }
-                      : {
-                          animationName: 'pn-packet-slide-right',
-                          animationDuration: `${travelAnimationDuration(calc.result.oneWayMs)}ms`,
-                          animationTimingFunction: 'ease-in-out',
-                          animationFillMode: 'forwards',
-                          left: '4%',
-                        }
-                  }
-                  className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-accent shadow-[0_0_8px_var(--color-accent)]"
-                />
-              </div>
-              <p className="mt-1 text-xs text-fg-subtle">
-                Animation is scaled for visibility, not to real time -- a longer bar of travel here
-                always means a genuinely longer one-way delay.
+              <p className="text-xs text-fg-subtle">
+                Propagation delay only -- real-world latency also includes processing, queuing, and
+                serialization delay at every hop.
               </p>
             </div>
-            <p className="text-xs text-fg-subtle">
-              Propagation delay only -- real-world latency also includes processing, queuing, and
-              serialization delay at every hop.
-            </p>
-          </div>
+          </GuidedMode>
         ) : (
           <p className="text-sm text-danger">{calc.error}</p>
         )
