@@ -300,6 +300,12 @@ export const toolCategories: ToolCategory[] = [
         description: 'Build a network topology by hand -- place devices, draw links, export it.',
         slug: 'topology-canvas',
       },
+      {
+        name: 'Device config generator',
+        description:
+          'Generate a real interface or static-route config for Cisco IOS/NX-OS, Junos, EOS, MikroTik, or pfSense.',
+        slug: 'device-config-generator',
+      },
     ],
   },
 ]

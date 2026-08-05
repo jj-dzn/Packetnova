@@ -149,6 +149,7 @@ export function VlanCalculator() {
       related={[
         { to: '/tools/802-1q-tag-explorer', label: '802.1Q tag explorer' },
         { to: '/scenarios/vlan-misconfiguration', label: 'Scenario: VLAN misconfiguration' },
+        { to: '/tools/device-config-generator', label: 'Device config generator' },
       ]}
       input={
         <div>

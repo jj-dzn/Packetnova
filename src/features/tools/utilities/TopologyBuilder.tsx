@@ -12,9 +12,12 @@ const VIEW_WIDTH = 100
 const VIEW_HEIGHT = 58
 const NODE_SIZE = 8
 const EDGE_MARGIN = 3
-const STORAGE_KEY = 'packetnova-topology-canvas'
+// Exported so the device config generator (v1.9) can read the same saved
+// topology for its "generate from my topology" picker, without a second,
+// independently-drifting copy of the storage key or shape.
+export const STORAGE_KEY = 'packetnova-topology-canvas'
 
-interface CanvasNode {
+export interface CanvasNode {
   id: string
   kind: DeviceIconKind
   label: string
@@ -25,7 +28,7 @@ interface CanvasNode {
   address?: string
 }
 
-interface CanvasLink {
+export interface CanvasLink {
   id: string
   from: string
   to: string
@@ -72,6 +75,13 @@ function buildNodeToolLinks(node: CanvasNode): ToolQuickLink[] {
           to: `/tools/route-lookup-simulator?destination=${host}`,
         })
       }
+      const [host, prefix] = address.split('/')
+      if (host && prefix) {
+        links.push({
+          label: 'Generate device config',
+          to: `/tools/device-config-generator?hostname=${encodeURIComponent(node.label)}&addr=${encodeURIComponent(host)}&prefix=${encodeURIComponent(prefix)}`,
+        })
+      }
     }
   }
   return links
@@ -94,7 +104,7 @@ function buildLinkToolLinks(link: CanvasLink): ToolQuickLink[] {
   return links
 }
 
-interface StoredTopology {
+export interface StoredTopology {
   nodes: CanvasNode[]
   links: CanvasLink[]
 }
@@ -326,6 +336,7 @@ export function TopologyBuilder() {
       category="Utilities"
       title="Topology canvas"
       description="Build a network topology by hand -- place devices, draw links between them. Saves automatically in this browser, no account needed."
+      related={[{ to: '/tools/device-config-generator', label: 'Device config generator' }]}
       fullWidth={
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">

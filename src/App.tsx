@@ -231,6 +231,11 @@ const TopologyBuilder = lazy(() =>
     default: m.TopologyBuilder,
   })),
 )
+const DeviceConfigGenerator = lazy(() =>
+  import('./features/tools/utilities/DeviceConfigGenerator').then((m) => ({
+    default: m.DeviceConfigGenerator,
+  })),
+)
 const TcpHandshakeVisualizer = lazy(() =>
   import('./features/visualizers/TcpHandshakeVisualizer').then((m) => ({
     default: m.TcpHandshakeVisualizer,
@@ -458,6 +463,7 @@ function App() {
             <Route path="/tools/ascii-converter" element={<AsciiConverterTool />} />
             <Route path="/tools/text-diff-viewer" element={<TextDiffViewer />} />
             <Route path="/tools/topology-canvas" element={<TopologyBuilder />} />
+            <Route path="/tools/device-config-generator" element={<DeviceConfigGenerator />} />
             <Route path="/visualizers" element={<VisualizersPage />} />
             <Route
               path="/visualizers/tcp-three-way-handshake"
