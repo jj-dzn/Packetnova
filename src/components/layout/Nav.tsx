@@ -5,7 +5,6 @@ import { SearchBar } from '../ui/SearchBar'
 import { Mascot } from '../ui/Mascot'
 import { useDarkMode } from '../../hooks/useDarkMode'
 import { useColorblindMode } from '../../hooks/useColorblindMode'
-import { usePwaInstallPrompt } from '../../hooks/usePwaInstallPrompt'
 import { openCommandPalette } from '../../lib/commandPalette'
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
@@ -50,7 +49,6 @@ function MenuIcon({ open }: { open: boolean }) {
 export function Nav() {
   const { theme, toggleTheme } = useDarkMode()
   const { colorblind, toggleColorblind } = useColorblindMode()
-  const { canInstall, promptInstall } = usePwaInstallPrompt()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
@@ -89,11 +87,6 @@ export function Nav() {
             <kbd className="font-sans">{isMac ? '⌘' : 'Ctrl'}</kbd>
             <kbd className="font-sans">K</kbd>
           </button>
-          {canInstall && (
-            <Button variant="secondary" onClick={promptInstall}>
-              Install app
-            </Button>
-          )}
           <Button
             variant="secondary"
             onClick={toggleColorblind}
@@ -138,15 +131,6 @@ export function Nav() {
                 {link.label}
               </NavLink>
             ))}
-            {canInstall && (
-              <button
-                type="button"
-                onClick={promptInstall}
-                className="rounded-md px-3 py-2 text-left text-sm font-medium text-fg-muted hover:bg-surface hover:text-fg"
-              >
-                Install app
-              </button>
-            )}
             <button
               type="button"
               onClick={toggleColorblind}
