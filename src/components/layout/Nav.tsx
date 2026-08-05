@@ -4,6 +4,8 @@ import { Button } from '../ui/Button'
 import { SearchBar } from '../ui/SearchBar'
 import { Mascot } from '../ui/Mascot'
 import { useDarkMode } from '../../hooks/useDarkMode'
+import { useColorblindMode } from '../../hooks/useColorblindMode'
+import { usePwaInstallPrompt } from '../../hooks/usePwaInstallPrompt'
 import { openCommandPalette } from '../../lib/commandPalette'
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
@@ -47,6 +49,8 @@ function MenuIcon({ open }: { open: boolean }) {
 
 export function Nav() {
   const { theme, toggleTheme } = useDarkMode()
+  const { colorblind, toggleColorblind } = useColorblindMode()
+  const { canInstall, promptInstall } = usePwaInstallPrompt()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
@@ -74,7 +78,7 @@ export function Nav() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden flex-wrap items-center justify-end gap-3 md:flex">
           <SearchBar className="w-48 lg:w-64" />
           <button
             type="button"
@@ -85,6 +89,19 @@ export function Nav() {
             <kbd className="font-sans">{isMac ? '⌘' : 'Ctrl'}</kbd>
             <kbd className="font-sans">K</kbd>
           </button>
+          {canInstall && (
+            <Button variant="secondary" onClick={promptInstall}>
+              Install app
+            </Button>
+          )}
+          <Button
+            variant="secondary"
+            onClick={toggleColorblind}
+            aria-pressed={colorblind}
+            aria-label="Toggle colorblind-safe colors"
+          >
+            {colorblind ? 'Standard colors' : 'Colorblind-safe'}
+          </Button>
           <Button variant="secondary" onClick={toggleTheme} aria-label="Toggle color theme">
             {theme === 'dark' ? 'Light mode' : 'Dark mode'}
           </Button>
@@ -121,6 +138,23 @@ export function Nav() {
                 {link.label}
               </NavLink>
             ))}
+            {canInstall && (
+              <button
+                type="button"
+                onClick={promptInstall}
+                className="rounded-md px-3 py-2 text-left text-sm font-medium text-fg-muted hover:bg-surface hover:text-fg"
+              >
+                Install app
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={toggleColorblind}
+              aria-pressed={colorblind}
+              className="rounded-md px-3 py-2 text-left text-sm font-medium text-fg-muted hover:bg-surface hover:text-fg"
+            >
+              {colorblind ? 'Switch to standard colors' : 'Switch to colorblind-safe colors'}
+            </button>
             <button
               type="button"
               onClick={toggleTheme}

@@ -237,6 +237,26 @@
   --pn-danger: #ef4444;
 }
 
+/* Colorblind-safe palette -- red-green (deuteranopia/protanopia) is by far
+   the most common form of color blindness, and success/danger sitting at
+   opposite ends of the red-green axis is exactly the pairing that
+   collapses under it. Success moves to a blue-green teal and danger to a
+   vermillion (an orange-leaning red), which stay separated on the
+   blue-yellow axis CVD preserves -- warning stays anchored in amber, which
+   was never the confusable pair. Only the three status tokens change;
+   everything else (bg, fg, accent) is untouched. */
+.colorblind {
+  --pn-success: #0f7a63;
+  --pn-warning: #93590a;
+  --pn-danger: #a6420f;
+}
+
+.dark.colorblind {
+  --pn-success: #2fa787;
+  --pn-warning: #f5a623;
+  --pn-danger: #e0631c;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--color-bg);
