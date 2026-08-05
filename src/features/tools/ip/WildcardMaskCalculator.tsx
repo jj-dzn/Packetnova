@@ -59,6 +59,7 @@ export function WildcardMaskCalculator() {
       category="IP"
       title="Wildcard mask calculator"
       description="Convert a subnet mask to its wildcard mask for ACLs and OSPF."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/cidr-calculator', label: 'CIDR calculator' },
         { to: '/tools/subnet-calculator', label: 'Subnet calculator' },

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import { useLocation } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { RelatedLinks, type RelatedLink } from '../../components/ui/RelatedLinks'
@@ -7,6 +7,7 @@ import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { useRecordVisit } from '../../hooks/useRecentlyViewed'
 import { useIsScenarioEmbed } from '../scenarios/ScenarioEmbedContext'
+import { reportMascotMood } from '../../lib/mascotMood'
 
 interface ToolPageLayoutBaseProps {
   category: string
@@ -16,6 +17,13 @@ interface ToolPageLayoutBaseProps {
   /** Optional content rendered below the main grid -- e.g. a ToolEducation
    * block. Most tools don't pass this yet. */
   children?: ReactNode
+  /** When set, reports a brief, transient mood to the sitewide mascot --
+   * 'ok' on a fresh valid result, 'error' on a validation failure. Most
+   * tools compute this for free at their own existing `calc.ok` branch
+   * point. Omit for tools with no natural success/error state. Skipped
+   * while embedded (a scenario stage with several tools on one page
+   * shouldn't have them fight over the one global mood). */
+  status?: 'ok' | 'error'
 }
 
 type ToolPageLayoutProps = ToolPageLayoutBaseProps &
@@ -33,13 +41,17 @@ type ToolPageLayoutProps = ToolPageLayoutBaseProps &
   )
 
 export function ToolPageLayout(props: ToolPageLayoutProps) {
-  const { category, title, description, related, children } = props
+  const { category, title, description, related, children, status } = props
   const breadcrumbSchema = useBreadcrumbSchema('Tools', '/tools', title)
   const embedded = useIsScenarioEmbed()
   const Heading = embedded ? 'h3' : 'h1'
   const { pathname } = useLocation()
 
   useRecordVisit(embedded ? null : { href: pathname, title, category })
+
+  useEffect(() => {
+    if (status && !embedded) reportMascotMood(status === 'ok' ? 'fast' : 'error')
+  }, [status, embedded])
 
   return (
     <div className={embedded ? '' : 'py-12'}>

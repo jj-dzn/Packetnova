@@ -41,6 +41,7 @@ export function MacAddressLookup() {
       category="Switching"
       title="MAC address lookup"
       description="Break a MAC address down into its OUI and NIC-specific portion, and check it against a curated set of well-known vendor OUIs."
+      status={calc.ok ? 'ok' : 'error'}
       related={[{ to: '/tools/mac-formatter', label: 'MAC formatter' }]}
       input={
         <div>

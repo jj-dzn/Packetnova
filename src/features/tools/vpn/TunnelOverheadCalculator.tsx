@@ -37,6 +37,7 @@ export function TunnelOverheadCalculator() {
       category="VPN"
       title="VPN tunnel overhead calculator"
       description="See how much throughput a VPN tunnel's encapsulation overhead actually costs you."
+      status={calc.ok ? 'ok' : 'error'}
       input={
         <div className="flex flex-col gap-4">
           <div>

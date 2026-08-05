@@ -80,6 +80,7 @@ export function CidrCalculator() {
       category="IP"
       title="CIDR calculator"
       description="Break down any CIDR block into its network address, broadcast address, subnet mask, and usable host range."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/subnet-calculator', label: 'Subnet calculator' },
         { to: '/tools/network-address-calculator', label: 'Network address calculator' },

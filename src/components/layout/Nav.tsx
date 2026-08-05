@@ -5,6 +5,7 @@ import { SearchBar } from '../ui/SearchBar'
 import { Mascot } from '../ui/Mascot'
 import { useDarkMode } from '../../hooks/useDarkMode'
 import { useColorblindMode } from '../../hooks/useColorblindMode'
+import { useMascotMood } from '../../hooks/useMascotMood'
 import { openCommandPalette } from '../../lib/commandPalette'
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
@@ -51,6 +52,7 @@ export function Nav() {
   const { theme, toggleTheme } = useDarkMode()
   const { colorblind, toggleColorblind } = useColorblindMode()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const mood = useMascotMood()
 
   return (
     <header className="border-b border-border">
@@ -58,7 +60,7 @@ export function Nav() {
         <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
           <img src="/logo.svg" alt="" width={28} height={28} />
           <span className="text-lg font-semibold">PacketNova</span>
-          <Mascot mood="idle" className="h-5 w-5 shrink-0" label="PacketNova, online" />
+          <Mascot mood={mood} className="h-5 w-5 shrink-0" label={`PacketNova, ${mood}`} />
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">

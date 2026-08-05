@@ -109,6 +109,7 @@ export function Ipv6Calculator() {
       category="IP"
       title="IPv6 calculator"
       description="Expand, compress, and inspect IPv6 addresses and prefixes -- and split a block into subnets."
+      status={calc.ok ? 'ok' : 'error'}
       input={
         <div>
           <label htmlFor="ipv6-input" className="text-sm font-medium">

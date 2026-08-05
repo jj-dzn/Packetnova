@@ -146,6 +146,7 @@ export function VlanCalculator() {
       category="Switching"
       title="VLAN calculator"
       description="Check a VLAN ID's validity, range classification, and hex representation."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/802-1q-tag-explorer', label: '802.1Q tag explorer' },
         { to: '/scenarios/vlan-misconfiguration', label: 'Scenario: VLAN misconfiguration' },

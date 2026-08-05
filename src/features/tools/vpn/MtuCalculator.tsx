@@ -87,6 +87,7 @@ export function MtuCalculator() {
       category="VPN"
       title="MTU calculator"
       description="Find the right MTU for a link and see what happens when a given payload doesn't fit."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/mss-calculator', label: 'MSS calculator' },
         { to: '/tools/packet-fragmentation-calculator', label: 'Packet fragmentation calculator' },

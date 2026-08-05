@@ -118,6 +118,7 @@ export function RegexTester() {
       category="Utilities"
       title="Regex tester"
       description="Test a regular expression against sample text with live match highlighting."
+      status={calc.ok ? 'ok' : 'error'}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

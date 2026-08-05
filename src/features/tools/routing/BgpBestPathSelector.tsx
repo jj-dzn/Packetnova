@@ -206,6 +206,7 @@ export function BgpBestPathSelector() {
       category="Routing"
       title="BGP path comparison"
       description="Compare candidate BGP paths and see exactly which attribute decides the winner, in the standard tie-breaking order."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/visualizers/bgp-best-path-selection', label: 'BGP best-path visualizer' },
         { to: '/scenarios/bgp-path-selection', label: 'Scenario: BGP path selection' },

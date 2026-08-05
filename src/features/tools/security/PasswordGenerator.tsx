@@ -136,6 +136,7 @@ export function PasswordGenerator() {
       category="Security"
       title="Password generator"
       description="Generate strong, random passwords using your browser's cryptographically secure random number generator."
+      status={calc.ok ? 'ok' : 'error'}
       input={
         <div className="flex flex-col gap-4">
           <div>
