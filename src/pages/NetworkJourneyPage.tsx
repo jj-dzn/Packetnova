@@ -1,17 +1,14 @@
-import { useState, type ReactNode } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router'
 import { Button } from '../components/ui/Button'
 import { Pill } from '../components/ui/Pill'
-import type { MascotMood } from '../components/ui/Mascot'
-import { JourneyMap } from '../features/journey/JourneyMap'
-import { JourneyGuide } from '../features/journey/JourneyGuide'
-import { ScenarioEmbedContext } from '../features/scenarios/ScenarioEmbedContext'
+import { JourneyShell, type JourneyStage } from '../features/journey/JourneyShell'
+import { otherJourneys } from '../features/journey/journeyFamily'
 import {
   TopologyCanvas,
   type TopologyEdge,
   type TopologyNode,
 } from '../features/diagram/TopologyCanvas'
-import { useStepPlayer } from '../hooks/useStepPlayer'
 import { TcpHandshakeVisualizer } from '../features/visualizers/TcpHandshakeVisualizer'
 import { TlsHandshakeVisualizer } from '../features/visualizers/TlsHandshakeVisualizer'
 import { PacketEncapsulationVisualizer } from '../features/visualizers/PacketEncapsulationVisualizer'
@@ -116,18 +113,6 @@ function ArrivalStage() {
       </div>
     </div>
   )
-}
-
-interface JourneyStage {
-  id: string
-  title: string
-  mood: MascotMood
-  narration: string
-  /** A genuine branch point -- rendered as its own distinct block between
-   * the narration and the stage content, not crammed into the narration
-   * paragraph itself. */
-  choice?: ReactNode
-  content: ReactNode
 }
 
 export function NetworkJourneyPage() {
@@ -237,50 +222,13 @@ export function NetworkJourneyPage() {
     },
   ]
 
-  const player = useStepPlayer(stages.length)
-  const current = stages[player.step]!
-
   return (
-    <div className="relative pb-24 pt-12 lg:pb-12">
-      <div className="mb-8 max-w-2xl">
-        <p className="font-mono text-xs uppercase tracking-wide text-accent">Flagship experience</p>
-        <h1 className="mt-2 text-2xl font-semibold">Follow a packet's journey</h1>
-        <p className="mt-2 text-fg-muted">
-          One request, from your browser to a server on the other side of the internet -- every
-          concept this site teaches separately, in the order it actually happens.
-        </p>
-      </div>
-
-      <div className="lg:grid lg:grid-cols-[220px_1fr] lg:items-start lg:gap-8">
-        <JourneyMap stages={stages} currentIndex={player.step} onJump={player.goTo} />
-
-        <div
-          tabIndex={0}
-          onKeyDown={player.onKeyDown}
-          aria-label="Network journey. Use the Previous and Next buttons, or the left and right arrow keys, to step through."
-          className="flex flex-col gap-6 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          <h2 className="text-lg font-semibold">{current.title}</h2>
-          <JourneyGuide mood={current.mood}>{current.narration}</JourneyGuide>
-          {current.choice}
-
-          <ScenarioEmbedContext.Provider value={true}>
-            {current.content}
-          </ScenarioEmbedContext.Provider>
-
-          <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
-            <Button variant="secondary" onClick={player.previous} disabled={player.isFirst}>
-              Previous stage
-            </Button>
-            <p className="text-sm text-fg-muted">
-              Stage {player.step + 1} of {stages.length}
-            </p>
-            <Button onClick={player.next} disabled={player.isLast}>
-              Next stage
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <JourneyShell
+      eyebrow="Flagship experience"
+      title="Follow a packet's journey"
+      description="One request, from your browser to a server on the other side of the internet -- every concept this site teaches separately, in the order it actually happens."
+      stages={stages}
+      otherJourneys={otherJourneys('/journey')}
+    />
   )
 }

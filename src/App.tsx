@@ -339,6 +339,15 @@ const VlanMisconfigurationScenario = lazy(() =>
 const NetworkJourneyPage = lazy(() =>
   import('./pages/NetworkJourneyPage').then((m) => ({ default: m.NetworkJourneyPage })),
 )
+const NatJourneyPage = lazy(() =>
+  import('./pages/NatJourneyPage').then((m) => ({ default: m.NatJourneyPage })),
+)
+const VpnTunnelJourneyPage = lazy(() =>
+  import('./pages/VpnTunnelJourneyPage').then((m) => ({ default: m.VpnTunnelJourneyPage })),
+)
+const BgpPathJourneyPage = lazy(() =>
+  import('./pages/BgpPathJourneyPage').then((m) => ({ default: m.BgpPathJourneyPage })),
+)
 const PingPet = lazy(() => import('./features/labs/PingPet').then((m) => ({ default: m.PingPet })))
 const RetroTerminal = lazy(() =>
   import('./features/labs/RetroTerminal').then((m) => ({ default: m.RetroTerminal })),
@@ -513,6 +522,9 @@ function App() {
             <Route path="/terminal" element={<RetroTerminal />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/journey" element={<NetworkJourneyPage />} />
+            <Route path="/journey/nat" element={<NatJourneyPage />} />
+            <Route path="/journey/vpn-tunnel" element={<VpnTunnelJourneyPage />} />
+            <Route path="/journey/bgp-path" element={<BgpPathJourneyPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

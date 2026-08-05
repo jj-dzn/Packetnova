@@ -65,6 +65,7 @@ export function NatFlowVisualizer() {
           ? 'Watch how NAT translates a private address and port as a packet leaves the network.'
           : 'PAT (NAT overload) is what most home and office routers actually run: many private hosts share one public IP, disambiguated by port -- not the one-to-one mapping the static mode above shows.'
       }
+      related={[{ to: '/journey/nat', label: 'Inside a NAT translation (deep dive)' }]}
     >
       <div className="mb-6 flex gap-2">
         <Pill active={mode === 'static'} onClick={() => setMode('static')}>

@@ -54,6 +54,7 @@ export function BgpBestPathVisualizer() {
       description="Walk through BGP's path-selection algorithm step by step, attribute by attribute."
       candidates={CANDIDATES}
       steps={STEPS}
+      related={[{ to: '/journey/bgp-path', label: 'Inside a BGP path decision (deep dive)' }]}
     />
   )
 }

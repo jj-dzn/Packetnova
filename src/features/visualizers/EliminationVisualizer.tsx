@@ -3,6 +3,7 @@ import { StepControls } from './StepControls'
 import { StepNarration } from './StepNarration'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
 import { EliminationSteps, type Candidate, type EliminationStep } from './EliminationSteps'
+import type { RelatedLink } from '../../components/ui/RelatedLinks'
 
 export type { Candidate, EliminationStep }
 
@@ -12,6 +13,7 @@ interface EliminationVisualizerProps {
   description: string
   candidates: Candidate[]
   steps: EliminationStep[]
+  related?: RelatedLink[]
 }
 
 // Shared "narrow a fixed set of candidates down to a winner, one
@@ -27,13 +29,19 @@ export function EliminationVisualizer({
   description,
   candidates,
   steps,
+  related,
 }: EliminationVisualizerProps) {
   const player = useStepPlayer(steps.length)
   const current = steps[player.step]!
   const isFinal = player.step === steps.length - 1
 
   return (
-    <VisualizerPageLayout category={category} title={title} description={description}>
+    <VisualizerPageLayout
+      category={category}
+      title={title}
+      description={description}
+      related={related}
+    >
       <div
         tabIndex={0}
         onKeyDown={player.onKeyDown}

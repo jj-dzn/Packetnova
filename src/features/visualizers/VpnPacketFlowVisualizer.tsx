@@ -100,6 +100,7 @@ export function VpnPacketFlowVisualizer() {
       }
       related={[
         { to: '/tools/vpn-tunnel-overhead-calculator', label: 'VPN tunnel overhead calculator' },
+        { to: '/journey/vpn-tunnel', label: 'Inside a VPN tunnel (deep dive)' },
       ]}
     >
       <div className="mb-6 flex gap-2">

@@ -102,6 +102,21 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     description:
       'One request, from your browser to a server across the internet -- every concept this site teaches separately, in the order it actually happens.',
   },
+  '/journey/nat': {
+    title: `Inside a NAT translation - ${SITE_TITLE}`,
+    description:
+      'One private address hiding behind one public one, connection table and all -- and how the reply finds its way back.',
+  },
+  '/journey/vpn-tunnel': {
+    title: `Inside a VPN tunnel - ${SITE_TITLE}`,
+    description:
+      'A whole packet wrapped inside another one, encrypted, and unwrapped again at the other end of a site-to-site link.',
+  },
+  '/journey/bgp-path': {
+    title: `Inside a BGP path decision - ${SITE_TITLE}`,
+    description:
+      'The same prefix arrives from four neighbors. Walk the attribute-by-attribute tiebreak that picks the winner.',
+  },
 }
 
 const NOT_FOUND_META: PageMeta = {

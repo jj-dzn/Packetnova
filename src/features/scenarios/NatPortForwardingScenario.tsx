@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { ScenarioPageLayout, ScenarioStage } from './ScenarioPageLayout'
 import { NatFlowVisualizer } from '../visualizers/NatFlowVisualizer'
 import { TopologyCanvas, type TopologyEdge, type TopologyNode } from '../diagram/TopologyCanvas'
@@ -65,12 +66,19 @@ export function NatPortForwardingScenario() {
         </>
       }
       resolution={
-        <p>
-          A static port-forward rule on the router -- mapping the public port straight to the
-          private host's address and port -- pre-populates exactly the mapping that outbound traffic
-          would otherwise have created on its own. That gives an unsolicited inbound SYN somewhere
-          to go before the private host has ever initiated anything itself.
-        </p>
+        <>
+          <p>
+            A static port-forward rule on the router -- mapping the public port straight to the
+            private host's address and port -- pre-populates exactly the mapping that outbound
+            traffic would otherwise have created on its own. That gives an unsolicited inbound SYN
+            somewhere to go before the private host has ever initiated anything itself.
+          </p>
+          <p>
+            <Link to="/journey/nat" className="text-accent hover:underline">
+              See the whole translation table lifecycle, stage by stage, in the NAT journey.
+            </Link>
+          </p>
+        </>
       }
     >
       <ScenarioStage

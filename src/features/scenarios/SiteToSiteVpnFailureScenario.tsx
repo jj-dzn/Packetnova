@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { ScenarioPageLayout, ScenarioStage } from './ScenarioPageLayout'
 import { TunnelOverheadCalculator } from '../tools/vpn/TunnelOverheadCalculator'
 import { MtuCalculator } from '../tools/vpn/MtuCalculator'
@@ -23,12 +24,19 @@ export function SiteToSiteVpnFailureScenario() {
         </>
       }
       resolution={
-        <p>
-          Clamping the sender's MSS to fit inside the tunnel's real capacity -- or making sure the
-          path isn't silently dropping the ICMP "fragmentation needed" message Path MTU Discovery
-          depends on -- turns the silent hang back into a working transfer. Increasing the link MTU
-          is almost never the actual fix.
-        </p>
+        <>
+          <p>
+            Clamping the sender's MSS to fit inside the tunnel's real capacity -- or making sure the
+            path isn't silently dropping the ICMP "fragmentation needed" message Path MTU Discovery
+            depends on -- turns the silent hang back into a working transfer. Increasing the link
+            MTU is almost never the actual fix.
+          </p>
+          <p>
+            <Link to="/journey/vpn-tunnel" className="text-accent hover:underline">
+              See exactly what gets wrapped around a packet inside that tunnel in the VPN journey.
+            </Link>
+          </p>
+        </>
       }
     >
       <ScenarioStage

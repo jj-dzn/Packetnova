@@ -22,11 +22,18 @@ function importFrom(relativePath) {
 
 const { toolCategories } = await importFrom('src/content/reference/tools.ts')
 const { visualizers } = await importFrom('src/content/reference/visualizers.ts')
+const { scenarios } = await importFrom('src/content/reference/scenarios.ts')
 
 const staticPaths = [
   '/',
   '/tools',
   '/visualizers',
+  '/scenarios',
+  '/about',
+  '/journey',
+  '/journey/nat',
+  '/journey/vpn-tunnel',
+  '/journey/bgp-path',
   '/labs',
   '/labs/ping-pet',
   '/labs/ip-zodiac',
@@ -52,7 +59,11 @@ const visualizerPaths = visualizers
   .filter((visualizer) => visualizer.slug)
   .map((visualizer) => `/visualizers/${visualizer.slug}`)
 
-const allPaths = [...staticPaths, ...toolPaths, ...visualizerPaths]
+const scenarioPaths = scenarios
+  .filter((scenario) => scenario.slug)
+  .map((scenario) => `/scenarios/${scenario.slug}`)
+
+const allPaths = [...staticPaths, ...toolPaths, ...visualizerPaths, ...scenarioPaths]
 
 const today = new Date().toISOString().slice(0, 10)
 

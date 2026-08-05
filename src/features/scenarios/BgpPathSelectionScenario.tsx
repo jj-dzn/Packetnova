@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { ScenarioPageLayout, ScenarioStage } from './ScenarioPageLayout'
 import { BgpBestPathSelector } from '../tools/routing/BgpBestPathSelector'
 import { BgpBestPathVisualizer } from '../visualizers/BgpBestPathVisualizer'
@@ -18,12 +19,19 @@ export function BgpPathSelectionScenario() {
         </>
       }
       resolution={
-        <p>
-          Local preference was set higher on the path most people expected to lose, by a previous
-          engineer deliberately steering traffic toward a specific egress point. BGP was never
-          broken -- local preference simply outranks AS-path length, and it's checked second, not
-          first. Nothing needed fixing except the assumption about which attribute matters most.
-        </p>
+        <>
+          <p>
+            Local preference was set higher on the path most people expected to lose, by a previous
+            engineer deliberately steering traffic toward a specific egress point. BGP was never
+            broken -- local preference simply outranks AS-path length, and it's checked second, not
+            first. Nothing needed fixing except the assumption about which attribute matters most.
+          </p>
+          <p>
+            <Link to="/journey/bgp-path" className="text-accent hover:underline">
+              Walk the full tie-break order end to end in the BGP path journey.
+            </Link>
+          </p>
+        </>
       }
     >
       <ScenarioStage
