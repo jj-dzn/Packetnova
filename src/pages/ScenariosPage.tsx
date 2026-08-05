@@ -23,6 +23,7 @@ export function ScenariosPage() {
             description={scenario.symptom}
             href={`/scenarios/${scenario.slug}`}
             comingSoon={false}
+            tag={scenario.format === 'branching' ? 'Branching + timed challenge' : undefined}
           />
         ))}
       </div>

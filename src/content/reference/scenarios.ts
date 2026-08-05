@@ -3,6 +3,10 @@ export interface ScenarioListing {
   title: string
   category: string
   symptom: string
+  /** Absent for the original linear read-through-with-embedded-tools
+   * format. 'branching' scenarios (v2.1+) have real wrong-turn choice
+   * points and an optional timed, scored challenge mode. */
+  format?: 'branching'
 }
 
 // Mirrors visualizers.ts's shape -- feeds the /scenarios index page, search,
@@ -52,5 +56,19 @@ export const scenarios: ScenarioListing[] = [
     title: 'VLAN misconfiguration',
     category: 'Switching',
     symptom: "Two hosts on the same switch, meant to share a VLAN, can't reach each other.",
+  },
+  {
+    slug: 'dhcp-lease-failure',
+    title: 'No IP address: DHCP across a VLAN boundary',
+    category: 'DHCP',
+    symptom: 'A new laptop never gets a real address -- stuck on a self-assigned 169.254.x.x.',
+    format: 'branching',
+  },
+  {
+    slug: 'switching-loop',
+    title: 'Switching loop: one floor, random drops',
+    category: 'Switching',
+    symptom: "One access switch's CPU is pegged and its MAC table won't settle down.",
+    format: 'branching',
   },
 ]

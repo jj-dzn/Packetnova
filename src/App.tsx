@@ -342,6 +342,16 @@ const VlanMisconfigurationScenario = lazy(() =>
     default: m.VlanMisconfigurationScenario,
   })),
 )
+const DhcpFailureScenario = lazy(() =>
+  import('./features/scenarios/DhcpFailureScenario').then((m) => ({
+    default: m.DhcpFailureScenario,
+  })),
+)
+const SwitchingLoopScenario = lazy(() =>
+  import('./features/scenarios/SwitchingLoopScenario').then((m) => ({
+    default: m.SwitchingLoopScenario,
+  })),
+)
 const NetworkJourneyPage = lazy(() =>
   import('./pages/NetworkJourneyPage').then((m) => ({ default: m.NetworkJourneyPage })),
 )
@@ -531,6 +541,8 @@ function App() {
               path="/scenarios/vlan-misconfiguration"
               element={<VlanMisconfigurationScenario />}
             />
+            <Route path="/scenarios/dhcp-lease-failure" element={<DhcpFailureScenario />} />
+            <Route path="/scenarios/switching-loop" element={<SwitchingLoopScenario />} />
             <Route path="/labs" element={<LabsPage />} />
             <Route path="/labs/ping-pet" element={<PingPet />} />
             <Route path="/labs/ip-zodiac" element={<IpZodiac />} />
