@@ -66,4 +66,21 @@ export const visualizers: VisualizerListing[] = [
     description: 'Watch Discover, Offer, Request, and Ack hand a client its first IP address.',
     slug: 'dhcp-dora-sequence',
   },
+  {
+    name: 'TLS 1.2 vs TLS 1.3',
+    description:
+      'Watch both handshakes run side by side and see exactly where TLS 1.3 cuts out a round trip.',
+    slug: 'tls-1-2-vs-1-3',
+  },
+  {
+    name: 'IPv4 vs IPv6 header',
+    description: 'The same packet header, redesigned -- what got removed, renamed, and added.',
+    slug: 'ipv4-vs-ipv6-header',
+  },
+  {
+    name: 'STP vs RSTP convergence',
+    description:
+      "Watch a port's state machine run under both protocols after the same topology change.",
+    slug: 'stp-vs-rstp-convergence',
+  },
 ]

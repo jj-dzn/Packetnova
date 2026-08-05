@@ -281,6 +281,21 @@ const DhcpDoraVisualizer = lazy(() =>
     default: m.DhcpDoraVisualizer,
   })),
 )
+const TlsVersionComparisonVisualizer = lazy(() =>
+  import('./features/visualizers/TlsVersionComparisonVisualizer').then((m) => ({
+    default: m.TlsVersionComparisonVisualizer,
+  })),
+)
+const Ipv4Ipv6HeaderComparisonVisualizer = lazy(() =>
+  import('./features/visualizers/Ipv4Ipv6HeaderComparisonVisualizer').then((m) => ({
+    default: m.Ipv4Ipv6HeaderComparisonVisualizer,
+  })),
+)
+const StpRstpComparisonVisualizer = lazy(() =>
+  import('./features/visualizers/StpRstpComparisonVisualizer').then((m) => ({
+    default: m.StpRstpComparisonVisualizer,
+  })),
+)
 const SiteToSiteVpnFailureScenario = lazy(() =>
   import('./features/scenarios/SiteToSiteVpnFailureScenario').then((m) => ({
     default: m.SiteToSiteVpnFailureScenario,
@@ -449,6 +464,18 @@ function App() {
             />
             <Route path="/visualizers/ospf-spf-animation" element={<OspfSpfVisualizer />} />
             <Route path="/visualizers/dhcp-dora-sequence" element={<DhcpDoraVisualizer />} />
+            <Route
+              path="/visualizers/tls-1-2-vs-1-3"
+              element={<TlsVersionComparisonVisualizer />}
+            />
+            <Route
+              path="/visualizers/ipv4-vs-ipv6-header"
+              element={<Ipv4Ipv6HeaderComparisonVisualizer />}
+            />
+            <Route
+              path="/visualizers/stp-vs-rstp-convergence"
+              element={<StpRstpComparisonVisualizer />}
+            />
             <Route path="/scenarios" element={<ScenariosPage />} />
             <Route
               path="/scenarios/site-to-site-vpn-failure"

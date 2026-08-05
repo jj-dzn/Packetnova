@@ -20,7 +20,10 @@ export function IpHeaderExplorer() {
       category="Protocols"
       title="IP header explorer"
       description="Every field in an IPv4 header, byte by byte, plus a quick flags-field calculator."
-      related={[{ to: '/tools/icmp-explorer', label: 'ICMP explorer' }]}
+      related={[
+        { to: '/visualizers/ipv4-vs-ipv6-header', label: 'Compare: IPv4 vs IPv6 header' },
+        { to: '/tools/icmp-explorer', label: 'ICMP explorer' },
+      ]}
     >
       <div className="mb-8">
         <HeaderByteDiagram
