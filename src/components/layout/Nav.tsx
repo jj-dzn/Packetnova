@@ -14,6 +14,7 @@ const navLinks = [
   { to: '/visualizers', label: 'Visualizers' },
   { to: '/scenarios', label: 'Scenarios' },
   { to: '/journey', label: 'Journey' },
+  { to: '/paths', label: 'Paths' },
   { to: '/labs', label: 'Labs' },
 ]
 

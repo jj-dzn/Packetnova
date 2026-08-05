@@ -20,6 +20,16 @@ describe('searchItems', () => {
     const tcp = searchItems.find((item) => item.title === 'TCP three-way handshake')
     expect(tcp?.href).toBe('/visualizers/tcp-three-way-handshake')
   })
+
+  it('includes every competency path from the content data', () => {
+    const pathItems = searchItems.filter((item) => item.type === 'path')
+    expect(pathItems.length).toBeGreaterThanOrEqual(3)
+  })
+
+  it('gives a built path a real href', () => {
+    const subnetting = searchItems.find((item) => item.title === 'Subnetting fluency')
+    expect(subnetting?.href).toBe('/paths/subnetting-fluency')
+  })
 })
 
 describe('searchIndex', () => {

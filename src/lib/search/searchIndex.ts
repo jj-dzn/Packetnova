@@ -2,9 +2,10 @@ import Fuse from 'fuse.js'
 import { toolCategories } from '../../content/reference/tools'
 import { visualizers } from '../../content/reference/visualizers'
 import { scenarios } from '../../content/reference/scenarios'
+import { competencyPaths } from '../../content/reference/paths'
 
 export interface SearchItem {
-  type: 'tool' | 'visualizer' | 'scenario'
+  type: 'tool' | 'visualizer' | 'scenario' | 'path'
   title: string
   description: string
   category: string
@@ -43,10 +44,21 @@ function buildScenarioSearchItems(): SearchItem[] {
   }))
 }
 
+function buildPathSearchItems(): SearchItem[] {
+  return competencyPaths.map((path) => ({
+    type: 'path' as const,
+    title: path.title,
+    description: path.description,
+    category: path.category,
+    href: `/paths/${path.slug}`,
+  }))
+}
+
 export const searchItems: SearchItem[] = [
   ...buildToolSearchItems(),
   ...buildVisualizerSearchItems(),
   ...buildScenarioSearchItems(),
+  ...buildPathSearchItems(),
 ]
 
 export const searchIndex = new Fuse<SearchItem>(searchItems, {

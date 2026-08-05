@@ -4,7 +4,7 @@ import type { JourneyFamilyLink } from './JourneyShell'
 // filters itself out via otherJourneys() rather than every page keeping
 // its own hand-trimmed list, so adding a journey here is enough to cross
 // -link it from every other one automatically.
-const ALL_JOURNEYS: JourneyFamilyLink[] = [
+export const JOURNEYS: JourneyFamilyLink[] = [
   {
     to: '/journey',
     title: "Follow a packet's journey",
@@ -32,5 +32,5 @@ const ALL_JOURNEYS: JourneyFamilyLink[] = [
 ]
 
 export function otherJourneys(currentPath: string): JourneyFamilyLink[] {
-  return ALL_JOURNEYS.filter((journey) => journey.to !== currentPath)
+  return JOURNEYS.filter((journey) => journey.to !== currentPath)
 }

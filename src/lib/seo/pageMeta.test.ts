@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { getPageMeta } from './pageMeta'
 import { toolCategories } from '../../content/reference/tools'
 import { visualizers } from '../../content/reference/visualizers'
+import { competencyPaths } from '../../content/reference/paths'
 
 describe('getPageMeta', () => {
   it('gives the homepage a site-wide title and description', () => {
@@ -32,6 +33,7 @@ describe('getPageMeta', () => {
       '/terminal',
       '/about',
       '/journey',
+      '/paths',
     ]) {
       const meta = getPageMeta(path)
       expect(meta.title).toContain('PacketNova')
@@ -66,6 +68,13 @@ describe('getPageMeta', () => {
       const meta = getPageMeta(`/visualizers/${visualizer.slug}`)
       expect(meta.title).toBe(`${visualizer.name} - PacketNova`)
     }
+  })
+
+  it("uses a competency path's real title and description for its page", () => {
+    const bgp = competencyPaths.find((p) => p.slug === 'bgp-path-selection')!
+    const meta = getPageMeta('/paths/bgp-path-selection')
+    expect(meta.title).toBe(`${bgp.title} - PacketNova`)
+    expect(meta.description).toBe(bgp.description)
   })
 
   it('falls back to a not-found title for an unknown slug', () => {

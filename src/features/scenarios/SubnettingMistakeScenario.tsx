@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { ScenarioPageLayout, ScenarioStage } from './ScenarioPageLayout'
 import { SubnetCalculator } from '../tools/ip/SubnetCalculator'
 import { RouteSummarizer } from '../tools/ip/RouteSummarizer'
@@ -19,12 +20,19 @@ export function SubnettingMistakeScenario() {
         </>
       }
       resolution={
-        <p>
-          The aggregate route being advertised upstream didn't actually cover the new VLSM block on
-          a clean power-of-2-aligned boundary, so it silently missed it. Re-summarizing correctly --
-          or advertising the specific block alongside the aggregate -- fixed reachability without
-          touching the addressing plan itself.
-        </p>
+        <>
+          <p>
+            The aggregate route being advertised upstream didn't actually cover the new VLSM block
+            on a clean power-of-2-aligned boundary, so it silently missed it. Re-summarizing
+            correctly -- or advertising the specific block alongside the aggregate -- fixed
+            reachability without touching the addressing plan itself.
+          </p>
+          <p>
+            <Link to="/paths/subnetting-fluency" className="text-accent hover:underline">
+              Build this intuition from the ground up in the Subnetting fluency path.
+            </Link>
+          </p>
+        </>
       }
     >
       <ScenarioStage

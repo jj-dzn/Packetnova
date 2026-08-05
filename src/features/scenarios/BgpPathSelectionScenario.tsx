@@ -29,7 +29,12 @@ export function BgpPathSelectionScenario() {
           <p>
             <Link to="/journey/bgp-path" className="text-accent hover:underline">
               Walk the full tie-break order end to end in the BGP path journey.
+            </Link>{' '}
+            or start from the beginning with the{' '}
+            <Link to="/paths/bgp-path-selection" className="text-accent hover:underline">
+              BGP path selection path
             </Link>
+            .
           </p>
         </>
       }

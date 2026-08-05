@@ -1,6 +1,7 @@
 import { toolCategories } from '../../content/reference/tools'
 import { visualizers } from '../../content/reference/visualizers'
 import { scenarios } from '../../content/reference/scenarios'
+import { competencyPaths } from '../../content/reference/paths'
 
 export interface PageMeta {
   title: string
@@ -28,6 +29,11 @@ const STATIC_PAGES: Record<string, PageMeta> = {
   '/scenarios': {
     title: `Scenarios - ${SITE_TITLE}`,
     description: 'Guided troubleshooting labs that chain real tools and visualizers together.',
+  },
+  '/paths': {
+    title: `Guided paths - ${SITE_TITLE}`,
+    description:
+      'Curated, ordered sequences through existing tools, visualizers, and scenarios, built around a real skill.',
   },
   '/search': {
     title: `Search - ${SITE_TITLE}`,
@@ -161,6 +167,12 @@ export function getPageMeta(pathname: string): PageMeta {
     const scenario = scenarios.find((s) => s.slug === scenarioMatch[1])
     if (scenario)
       return { title: `${scenario.title} - ${SITE_TITLE}`, description: scenario.symptom }
+  }
+
+  const pathMatch = /^\/paths\/([^/]+)$/.exec(pathname)
+  if (pathMatch) {
+    const path = competencyPaths.find((p) => p.slug === pathMatch[1])
+    if (path) return { title: `${path.title} - ${SITE_TITLE}`, description: path.description }
   }
 
   return NOT_FOUND_META

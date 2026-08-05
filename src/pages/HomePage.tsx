@@ -1,5 +1,6 @@
 import { Hero } from './home/Hero'
 import { ContinueWhereYouLeftOff } from './home/ContinueWhereYouLeftOff'
+import { ContinuePathTeaser } from './home/ContinuePathTeaser'
 import { PopularTools } from './home/PopularTools'
 import { FeaturedVisualizers } from './home/FeaturedVisualizers'
 import { WhyPacketNova } from './home/WhyPacketNova'
@@ -27,6 +28,7 @@ export function HomePage() {
       <StructuredData data={WEBSITE_SCHEMA} />
       <Hero />
       <ContinueWhereYouLeftOff />
+      <ContinuePathTeaser />
       <LabsTeaser />
       <PopularTools />
       <FeaturedVisualizers />

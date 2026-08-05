@@ -23,12 +23,14 @@ function importFrom(relativePath) {
 const { toolCategories } = await importFrom('src/content/reference/tools.ts')
 const { visualizers } = await importFrom('src/content/reference/visualizers.ts')
 const { scenarios } = await importFrom('src/content/reference/scenarios.ts')
+const { competencyPaths } = await importFrom('src/content/reference/paths.ts')
 
 const staticPaths = [
   '/',
   '/tools',
   '/visualizers',
   '/scenarios',
+  '/paths',
   '/about',
   '/journey',
   '/journey/nat',
@@ -63,7 +65,15 @@ const scenarioPaths = scenarios
   .filter((scenario) => scenario.slug)
   .map((scenario) => `/scenarios/${scenario.slug}`)
 
-const allPaths = [...staticPaths, ...toolPaths, ...visualizerPaths, ...scenarioPaths]
+const competencyPathPaths = competencyPaths.map((path) => `/paths/${path.slug}`)
+
+const allPaths = [
+  ...staticPaths,
+  ...toolPaths,
+  ...visualizerPaths,
+  ...scenarioPaths,
+  ...competencyPathPaths,
+]
 
 const today = new Date().toISOString().slice(0, 10)
 

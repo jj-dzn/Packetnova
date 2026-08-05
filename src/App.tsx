@@ -7,6 +7,7 @@ import { AboutPage } from './pages/AboutPage'
 import { ToolsPage } from './pages/ToolsPage'
 import { VisualizersPage } from './pages/VisualizersPage'
 import { ScenariosPage } from './pages/ScenariosPage'
+import { PathsPage } from './pages/PathsPage'
 import { SearchPage } from './pages/SearchPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { LabsPage } from './pages/LabsPage'
@@ -344,6 +345,21 @@ const VlanMisconfigurationScenario = lazy(() =>
 const NetworkJourneyPage = lazy(() =>
   import('./pages/NetworkJourneyPage').then((m) => ({ default: m.NetworkJourneyPage })),
 )
+const SubnettingFluencyPathPage = lazy(() =>
+  import('./pages/SubnettingFluencyPathPage').then((m) => ({
+    default: m.SubnettingFluencyPathPage,
+  })),
+)
+const BgpPathSelectionPathPage = lazy(() =>
+  import('./pages/BgpPathSelectionPathPage').then((m) => ({
+    default: m.BgpPathSelectionPathPage,
+  })),
+)
+const VpnTroubleshootingPathPage = lazy(() =>
+  import('./pages/VpnTroubleshootingPathPage').then((m) => ({
+    default: m.VpnTroubleshootingPathPage,
+  })),
+)
 const NatJourneyPage = lazy(() =>
   import('./pages/NatJourneyPage').then((m) => ({ default: m.NatJourneyPage })),
 )
@@ -498,6 +514,10 @@ function App() {
               element={<StpRstpComparisonVisualizer />}
             />
             <Route path="/scenarios" element={<ScenariosPage />} />
+            <Route path="/paths" element={<PathsPage />} />
+            <Route path="/paths/subnetting-fluency" element={<SubnettingFluencyPathPage />} />
+            <Route path="/paths/bgp-path-selection" element={<BgpPathSelectionPathPage />} />
+            <Route path="/paths/vpn-troubleshooting" element={<VpnTroubleshootingPathPage />} />
             <Route
               path="/scenarios/site-to-site-vpn-failure"
               element={<SiteToSiteVpnFailureScenario />}

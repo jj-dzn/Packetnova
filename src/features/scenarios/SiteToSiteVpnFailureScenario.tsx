@@ -34,7 +34,12 @@ export function SiteToSiteVpnFailureScenario() {
           <p>
             <Link to="/journey/vpn-tunnel" className="text-accent hover:underline">
               See exactly what gets wrapped around a packet inside that tunnel in the VPN journey.
+            </Link>{' '}
+            or build the whole intuition with the{' '}
+            <Link to="/paths/vpn-troubleshooting" className="text-accent hover:underline">
+              VPN troubleshooting path
             </Link>
+            .
           </p>
         </>
       }
