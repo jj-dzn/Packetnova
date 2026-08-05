@@ -295,6 +295,11 @@ export const toolCategories: ToolCategory[] = [
         description: 'Compare two blocks of text and highlight the differences.',
         slug: 'text-diff-viewer',
       },
+      {
+        name: 'Topology canvas',
+        description: 'Build a network topology by hand -- place devices, draw links, export it.',
+        slug: 'topology-canvas',
+      },
     ],
   },
 ]

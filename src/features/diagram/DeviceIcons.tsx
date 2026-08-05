@@ -1,4 +1,4 @@
-export type DeviceIconKind = 'router' | 'switch' | 'firewall'
+export type DeviceIconKind = 'router' | 'switch' | 'firewall' | 'host' | 'vpn-gateway'
 
 interface GlyphProps {
   x: number
@@ -122,6 +122,62 @@ function FirewallGlyph({ x, y, size, fill, stroke }: GlyphProps) {
   )
 }
 
+// A monitor-on-a-stand -- reads as "end host," distinct from the switch's
+// wide ported rectangle and the router's circle-with-spokes.
+function HostGlyph({ x, y, size, fill, stroke }: GlyphProps) {
+  const w = size * 0.9
+  const h = size * 0.62
+  const left = x - w / 2
+  const top = y - size / 2
+  const standWidth = size * 0.28
+  const standHeight = size * 0.12
+  return (
+    <g>
+      <rect
+        x={left}
+        y={top}
+        width={w}
+        height={h}
+        rx={2.5}
+        fill={fill}
+        stroke={stroke}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={x}
+        y1={top + h}
+        x2={x}
+        y2={top + h + standHeight}
+        stroke={stroke}
+        strokeWidth={1.5}
+      />
+      <line
+        x1={x - standWidth / 2}
+        y1={top + h + standHeight}
+        x2={x + standWidth / 2}
+        y2={top + h + standHeight}
+        stroke={stroke}
+        strokeWidth={1.5}
+        strokeLinecap="round"
+      />
+    </g>
+  )
+}
+
+// A hexagon -- a "boundary/checkpoint" read distinct from the firewall's
+// shield, for a device whose defining trait is the encrypted tunnel it
+// terminates rather than the traffic policy it enforces.
+function VpnGatewayGlyph({ x, y, size, fill, stroke }: GlyphProps) {
+  const r = size / 2
+  const points = Array.from({ length: 6 }, (_, i) => {
+    const angle = (Math.PI / 3) * i - Math.PI / 2
+    return `${x + r * Math.cos(angle)},${y + r * Math.sin(angle)}`
+  }).join(' ')
+  return (
+    <polygon points={points} fill={fill} stroke={stroke} strokeWidth={1.5} strokeLinejoin="round" />
+  )
+}
+
 interface DeviceIconProps extends GlyphProps {
   kind: DeviceIconKind
 }
@@ -129,5 +185,7 @@ interface DeviceIconProps extends GlyphProps {
 export function DeviceIcon({ kind, ...glyphProps }: DeviceIconProps) {
   if (kind === 'router') return <RouterGlyph {...glyphProps} />
   if (kind === 'switch') return <SwitchGlyph {...glyphProps} />
+  if (kind === 'host') return <HostGlyph {...glyphProps} />
+  if (kind === 'vpn-gateway') return <VpnGatewayGlyph {...glyphProps} />
   return <FirewallGlyph {...glyphProps} />
 }

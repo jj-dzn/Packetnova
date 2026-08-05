@@ -226,6 +226,11 @@ const TextDiffViewer = lazy(() =>
     default: m.TextDiffViewer,
   })),
 )
+const TopologyBuilder = lazy(() =>
+  import('./features/tools/utilities/TopologyBuilder').then((m) => ({
+    default: m.TopologyBuilder,
+  })),
+)
 const TcpHandshakeVisualizer = lazy(() =>
   import('./features/visualizers/TcpHandshakeVisualizer').then((m) => ({
     default: m.TcpHandshakeVisualizer,
@@ -443,6 +448,7 @@ function App() {
             <Route path="/tools/binary-decimal-hex-converter" element={<BaseConverterTool />} />
             <Route path="/tools/ascii-converter" element={<AsciiConverterTool />} />
             <Route path="/tools/text-diff-viewer" element={<TextDiffViewer />} />
+            <Route path="/tools/topology-canvas" element={<TopologyBuilder />} />
             <Route path="/visualizers" element={<VisualizersPage />} />
             <Route
               path="/visualizers/tcp-three-way-handshake"
