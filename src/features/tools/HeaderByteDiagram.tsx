@@ -1,4 +1,6 @@
 import type { HeaderField } from '../../content/reference/tcpHeaderFields'
+import { useDiagramExport } from '../../hooks/useDiagramExport'
+import { ExportButton } from '../../components/ui/ExportButton'
 
 interface HeaderByteDiagramProps {
   fields: HeaderField[]
@@ -50,45 +52,54 @@ export function HeaderByteDiagram({ fields, values, caption }: HeaderByteDiagram
   }
   if (currentRow.length > 0) rows.push(currentRow)
 
+  const { ref, exportAs, pending } = useDiagramExport<HTMLDivElement>('header-byte-diagram')
+
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between px-1 font-mono text-[10px] text-fg-subtle">
-        <span>bit 0</span>
-        {caption && <span className="text-accent">{caption}</span>}
-        <span>bit 31</span>
+      <div className="flex justify-end">
+        <ExportButton exportAs={exportAs} pending={pending} />
       </div>
-      {rows.map((row, rowIndex) => (
-        <div key={rowIndex} className="flex h-11 overflow-hidden rounded-sm border border-border">
-          {row.map(({ field, bits }, fieldIndex) => {
-            const value = values?.[field.field]
-            return (
-              <div
-                key={field.field}
-                style={{ flexGrow: bits, flexBasis: 0 }}
-                className={`flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden border-r border-border px-1 text-center font-mono last:border-r-0 ${TINTS[fieldIndex % TINTS.length]}`}
-                title={`${field.field} -- ${field.size}${field.description ? ` -- ${field.description}` : ''}${value ? ` -- current value: ${value}` : ''}`}
-              >
-                <span
-                  className={`block max-w-full truncate text-[11px] ${value ? 'text-[10px]' : ''}`}
+      <div ref={ref} className="flex flex-col gap-1">
+        <div className="flex items-center justify-between px-1 font-mono text-[10px] text-fg-subtle">
+          <span>bit 0</span>
+          {caption && <span className="text-accent">{caption}</span>}
+          <span>bit 31</span>
+        </div>
+        {rows.map((row, rowIndex) => (
+          <div key={rowIndex} className="flex h-11 overflow-hidden rounded-sm border border-border">
+            {row.map(({ field, bits }, fieldIndex) => {
+              const value = values?.[field.field]
+              return (
+                <div
+                  key={field.field}
+                  style={{ flexGrow: bits, flexBasis: 0 }}
+                  className={`flex min-w-0 flex-col items-center justify-center gap-0.5 overflow-hidden border-r border-border px-1 text-center font-mono last:border-r-0 ${TINTS[fieldIndex % TINTS.length]}`}
+                  title={`${field.field} -- ${field.size}${field.description ? ` -- ${field.description}` : ''}${value ? ` -- current value: ${value}` : ''}`}
                 >
-                  {field.field}
-                </span>
-                {value && (
-                  <span className="block max-w-full truncate text-[10px] text-accent">{value}</span>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      ))}
-      {variableField && (
-        <div
-          className="flex h-11 items-center justify-center rounded-sm border border-dashed border-border px-2 text-center font-mono text-[11px] text-fg-subtle"
-          title={`${variableField.field} -- ${variableField.description}`}
-        >
-          {variableField.field} (variable length)
-        </div>
-      )}
+                  <span
+                    className={`block max-w-full truncate text-[11px] ${value ? 'text-[10px]' : ''}`}
+                  >
+                    {field.field}
+                  </span>
+                  {value && (
+                    <span className="block max-w-full truncate text-[10px] text-accent">
+                      {value}
+                    </span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        ))}
+        {variableField && (
+          <div
+            className="flex h-11 items-center justify-center rounded-sm border border-dashed border-border px-2 text-center font-mono text-[11px] text-fg-subtle"
+            title={`${variableField.field} -- ${variableField.description}`}
+          >
+            {variableField.field} (variable length)
+          </div>
+        )}
+      </div>
     </div>
   )
 }

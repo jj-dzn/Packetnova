@@ -1,3 +1,6 @@
+import { useDiagramExport } from '../../hooks/useDiagramExport'
+import { ExportButton } from '../../components/ui/ExportButton'
+
 export interface BitField {
   label: string
   bits: number
@@ -15,10 +18,14 @@ const TINTS = ['bg-accent/10', 'bg-accent-alt/10']
 // segments sized by bit count, each showing its own binary value.
 export function BitFieldDiagram({ fields }: BitFieldDiagramProps) {
   const totalBits = fields.reduce((sum, field) => sum + field.bits, 0)
+  const { ref, exportAs, pending } = useDiagramExport<HTMLDivElement>('bit-field-diagram')
 
   return (
     <div>
-      <div className="flex h-14 overflow-hidden rounded-md border border-border">
+      <div className="mb-1 flex justify-end">
+        <ExportButton exportAs={exportAs} pending={pending} />
+      </div>
+      <div ref={ref} className="flex h-14 overflow-hidden rounded-md border border-border">
         {fields.map((field, index) => (
           <div
             key={field.label}

@@ -1,3 +1,6 @@
+import { useDiagramExport } from '../../hooks/useDiagramExport'
+import { ExportButton } from '../../components/ui/ExportButton'
+
 export interface FrameSegment {
   label: string
   bytes: number
@@ -17,10 +20,14 @@ interface FrameFieldStripProps {
 // a byte-by-byte reference in its own right.
 export function FrameFieldStrip({ segments }: FrameFieldStripProps) {
   const totalBytes = segments.reduce((sum, segment) => sum + segment.bytes, 0)
+  const { ref, exportAs, pending } = useDiagramExport<HTMLDivElement>('frame-field-strip')
 
   return (
     <div>
-      <div className="flex h-14 overflow-hidden rounded-md border border-border">
+      <div className="mb-1 flex justify-end">
+        <ExportButton exportAs={exportAs} pending={pending} />
+      </div>
+      <div ref={ref} className="flex h-14 overflow-hidden rounded-md border border-border">
         {segments.map((segment, index) => (
           <div
             key={index}

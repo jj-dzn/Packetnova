@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { VisualizerPageLayout } from './VisualizerPageLayout'
 import { StepControls } from './StepControls'
 import { StepNarration } from './StepNarration'
@@ -25,6 +26,53 @@ interface SequenceDiagramVisualizerProps extends SequenceDiagramContentProps {
   category: string
   title: string
   description: string
+}
+
+// A lost segment has an X mid-flight in Mermaid's own notation for exactly
+// that ("-x" instead of "->>"), so the exported diagram still shows a
+// dropped SYN or lost ACK, not just a clean happy-path sequence.
+function buildMermaidSequence(
+  leftLabel: string,
+  rightLabel: string,
+  steps: SequenceStep[],
+): string {
+  const lines = [
+    'sequenceDiagram',
+    `    participant A as ${leftLabel}`,
+    `    participant B as ${rightLabel}`,
+  ]
+  for (const step of steps) {
+    if (!step.segment) continue
+    const { direction, label, lost } = step.segment
+    const from = direction === 'right' ? 'A' : 'B'
+    const to = direction === 'right' ? 'B' : 'A'
+    lines.push(`    ${from}${lost ? '-x' : '->>'}${to}: ${label}`)
+  }
+  return lines.join('\n')
+}
+
+function CopyMermaidButton({ mermaid }: { mermaid: string }) {
+  const [copied, setCopied] = useState(false)
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(mermaid)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // Clipboard API unavailable -- nothing to recover into.
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="rounded-md border border-border px-2 py-1 text-xs font-medium text-fg-muted transition-colors hover:border-accent/40 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+    >
+      {copied ? 'Copied!' : 'Copy as Mermaid'}
+    </button>
+  )
 }
 
 // Shared "two parties exchange messages" visualizer: each message gets its
@@ -110,7 +158,10 @@ export function SequenceDiagramContent({
 
       <StepNarration steps={steps} currentIndex={player.step} />
 
-      <StepControls player={player} totalSteps={steps.length} />
+      <div className="flex items-center justify-between gap-3">
+        <StepControls player={player} totalSteps={steps.length} />
+        <CopyMermaidButton mermaid={buildMermaidSequence(leftLabel, rightLabel, steps)} />
+      </div>
     </div>
   )
 }

@@ -1,3 +1,6 @@
+import { useDiagramExport } from '../../../hooks/useDiagramExport'
+import { ExportButton } from '../../../components/ui/ExportButton'
+
 interface AddressSpaceBarProps {
   networkAddress: string
   broadcastAddress: string
@@ -32,10 +35,20 @@ export function AddressSpaceBar({
   networkValue,
   broadcastValue,
 }: AddressSpaceBarProps) {
+  const { ref, exportAs, pending } = useDiagramExport<HTMLDivElement>('address-space')
+
   if (firstUsable === null) {
     return (
-      <div className="flex h-10 items-center justify-center overflow-hidden rounded-md border border-border bg-accent/15 px-2 text-center font-mono text-[11px] text-accent">
-        {networkAddress} -- single host (/32)
+      <div className="flex flex-col gap-1">
+        <div className="flex justify-end">
+          <ExportButton exportAs={exportAs} pending={pending} />
+        </div>
+        <div
+          ref={ref}
+          className="flex h-10 items-center justify-center overflow-hidden rounded-md border border-border bg-accent/15 px-2 text-center font-mono text-[11px] text-accent"
+        >
+          {networkAddress} -- single host (/32)
+        </div>
       </div>
     )
   }
@@ -56,37 +69,45 @@ export function AddressSpaceBar({
     : null
 
   return (
-    <div className="relative flex h-10 overflow-hidden rounded-md border border-border font-mono text-[11px]">
-      {showNetworkCap && (
-        <div
-          className="flex w-24 shrink-0 items-center justify-center truncate border-r border-border bg-fg-subtle/10 px-1 text-fg-muted"
-          title={`Network address: ${networkAddress} (not assignable to a host)`}
-        >
-          {networkAddress}
-        </div>
-      )}
-      <div
-        className="flex min-w-0 flex-1 items-center justify-center truncate bg-accent/15 px-1 text-accent"
-        title={`Usable range: ${firstUsable} - ${lastUsable}`}
-      >
-        {usableHosts.toLocaleString()} usable host{usableHosts === 1 ? '' : 's'}
+    <div className="flex flex-col gap-1">
+      <div className="flex justify-end">
+        <ExportButton exportAs={exportAs} pending={pending} />
       </div>
-      {showBroadcastCap && (
+      <div
+        ref={ref}
+        className="relative flex h-10 overflow-hidden rounded-md border border-border font-mono text-[11px]"
+      >
+        {showNetworkCap && (
+          <div
+            className="flex w-24 shrink-0 items-center justify-center truncate border-r border-border bg-fg-subtle/10 px-1 text-fg-muted"
+            title={`Network address: ${networkAddress} (not assignable to a host)`}
+          >
+            {networkAddress}
+          </div>
+        )}
         <div
-          className="flex w-24 shrink-0 items-center justify-center truncate border-l border-border bg-fg-subtle/10 px-1 text-fg-muted"
-          title={`Broadcast address: ${broadcastAddress} (not assignable to a host)`}
+          className="flex min-w-0 flex-1 items-center justify-center truncate bg-accent/15 px-1 text-accent"
+          title={`Usable range: ${firstUsable} - ${lastUsable}`}
         >
-          {broadcastAddress}
+          {usableHosts.toLocaleString()} usable host{usableHosts === 1 ? '' : 's'}
         </div>
-      )}
-      {markerPercent !== null && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute top-0 h-full w-0.5 -translate-x-1/2 bg-fg shadow-[0_0_6px_1px_var(--color-accent)]"
-          style={{ left: `${markerPercent}%` }}
-          title="Current address"
-        />
-      )}
+        {showBroadcastCap && (
+          <div
+            className="flex w-24 shrink-0 items-center justify-center truncate border-l border-border bg-fg-subtle/10 px-1 text-fg-muted"
+            title={`Broadcast address: ${broadcastAddress} (not assignable to a host)`}
+          >
+            {broadcastAddress}
+          </div>
+        )}
+        {markerPercent !== null && (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute top-0 h-full w-0.5 -translate-x-1/2 bg-fg shadow-[0_0_6px_1px_var(--color-accent)]"
+            style={{ left: `${markerPercent}%` }}
+            title="Current address"
+          />
+        )}
+      </div>
     </div>
   )
 }

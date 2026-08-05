@@ -8,6 +8,8 @@ import { Button } from '../../../components/ui/Button'
 import { Select } from '../../../components/ui/Select'
 import { Pill } from '../../../components/ui/Pill'
 import { TopologyCanvas, type TopologyEdge, type TopologyNode } from '../../diagram/TopologyCanvas'
+import { useDiagramExport } from '../../../hooks/useDiagramExport'
+import { ExportButton } from '../../../components/ui/ExportButton'
 import {
   computeStpPortRoles,
   electRootBridge,
@@ -305,6 +307,7 @@ function LiveTopologyDiagram({ result }: { result: StpTopologyResult }) {
   const { rootBridgeId, ports } = result
   const bridgeIds = Array.from(new Set(ports.flatMap((port) => [port.bridgeId, port.neighborId])))
   const positions = computeCircularPositions(bridgeIds.length > 0 ? bridgeIds : [rootBridgeId])
+  const { ref, exportAs, pending } = useDiagramExport<HTMLDivElement>('stp-topology')
 
   function roleOf(bridgeId: string, neighborId: string) {
     return ports.find((p) => p.bridgeId === bridgeId && p.neighborId === neighborId)?.role
@@ -335,36 +338,41 @@ function LiveTopologyDiagram({ result }: { result: StpTopologyResult }) {
 
   return (
     <div className="mt-6 max-w-2xl rounded-lg border border-border bg-surface p-4">
-      <p className="mb-3 text-sm font-medium">Live topology -- root and blocked ports</p>
-      <TopologyCanvas
-        viewWidth={DIAGRAM_WIDTH}
-        viewHeight={DIAGRAM_HEIGHT}
-        className="mx-auto w-full max-w-sm"
-        nodes={bridgeIds.map((id): TopologyNode => {
-          const pos = positions[id]!
-          const isRoot = id === rootBridgeId
-          return {
-            id,
-            x: pos.x,
-            y: pos.y,
-            label: id,
-            icon: 'switch',
-            radius: isRoot ? 24 : 20,
-            fill: isRoot ? 'var(--color-accent-alt)' : 'var(--color-bg)',
-            stroke: isRoot ? 'var(--color-accent)' : 'var(--color-border)',
-            strokeWidth: isRoot ? 3 : 1.5,
-          }
-        })}
-        edges={edges.map((edge): TopologyEdge => ({
-          from: edge.from,
-          to: edge.to,
-          stroke: linkIsBlocked(edge.from, edge.to)
-            ? 'var(--color-fg-subtle)'
-            : 'var(--color-accent-alt)',
-          strokeWidth: linkIsBlocked(edge.from, edge.to) ? 1.5 : 3,
-          dashed: linkIsBlocked(edge.from, edge.to),
-        }))}
-      />
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="text-sm font-medium">Live topology -- root and blocked ports</p>
+        <ExportButton exportAs={exportAs} pending={pending} />
+      </div>
+      <div ref={ref}>
+        <TopologyCanvas
+          viewWidth={DIAGRAM_WIDTH}
+          viewHeight={DIAGRAM_HEIGHT}
+          className="mx-auto w-full max-w-sm"
+          nodes={bridgeIds.map((id): TopologyNode => {
+            const pos = positions[id]!
+            const isRoot = id === rootBridgeId
+            return {
+              id,
+              x: pos.x,
+              y: pos.y,
+              label: id,
+              icon: 'switch',
+              radius: isRoot ? 24 : 20,
+              fill: isRoot ? 'var(--color-accent-alt)' : 'var(--color-bg)',
+              stroke: isRoot ? 'var(--color-accent)' : 'var(--color-border)',
+              strokeWidth: isRoot ? 3 : 1.5,
+            }
+          })}
+          edges={edges.map((edge): TopologyEdge => ({
+            from: edge.from,
+            to: edge.to,
+            stroke: linkIsBlocked(edge.from, edge.to)
+              ? 'var(--color-fg-subtle)'
+              : 'var(--color-accent-alt)',
+            strokeWidth: linkIsBlocked(edge.from, edge.to) ? 1.5 : 3,
+            dashed: linkIsBlocked(edge.from, edge.to),
+          }))}
+        />
+      </div>
       <div className="mt-3 overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>

@@ -1,3 +1,6 @@
+import { useDiagramExport } from '../../../hooks/useDiagramExport'
+import { ExportButton } from '../../../components/ui/ExportButton'
+
 interface AnatomySegment {
   label: string
   hexChars: string
@@ -18,10 +21,15 @@ const TINTS = ['bg-accent/10 border-accent/30', 'bg-accent-alt/10 border-accent-
 // for the cases that matter and only approximate for the rare
 // non-nibble-aligned prefix length.
 export function Ipv6AnatomyDiagram({ segments }: Ipv6AnatomyDiagramProps) {
+  const { ref, exportAs, pending } = useDiagramExport<HTMLDivElement>('ipv6-anatomy')
+
   return (
     <div>
-      <p className="text-xs font-medium text-fg-muted">Anatomy of this address</p>
-      <div className="mt-1.5 flex h-16 overflow-hidden rounded-md border border-border">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-medium text-fg-muted">Anatomy of this address</p>
+        <ExportButton exportAs={exportAs} pending={pending} />
+      </div>
+      <div ref={ref} className="mt-1.5 flex h-16 overflow-hidden rounded-md border border-border">
         {segments.map((segment, index) =>
           segment.bits > 0 ? (
             <div
