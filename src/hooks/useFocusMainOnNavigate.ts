@@ -1,6 +1,18 @@
 import { useEffect, useRef, type RefObject } from 'react'
 import { useLocation } from 'react-router'
 
+// Disabling the browser's own scroll restoration is required for the fix
+// below to actually hold on back/forward navigation specifically -- left
+// at the default 'auto', the browser tries to restore whatever scroll
+// position was recorded for that history entry (which often isn't 0, if
+// the page had scrolled even slightly during the visit that pushed it),
+// racing with -- and sometimes winning against -- the scrollTo(0, 0)
+// call below. Set once, at module load, so it's in effect before any
+// navigation (including the very first back/forward) can happen.
+if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual'
+}
+
 // Client-side navigation never resets scroll position or focus the way a
 // full page load does. Two fixes, both applied on every route change
 // (skipped on the very first render, which is the initial load -- scroll

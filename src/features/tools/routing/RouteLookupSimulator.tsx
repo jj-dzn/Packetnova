@@ -15,6 +15,7 @@ import {
   type RouteLookupMatch,
 } from '../../../lib/calculations/routeLookup'
 import { administrativeDistances } from '../../../content/reference/administrativeDistance'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 const DEFAULT_ROUTES: RouteLookupEntry[] = [
   { cidr: '192.168.0.0/16', administrativeDistance: 1, label: 'Static' },
@@ -128,7 +129,7 @@ function buildRouteLookupGuidedSteps(matches: RouteLookupMatch[]): GuidedStep[] 
 }
 
 export function RouteLookupSimulator() {
-  const [destination, setDestination] = useState('192.168.1.10')
+  const [destination, setDestination] = useUrlState('destination', '192.168.1.10')
   const [routes, setRoutes] = useState<RouteLookupEntry[]>(DEFAULT_ROUTES)
   const [showCli, setShowCli] = useState(false)
 

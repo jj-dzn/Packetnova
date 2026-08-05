@@ -9,6 +9,7 @@ import { calculateMtu, type MtuResult } from '../../../lib/calculations/mtu'
 import { calculateMss } from '../../../lib/calculations/mss'
 import { calculateFragmentation } from '../../../lib/calculations/fragmentation'
 import { DoesItFitBar } from './DoesItFitBar'
+import { useUrlState } from '../../../hooks/useUrlState'
 
 // The three tools T10 already cross-linked (MTU -> MSS -> Packet
 // Fragmentation) as one guided narrative instead of three separate visits --
@@ -75,7 +76,7 @@ function buildMtuChainSteps(mtu: MtuResult, payload: number): GuidedStep[] {
 }
 
 export function MtuCalculator() {
-  const [linkMtu, setLinkMtu] = useState('1500')
+  const [linkMtu, setLinkMtu] = useUrlState('mtu', '1500')
   const [overhead, setOverhead] = useState('0')
   const [payload, setPayload] = useState('1500')
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { Pill } from '../../../components/ui/Pill'
@@ -19,12 +20,78 @@ interface CanvasNode {
   label: string
   x: number
   y: number
+  /** Optional IP/CIDR, e.g. "192.168.1.1/24" -- unlocks "open in" links to
+   * the relevant IP tools, pre-filled with this exact value. */
+  address?: string
 }
 
 interface CanvasLink {
   id: string
   from: string
   to: string
+  /** Optional MTU in bytes -- unlocks an "open in MTU calculator" link. */
+  mtu?: string
+  /** Optional VLAN ID -- unlocks an "open in VLAN calculator" link, for a
+   * link standing in for a trunk carrying a specific VLAN. */
+  vlanId?: string
+}
+
+interface ToolQuickLink {
+  label: string
+  to: string
+}
+
+// What "tool integration" actually means here: a selected node/link with
+// enough optional data filled in surfaces direct links into the exact
+// tool that data is for, pre-filled via the same URL query params those
+// tools already read for permalink state (v1.1) -- no new plumbing on
+// the tool side beyond the two that didn't have it yet (route lookup
+// simulator's destination, MTU calculator's mtu).
+function buildNodeToolLinks(node: CanvasNode): ToolQuickLink[] {
+  const links: ToolQuickLink[] = []
+  const address = node.address?.trim()
+  if (address) {
+    const encoded = encodeURIComponent(address)
+    if (address.includes(':')) {
+      links.push({ label: 'IPv6 calculator', to: `/tools/ipv6-calculator?addr=${encoded}` })
+    } else {
+      links.push({ label: 'CIDR calculator', to: `/tools/cidr-calculator?cidr=${encoded}` })
+      links.push({ label: 'Subnet calculator', to: `/tools/subnet-calculator?cidr=${encoded}` })
+      links.push({
+        label: 'Network address calculator',
+        to: `/tools/network-address-calculator?cidr=${encoded}`,
+      })
+      links.push({
+        label: 'Broadcast calculator',
+        to: `/tools/broadcast-calculator?cidr=${encoded}`,
+      })
+      if (node.kind === 'router' || node.kind === 'vpn-gateway') {
+        const host = encodeURIComponent(address.split('/')[0]!)
+        links.push({
+          label: 'Route lookup simulator',
+          to: `/tools/route-lookup-simulator?destination=${host}`,
+        })
+      }
+    }
+  }
+  return links
+}
+
+function buildLinkToolLinks(link: CanvasLink): ToolQuickLink[] {
+  const links: ToolQuickLink[] = []
+  if (link.mtu?.trim()) {
+    links.push({
+      label: 'MTU calculator',
+      to: `/tools/mtu-calculator?mtu=${encodeURIComponent(link.mtu.trim())}`,
+    })
+  }
+  if (link.vlanId?.trim()) {
+    links.push({
+      label: 'VLAN calculator',
+      to: `/tools/vlan-calculator?vlan=${encodeURIComponent(link.vlanId.trim())}`,
+    })
+  }
+  return links
 }
 
 interface StoredTopology {
@@ -40,19 +107,24 @@ const DEVICE_KINDS: { kind: DeviceIconKind; label: string }[] = [
   { kind: 'vpn-gateway', label: 'VPN gateway' },
 ]
 
+// Node and link IDs are deliberately prefixed ("n"/"l") into separate
+// namespaces -- selection is looked up by a single selectedId across both
+// arrays (nodes first, then links), so a node and a link that happened to
+// share the same bare numeric ID would make a link selection silently
+// misread as a node selection whenever nodes.find() matched first.
 const DEFAULT_NODES: CanvasNode[] = [
-  { id: '1', kind: 'router', label: 'Router 1', x: 50, y: 12 },
-  { id: '2', kind: 'switch', label: 'Switch 1', x: 25, y: 32 },
-  { id: '3', kind: 'switch', label: 'Switch 2', x: 75, y: 32 },
-  { id: '4', kind: 'host', label: 'Host 1', x: 15, y: 50 },
-  { id: '5', kind: 'host', label: 'Host 2', x: 35, y: 50 },
+  { id: 'n1', kind: 'router', label: 'Router 1', x: 50, y: 12 },
+  { id: 'n2', kind: 'switch', label: 'Switch 1', x: 25, y: 32 },
+  { id: 'n3', kind: 'switch', label: 'Switch 2', x: 75, y: 32 },
+  { id: 'n4', kind: 'host', label: 'Host 1', x: 15, y: 50 },
+  { id: 'n5', kind: 'host', label: 'Host 2', x: 35, y: 50 },
 ]
 
 const DEFAULT_LINKS: CanvasLink[] = [
-  { id: '1', from: '1', to: '2' },
-  { id: '2', from: '1', to: '3' },
-  { id: '3', from: '2', to: '4' },
-  { id: '4', from: '2', to: '5' },
+  { id: 'l1', from: 'n1', to: 'n2' },
+  { id: 'l2', from: 'n1', to: 'n3' },
+  { id: 'l3', from: 'n2', to: 'n4' },
+  { id: 'l4', from: 'n2', to: 'n5' },
 ]
 
 function loadStoredTopology(): StoredTopology {
@@ -166,7 +238,7 @@ export function TopologyBuilder() {
     if (!svg) return
     if (mode === 'place' && placingKind) {
       const { x, y } = clientToViewBox(svg, event.clientX, event.clientY)
-      const id = String(nextNodeId.current++)
+      const id = `n${nextNodeId.current++}`
       const newNode: CanvasNode = { id, kind: placingKind, label: defaultLabel(placingKind), x, y }
       setNodes((current) => [...current, newNode])
       setSelectedId(id)
@@ -198,7 +270,7 @@ export function TopologyBuilder() {
           (l.from === linkStart && l.to === nodeId) || (l.from === nodeId && l.to === linkStart),
       )
       if (!alreadyLinked) {
-        const id = String(nextLinkId.current++)
+        const id = `l${nextLinkId.current++}`
         setLinks((current) => [...current, { id, from: linkStart, to: nodeId }])
       }
       setLinkStart(null)
@@ -388,34 +460,119 @@ export function TopologyBuilder() {
           </div>
 
           {(selectedNode || selectedLink) && (
-            <div className="flex flex-wrap items-center gap-3 rounded-md border border-border bg-surface p-3">
+            <div className="flex flex-col gap-3 rounded-md border border-border bg-surface p-3">
+              <div className="flex flex-wrap items-center gap-3">
+                {selectedNode && (
+                  <>
+                    <span className="text-xs font-medium text-fg-muted">Selected device</span>
+                    <input
+                      value={selectedNode.label}
+                      onChange={(e) => {
+                        const label = e.target.value
+                        setNodes((current) =>
+                          current.map((n) => (n.id === selectedNode.id ? { ...n, label } : n)),
+                        )
+                      }}
+                      className="min-w-0 flex-1 rounded-md border border-border bg-bg px-3 py-1.5 text-sm text-fg focus:border-accent focus:outline-none"
+                    />
+                  </>
+                )}
+                {selectedLink && (
+                  <span className="text-sm">
+                    Selected link:{' '}
+                    <span className="font-mono text-fg-muted">
+                      {nodeById.get(selectedLink.from)?.label} &ndash;{' '}
+                      {nodeById.get(selectedLink.to)?.label}
+                    </span>
+                  </span>
+                )}
+                <Button variant="secondary" onClick={deleteSelected} className="ml-auto">
+                  Delete
+                </Button>
+              </div>
+
               {selectedNode && (
-                <>
-                  <span className="text-xs font-medium text-fg-muted">Selected device</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="text-xs text-fg-subtle" htmlFor="node-address-input">
+                    Address (optional):
+                  </label>
                   <input
-                    value={selectedNode.label}
+                    id="node-address-input"
+                    value={selectedNode.address ?? ''}
                     onChange={(e) => {
-                      const label = e.target.value
+                      const address = e.target.value
                       setNodes((current) =>
-                        current.map((n) => (n.id === selectedNode.id ? { ...n, label } : n)),
+                        current.map((n) => (n.id === selectedNode.id ? { ...n, address } : n)),
                       )
                     }}
-                    className="min-w-0 flex-1 rounded-md border border-border bg-bg px-3 py-1.5 text-sm text-fg focus:border-accent focus:outline-none"
+                    placeholder="192.168.1.1/24"
+                    spellCheck={false}
+                    className="min-w-0 flex-1 rounded-md border border-border bg-bg px-3 py-1.5 font-mono text-sm text-fg focus:border-accent focus:outline-none"
                   />
-                </>
+                </div>
               )}
+
               {selectedLink && (
-                <span className="text-sm">
-                  Selected link:{' '}
-                  <span className="font-mono text-fg-muted">
-                    {nodeById.get(selectedLink.from)?.label} &ndash;{' '}
-                    {nodeById.get(selectedLink.to)?.label}
-                  </span>
-                </span>
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-fg-subtle" htmlFor="link-mtu-input">
+                      MTU (optional):
+                    </label>
+                    <input
+                      id="link-mtu-input"
+                      value={selectedLink.mtu ?? ''}
+                      onChange={(e) => {
+                        const mtu = e.target.value
+                        setLinks((current) =>
+                          current.map((l) => (l.id === selectedLink.id ? { ...l, mtu } : l)),
+                        )
+                      }}
+                      placeholder="1500"
+                      className="w-24 rounded-md border border-border bg-bg px-3 py-1.5 font-mono text-sm text-fg focus:border-accent focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-fg-subtle" htmlFor="link-vlan-input">
+                      VLAN (optional):
+                    </label>
+                    <input
+                      id="link-vlan-input"
+                      value={selectedLink.vlanId ?? ''}
+                      onChange={(e) => {
+                        const vlanId = e.target.value
+                        setLinks((current) =>
+                          current.map((l) => (l.id === selectedLink.id ? { ...l, vlanId } : l)),
+                        )
+                      }}
+                      placeholder="100"
+                      className="w-24 rounded-md border border-border bg-bg px-3 py-1.5 font-mono text-sm text-fg focus:border-accent focus:outline-none"
+                    />
+                  </div>
+                </div>
               )}
-              <Button variant="secondary" onClick={deleteSelected}>
-                Delete
-              </Button>
+
+              {(() => {
+                const toolLinks = selectedNode
+                  ? buildNodeToolLinks(selectedNode)
+                  : selectedLink
+                    ? buildLinkToolLinks(selectedLink)
+                    : []
+                if (toolLinks.length === 0) return null
+                return (
+                  <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3">
+                    <span className="text-xs text-fg-subtle">Open in:</span>
+                    {toolLinks.map((toolLink) => (
+                      <Link
+                        key={toolLink.to}
+                        to={toolLink.to}
+                        className="rounded-full border border-border px-3 py-1 text-xs font-medium text-fg-muted transition-colors hover:border-accent/40 hover:text-fg"
+                      >
+                        {toolLink.label}
+                      </Link>
+                    ))}
+                  </div>
+                )
+              })()}
             </div>
           )}
 
@@ -433,14 +590,19 @@ export function TopologyBuilder() {
           <p>
             Everything here lives in this browser's local storage -- nothing is uploaded, there's no
             account, and it persists across visits until you clear it or clear your browser data.
-            Positions, device types, and link connections are all saved on every change.
+            Positions, device types, and link connections are all saved on every change. Give a
+            device an address, or a link an MTU or VLAN, and an "Open in" row appears under the
+            selection panel linking straight into the matching calculator, pre-filled with that
+            exact value.
           </p>
         }
         whenToUseThis={
           <p>
             Sketch out a network you're troubleshooting, designing, or explaining to someone else --
             a quick visual reference that's faster to build than a full diagramming tool, and that
-            you can export as an image to drop into a ticket, doc, or chat.
+            you can export as an image to drop into a ticket, doc, or chat. Add addresses and link
+            properties as you go to jump directly into the CIDR, subnet, MTU, VLAN, or route-lookup
+            math for any specific piece of it, instead of retyping values into a separate tool.
           </p>
         }
         commonMistakes={
