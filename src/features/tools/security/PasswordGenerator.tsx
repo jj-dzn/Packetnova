@@ -137,6 +137,7 @@ export function PasswordGenerator() {
       title="Password generator"
       description="Generate strong, random passwords using your browser's cryptographically secure random number generator."
       status={calc.ok ? 'ok' : 'error'}
+      related={[{ to: '/labs/handle-generator', label: 'Labs: generate a hacker alias instead' }]}
       input={
         <div className="flex flex-col gap-4">
           <div>

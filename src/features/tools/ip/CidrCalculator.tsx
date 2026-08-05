@@ -86,6 +86,7 @@ export function CidrCalculator() {
         { to: '/tools/network-address-calculator', label: 'Network address calculator' },
         { to: '/tools/broadcast-calculator', label: 'Broadcast calculator' },
         { to: '/tools/wildcard-mask-calculator', label: 'Wildcard mask calculator' },
+        { to: '/labs/ip-zodiac', label: 'Labs: what your IP says about you' },
       ]}
       input={
         <div>

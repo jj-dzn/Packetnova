@@ -4,6 +4,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { TrafficStarfield } from './TrafficStarfield'
 import { HeroStatusLine } from './HeroStatusLine'
+import { HeroLiveDemo } from './HeroLiveDemo'
 
 // Ties the hero's ambient glow (the two blur blobs + the status line) to how
 // much of the hero is actually still in view -- full intensity at the top,
@@ -74,6 +75,9 @@ export function Hero() {
           <Link to="/visualizers" className="pointer-events-auto">
             <Button variant="secondary">Explore visualizers</Button>
           </Link>
+        </div>
+        <div className="flex w-full justify-center px-4">
+          <HeroLiveDemo />
         </div>
         <div className="transition-opacity duration-300" style={{ opacity: 'var(--pn-signal, 1)' }}>
           <HeroStatusLine />

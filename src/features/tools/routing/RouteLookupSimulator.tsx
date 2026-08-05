@@ -167,6 +167,7 @@ export function RouteLookupSimulator() {
           label: 'Administrative distance reference',
         },
         { to: '/scenarios/routing-black-hole', label: 'Scenario: Routing black hole' },
+        { to: '/labs/traceroute-ghost', label: 'Labs: a ghost travels hop by hop' },
       ]}
       input={
         <div className="flex flex-col gap-4">

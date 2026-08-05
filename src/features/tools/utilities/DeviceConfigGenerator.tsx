@@ -110,6 +110,7 @@ export function DeviceConfigGenerator() {
         { to: '/tools/topology-canvas', label: 'Topology canvas' },
         { to: '/tools/vlan-calculator', label: 'VLAN calculator' },
         { to: '/tools/subnet-calculator', label: 'Subnet calculator' },
+        { to: '/labs/cursed-config', label: 'Labs: the joke version of this generator' },
       ]}
       input={
         <div className="flex flex-col gap-4">
