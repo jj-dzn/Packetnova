@@ -50,9 +50,16 @@ export function PageShell({ children }: PageShellProps) {
 
   return (
     <div className="flex min-h-screen flex-col bg-bg text-fg">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-bg focus:outline-none"
+      >
+        Skip to main content
+      </a>
       <Nav />
       <main
         ref={mainRef}
+        id="main-content"
         tabIndex={-1}
         className="mx-auto w-full max-w-[1200px] flex-1 px-4 outline-none sm:px-6 lg:px-8"
       >
