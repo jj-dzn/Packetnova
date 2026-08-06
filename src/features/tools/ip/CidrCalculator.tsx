@@ -1,4 +1,5 @@
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
 import { AddressSpaceBar } from './AddressSpaceBar'
@@ -163,6 +164,48 @@ export function CidrCalculator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={{
+          concise:
+            'CIDR notation packs an address and its network size into one string, like 192.168.1.0/24 -- the number after the slash says how many of the 32 bits are the fixed network part.',
+          detailed: (
+            <p>
+              CIDR (Classless Inter-Domain Routing) notation writes a network as an address plus a
+              prefix length -- <code>/24</code> means the first 24 bits are fixed and shared by
+              every host on that network, leaving the remaining 8 bits free to identify individual
+              hosts. It replaced the older class-based system (Class A/B/C), which wasted enormous
+              blocks of address space by only offering three fixed sizes -- CIDR lets a network be
+              exactly as big as it needs to be, from a single <code>/32</code> host route up to
+              entire <code>/8</code> blocks.
+            </p>
+          ),
+          rfcPrecise: (
+            <p>
+              Defined in RFC 4632 (obsoleting RFC 1519), CIDR notation formally expresses an IP
+              prefix as <code>&lt;address&gt;/&lt;prefix-length&gt;</code>, where prefix-length
+              specifies the number of leading bits in the 32-bit IPv4 address that constitute the
+              network identifier. RFC 4632 §3 defines the aggregatable nature of CIDR blocks and
+              formally deprecates the classful addressing architecture of RFC 791, under which
+              network boundaries were implied by an address's leading bits (Class A/B/C) rather than
+              stated explicitly.
+            </p>
+          ),
+        }}
+        whenToUseThis={
+          <p>
+            Any time you need to know exactly what a network boundary is -- reading a router's
+            routing table, sizing a VLAN, or double-checking whether two addresses are actually on
+            the same subnet.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Forgetting that the network and broadcast addresses themselves aren't assignable to a
+            host -- a /24 has 256 total addresses but only 254 usable ones.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

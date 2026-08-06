@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { Pill } from '../../../components/ui/Pill'
@@ -211,6 +212,43 @@ export function VlanCalculator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={{
+          concise:
+            "A VLAN ID (1-4094) splits one physical network into separate logical ones -- devices in different VLANs can't talk to each other unless something routes between them.",
+          detailed: (
+            <p>
+              A VLAN (Virtual LAN) lets a switch treat ports as if they belonged to entirely
+              separate physical networks, even though they share the same switch and cabling. Each
+              VLAN gets a numeric ID and its own broadcast domain -- a device in VLAN 10 never sees
+              broadcast traffic from VLAN 20, and the two can't communicate at all unless a router
+              (or a Layer 3 switch) is explicitly configured to pass traffic between them.
+            </p>
+          ),
+          rfcPrecise: (
+            <p>
+              IEEE 802.1Q defines the tagging mechanism behind the VLAN ID here: a 12-bit VID within
+              the 802.1Q tag, valid range 1-4094 (0 and 4095 are reserved). The standard's Filtering
+              Database and Bridge Protocol Data Unit handling give each VID its own independent
+              forwarding and broadcast domain within a single bridged LAN.
+            </p>
+          ),
+        }}
+        whenToUseThis={
+          <p>
+            Segmenting a network by function or security zone (voice vs. data, guest vs. corporate)
+            without running separate physical cabling for each.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming two devices can reach each other just because they're on the same physical
+            switch -- if they're in different VLANs, nothing crosses without an explicit Layer 3
+            hop.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }
