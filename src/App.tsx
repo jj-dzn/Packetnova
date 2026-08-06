@@ -352,6 +352,11 @@ const SwitchingLoopScenario = lazy(() =>
     default: m.SwitchingLoopScenario,
   })),
 )
+const DnsFailureScenario = lazy(() =>
+  import('./features/scenarios/DnsFailureScenario').then((m) => ({
+    default: m.DnsFailureScenario,
+  })),
+)
 const NetworkJourneyPage = lazy(() =>
   import('./pages/NetworkJourneyPage').then((m) => ({ default: m.NetworkJourneyPage })),
 )
@@ -368,6 +373,16 @@ const BgpPathSelectionPathPage = lazy(() =>
 const VpnTroubleshootingPathPage = lazy(() =>
   import('./pages/VpnTroubleshootingPathPage').then((m) => ({
     default: m.VpnTroubleshootingPathPage,
+  })),
+)
+const VlanSwitchingFluencyPathPage = lazy(() =>
+  import('./pages/VlanSwitchingFluencyPathPage').then((m) => ({
+    default: m.VlanSwitchingFluencyPathPage,
+  })),
+)
+const SecurityFundamentalsPathPage = lazy(() =>
+  import('./pages/SecurityFundamentalsPathPage').then((m) => ({
+    default: m.SecurityFundamentalsPathPage,
   })),
 )
 const NatJourneyPage = lazy(() =>
@@ -529,6 +544,11 @@ function App() {
             <Route path="/paths/bgp-path-selection" element={<BgpPathSelectionPathPage />} />
             <Route path="/paths/vpn-troubleshooting" element={<VpnTroubleshootingPathPage />} />
             <Route
+              path="/paths/vlan-switching-fluency"
+              element={<VlanSwitchingFluencyPathPage />}
+            />
+            <Route path="/paths/security-fundamentals" element={<SecurityFundamentalsPathPage />} />
+            <Route
               path="/scenarios/site-to-site-vpn-failure"
               element={<SiteToSiteVpnFailureScenario />}
             />
@@ -543,6 +563,7 @@ function App() {
             />
             <Route path="/scenarios/dhcp-lease-failure" element={<DhcpFailureScenario />} />
             <Route path="/scenarios/switching-loop" element={<SwitchingLoopScenario />} />
+            <Route path="/scenarios/dns-negative-cache" element={<DnsFailureScenario />} />
             <Route path="/labs" element={<LabsPage />} />
             <Route path="/labs/ping-pet" element={<PingPet />} />
             <Route path="/labs/ip-zodiac" element={<IpZodiac />} />

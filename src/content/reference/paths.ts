@@ -137,6 +137,89 @@ export const competencyPaths: CompetencyPath[] = [
       },
     ],
   },
+  {
+    slug: 'vlan-switching-fluency',
+    title: 'VLAN & switching fluency',
+    category: 'Switching',
+    description:
+      'The two mechanisms every switched network actually runs on -- VLANs to keep traffic separate, Spanning Tree to keep a redundant physical topology from looping -- from the basics through a real misconfiguration and a real loop.',
+    steps: [
+      {
+        type: 'tool',
+        slug: 'vlan-calculator',
+        note: 'Start with the basics: what a VLAN ID actually is, and how a switch keeps it separate from every other VLAN.',
+      },
+      {
+        type: 'tool',
+        slug: '802-1q-tag-explorer',
+        note: 'See exactly how that VLAN gets tagged onto a frame crossing a trunk between switches.',
+      },
+      {
+        type: 'tool',
+        slug: 'mac-address-lookup',
+        note: 'The other half of switching: how a switch actually learns which port a MAC address lives behind.',
+      },
+      {
+        type: 'tool',
+        slug: 'stp-overview',
+        note: 'More than one switch means a loop is possible the moment two links exist between them -- see what stops it.',
+      },
+      {
+        type: 'visualizer',
+        slug: 'stp-vs-rstp-convergence',
+        note: 'Compare how much faster RSTP recovers from a topology change than classic STP.',
+      },
+      {
+        type: 'scenario',
+        slug: 'vlan-misconfiguration',
+        note: 'Apply it: two hosts on the same switch, meant to share a VLAN, that just cannot reach each other.',
+      },
+      {
+        type: 'scenario',
+        slug: 'switching-loop',
+        note: 'And a real loop, this one branching -- your own choices decide whether you actually find it.',
+      },
+    ],
+  },
+  {
+    slug: 'security-fundamentals',
+    title: 'Security fundamentals',
+    category: 'Security',
+    description:
+      'The building blocks underneath almost everything else on this site claims is secure -- hashing, the TLS handshake that makes HTTPS possible, the certificate chain it depends on, and the token format that gets mistaken for encryption more than any other.',
+    steps: [
+      {
+        type: 'tool',
+        slug: 'hash-generator',
+        note: 'Start with the basics: how a hash actually works, computed live from whatever you type.',
+      },
+      {
+        type: 'tool',
+        slug: 'hash-verifier',
+        note: 'Now use one for real: check a string against an expected hash the way an integrity check actually works.',
+      },
+      {
+        type: 'visualizer',
+        slug: 'tls-handshake',
+        note: 'See the handshake that makes HTTPS possible, negotiated before a single byte of your request goes anywhere.',
+      },
+      {
+        type: 'visualizer',
+        slug: 'tls-1-2-vs-1-3',
+        note: "Compare it against TLS 1.3's leaner handshake -- fewer round trips, the same guarantees.",
+      },
+      {
+        type: 'tool',
+        slug: 'certificate-viewer',
+        note: 'Inspect a real certificate chain -- the trust anchor the whole handshake actually relies on.',
+      },
+      {
+        type: 'tool',
+        slug: 'jwt-decoder',
+        note: "A different kind of trust: decode a JWT and see exactly what it does -- and doesn't -- guarantee.",
+      },
+    ],
+  },
 ]
 
 export function otherPaths(currentSlug: string): CompetencyPath[] {

@@ -74,6 +74,12 @@ export function DnsRecordReference() {
       category="Protocols"
       title="DNS record reference"
       description="Every common DNS record type and what it's used for."
+      related={[
+        {
+          to: '/scenarios/dns-negative-cache',
+          label: 'Scenario: DNS that works everywhere except one network',
+        },
+      ]}
     >
       <ResolutionFlow />
       <DataTable<DnsRecordEntry>

@@ -71,4 +71,11 @@ export const scenarios: ScenarioListing[] = [
     symptom: "One access switch's CPU is pegged and its MAC table won't settle down.",
     format: 'branching',
   },
+  {
+    slug: 'dns-negative-cache',
+    title: 'DNS that works everywhere except one network',
+    category: 'DNS',
+    symptom: 'A new subdomain resolves fine everywhere -- except one office network.',
+    format: 'branching',
+  },
 ]
