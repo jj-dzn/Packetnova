@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { MacBinaryBreakdown } from './MacBinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
@@ -100,6 +102,45 @@ export function MacAddressLookup() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            The first 3 bytes (the OUI) identify the manufacturer; the last 3 (the NIC-specific
+            portion) are that manufacturer's own serial numbering. Two of the OUI's bits carry
+            independent meaning: the lowest bit of the first byte is the I/G bit -- 0 for an
+            ordinary unicast address, 1 for multicast -- and the next bit up is the U/L bit -- 0 for
+            a universally-administered address burned in by the manufacturer, 1 for a
+            locally-administered one set by software instead (common on VMs, containers, and
+            randomized-MAC Wi-Fi clients).
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Identifying what kind of device is behind a MAC address seen in a switch's address table
+            or a packet capture, or checking whether an address is a real burned-in NIC address
+            versus one assigned by a hypervisor or generated for privacy.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming every MAC address has a real, factory-assigned vendor -- a locally-administered
+            address (U/L bit set to 1) was never burned in by any manufacturer at all, so an OUI
+            lookup on one is meaningless by design, not a gap in this tool's vendor database. Modern
+            OS Wi-Fi privacy features generate exactly this kind of address on purpose, specifically
+            so it can't be tracked back to a real hardware vendor.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Need the same address in a different notation instead of broken down? The{' '}
+            <Link to="/tools/mac-formatter" className="text-accent hover:underline">
+              MAC formatter
+            </Link>{' '}
+            converts between colon, hyphen, and dot notation.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

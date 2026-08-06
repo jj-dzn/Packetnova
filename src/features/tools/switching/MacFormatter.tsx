@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { MacBinaryBreakdown } from './MacBinaryBreakdown'
 import { Input } from '../../../components/ui/Input'
@@ -60,6 +62,43 @@ export function MacFormatter() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            It's the same 6 bytes in every notation -- only the separator and grouping change. Colon
+            and hyphen notation both show every individual byte (Windows favors hyphens, Linux and
+            most vendor documentation favor colons); Cisco's dotted notation instead groups the
+            address into three 16-bit halves separated by dots, which is what shows up in IOS
+            commands and <code className="font-mono">show mac address-table</code> output.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Pasting a MAC address from one tool or platform into another that expects a different
+            notation -- copying an address out of a Linux <code className="font-mono">ip link</code>{' '}
+            listing (colons) to paste into a Cisco IOS ACL or static ARP entry (dots), for instance.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Pasting the wrong notation into a command that parses it literally instead of
+            normalizing it -- IOS expects the dotted form specifically and won't accept colon- or
+            hyphen-separated input in most contexts, so a MAC copied straight from a packet capture
+            needs converting first, not just pasting as-is.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Want to know what device an address actually belongs to instead of just reformatting it?
+            The{' '}
+            <Link to="/tools/mac-address-lookup" className="text-accent hover:underline">
+              MAC address lookup
+            </Link>{' '}
+            tool checks it against a vendor OUI database.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

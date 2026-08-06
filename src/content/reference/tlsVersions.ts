@@ -18,14 +18,15 @@ export const tlsVersions: TlsVersionEntry[] = [
     version: 'TLS 1.0',
     year: 1999,
     status: 'Deprecated',
-    notes: 'Weak cipher support (RC4, CBC padding issues); formally deprecated industry-wide',
+    notes: 'Weak cipher support (RC4, CBC padding issues); formally deprecated by RFC 8996 (2021)',
     rfc: 'RFC 2246',
   },
   {
     version: 'TLS 1.1',
     year: 2006,
     status: 'Deprecated',
-    notes: 'Incremental fix over 1.0; still lacks modern AEAD ciphers',
+    notes:
+      'Incremental fix over 1.0; still lacks modern AEAD ciphers; deprecated alongside 1.0 by RFC 8996',
     rfc: 'RFC 4346',
   },
   {

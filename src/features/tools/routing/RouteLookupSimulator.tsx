@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
 import { GuidedMode, type GuidedStep } from '../GuidedMode'
@@ -310,6 +312,54 @@ export function RouteLookupSimulator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Two strictly ordered stages, never reversed: first, narrow to whichever configured
+            routes actually contain the destination at the longest prefix length available -- if
+            exactly one route wins that, it's installed and administrative distance is never even
+            checked. Only when two or more routes tie at that same longest prefix does
+            administrative distance step in to break the tie.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Working out which route actually gets installed when a router has more than one
+            candidate path to a destination -- especially the case people get backwards, where a
+            worse-trusted source (a higher AD) still wins because its route is more specific than a
+            better-trusted source's broader one.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Administrative distance isn't a protocol standard -- it's a per-vendor default table
+            (this one's Cisco's), and a different vendor can and does assign different numbers to
+            the same source. The other easy mix-up: lower AD means more trusted, not better or
+            faster -- a directly connected interface's AD of 0 beats a static route's 1, which beats
+            eBGP's 20, regardless of which one actually offers a better path.
+          </p>
+        }
+        relatedReading={
+          <p>
+            The{' '}
+            <Link
+              to="/tools/administrative-distance-reference"
+              className="text-accent hover:underline"
+            >
+              administrative distance reference
+            </Link>{' '}
+            has the full default table this tool draws from; the{' '}
+            <Link
+              to="/tools/longest-prefix-match-simulator"
+              className="text-accent hover:underline"
+            >
+              longest prefix match simulator
+            </Link>{' '}
+            isolates just the first stage on its own.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

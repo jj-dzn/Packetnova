@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
 import { BinaryBreakdown } from './BinaryBreakdown'
@@ -125,6 +127,50 @@ export function WildcardMaskCalculator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            A wildcard mask is the bitwise complement of a subnet mask -- flip every 1 to a 0 and
+            every 0 to a 1 and that's the whole calculation. It exists because Cisco's ACL and OSPF{' '}
+            <code className="font-mono">network</code> statement syntax both predate CIDR notation
+            and were built around wildcard masks as their match syntax; the underlying
+            255.255.255.0-style mask is a modern convenience layered on afterward.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Whenever you're writing a classic (numbered) Cisco ACL or an OSPF{' '}
+            <code className="font-mono">network</code> statement by hand and have a subnet mask or
+            prefix length in front of you instead of the wildcard mask those commands actually
+            expect.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Unlike a subnet mask, a wildcard mask doesn't have to be contiguous -- Cisco IOS accepts
+            something like <code className="font-mono">0.0.15.240</code>, which matches a scattered,
+            non-CIDR-aligned set of addresses no ordinary subnet could represent. This tool only
+            converts real subnet masks (contiguous 1s followed by contiguous 0s), which covers the
+            vast majority of real ACL/OSPF lines -- a hand-crafted discontiguous wildcard mask isn't
+            a subnet mask inverted, so it's a different thing entirely and outside what this
+            calculator does.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Need the network address a wildcard mask actually matches? The{' '}
+            <Link to="/tools/cidr-calculator" className="text-accent hover:underline">
+              CIDR calculator
+            </Link>{' '}
+            and{' '}
+            <Link to="/tools/subnet-calculator" className="text-accent hover:underline">
+              subnet calculator
+            </Link>{' '}
+            both work in ordinary subnet-mask terms and can feed straight into this one.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

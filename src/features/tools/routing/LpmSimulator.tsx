@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Aside } from '../Aside'
 import { Input } from '../../../components/ui/Input'
@@ -177,6 +179,49 @@ export function LpmSimulator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Every route whose network (destination masked down to that route's own prefix length)
+            matches the destination is a candidate; among candidates, the one with the longest
+            prefix length wins, no matter what else is true about the other routes.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Working out which of several overlapping routes actually gets used for a specific
+            destination -- especially when a more specific route (a /30 for one particular link)
+            sits alongside a broader aggregate (a /16 for the whole site) or a default route.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming a tie on prefix length gets decided the same way this simulator shows it -- if
+            two candidate routes match with the exact same prefix length, longest-prefix-match
+            genuinely can't distinguish between them, and a real router falls through to
+            administrative distance and then metric to break the tie. This tool has no concept of AD
+            or metric at all, so an equal-length tie here is just whichever route happens to be
+            listed first -- see the{' '}
+            <Link to="/tools/route-lookup-simulator" className="text-accent hover:underline">
+              route lookup simulator
+            </Link>{' '}
+            for that next step of the real decision.
+          </p>
+        }
+        relatedReading={
+          <p>
+            The{' '}
+            <Link
+              to="/tools/administrative-distance-reference"
+              className="text-accent hover:underline"
+            >
+              administrative distance reference
+            </Link>{' '}
+            covers what actually breaks a tie once prefix length no longer can.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

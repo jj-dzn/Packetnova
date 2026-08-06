@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ReferencePageLayout } from '../ReferencePageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { DataTable } from '../../../components/ui/DataTable'
 import { Input } from '../../../components/ui/Input'
 import { dnsRecordTypes, type DnsRecordEntry } from '../../../content/reference/dnsRecordTypes'
@@ -91,6 +92,39 @@ export function DnsRecordReference() {
           { key: 'rfc', label: 'RFC', mono: true },
         ]}
         rows={dnsRecordTypes}
+      />
+      <ToolEducation
+        howItWorks={
+          <p>
+            Every record has a type (what kind of answer it is), a TTL in seconds (how long any
+            resolver may cache it before asking again), and the actual data. TTL applies uniformly
+            to whichever record it's attached to -- there's no separate mechanism governing how long
+            an answer stays cached beyond the number sitting right there in the record.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Picking the right record type for what you're actually trying to point somewhere -- an
+            A/AAAA record for a bare IP mapping, CNAME for aliasing one name to another, MX for mail
+            routing -- or looking up what a record type you've encountered in a zone file actually
+            does.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            A CNAME can't coexist with any other record at the same name -- RFC 1034 requires that
+            if a name has a CNAME, that's the only record it's allowed to have, which is exactly why
+            a zone apex (the bare domain itself, which also needs SOA and NS records) can't usually
+            be CNAME'd directly to a CDN; providers work around this with a proprietary
+            apex-flattening feature, not by breaking the rule. TTL set too low is the other classic
+            mistake -- it doesn't just mean fresher answers, it means every resolver on the internet
+            re-queries far more often, and a popular record with an aggressively low TTL can
+            genuinely overload an authoritative server with repeat traffic. And that trailing dot in
+            the example rows above isn't a typo -- it marks the name as fully qualified (anchored at
+            the root), which matters most inside zone files, where a name written without it gets
+            the zone's own origin silently appended.
+          </p>
+        }
       />
     </ReferencePageLayout>
   )

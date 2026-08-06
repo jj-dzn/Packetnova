@@ -1,4 +1,6 @@
+import { Link } from 'react-router'
 import { ReferencePageLayout } from '../ReferencePageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { Aside } from '../Aside'
 import { DataTable } from '../../../components/ui/DataTable'
 import {
@@ -81,6 +83,44 @@ export function AdministrativeDistanceReference() {
           </div>
         </Aside>
       </div>
+      <ToolEducation
+        howItWorks={
+          <p>
+            Administrative distance only matters when a router learns a route to the exact same
+            network from two different sources at once -- it's a trust ranking between sources, not
+            a measure of path quality within one source (that's what metric is for). Lower AD wins
+            and gets installed; the higher-AD route to that same network still exists in the source
+            protocol's own table, it's just not the one forwarding traffic.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Predicting which routing source wins when two are configured for the same network, or
+            deliberately engineering that outcome -- a static route with a low AD to override
+            whatever a dynamic protocol would otherwise install, or a high one to sit quietly in
+            reserve.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            A high administrative distance isn't always a mistake -- a floating static route is a
+            static route configured with an AD deliberately set higher than whatever dynamic
+            protocol normally handles that network, so it stays completely inactive until the
+            dynamic route disappears, then takes over as an automatic backup path. Seeing an
+            unusually high AD on a static route is a design choice to look for, not necessarily a
+            misconfiguration.
+          </p>
+        }
+        relatedReading={
+          <p>
+            See this table actually decide a route in the{' '}
+            <Link to="/tools/route-lookup-simulator" className="text-accent hover:underline">
+              route lookup simulator
+            </Link>
+            .
+          </p>
+        }
+      />
     </ReferencePageLayout>
   )
 }

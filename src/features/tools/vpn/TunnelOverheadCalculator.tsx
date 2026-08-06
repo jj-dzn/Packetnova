@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { Input } from '../../../components/ui/Input'
 import { Select } from '../../../components/ui/Select'
@@ -38,6 +40,11 @@ export function TunnelOverheadCalculator() {
       title="VPN tunnel overhead calculator"
       description="See how much throughput a VPN tunnel's encapsulation overhead actually costs you."
       status={calc.ok ? 'ok' : 'error'}
+      related={[
+        { to: '/tools/mtu-calculator', label: 'MTU calculator' },
+        { to: '/tools/mss-calculator', label: 'MSS calculator' },
+        { to: '/tools/bandwidth-estimator', label: 'Bandwidth estimator' },
+      ]}
       input={
         <div className="flex flex-col gap-4">
           <div>
@@ -159,6 +166,45 @@ export function TunnelOverheadCalculator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Every tunnel protocol wraps your original packet in its own headers before it goes on
+            the wire, and those headers eat into the link's usable MTU -- effective MTU is just the
+            link MTU minus that overhead. GRE's 24 bytes is structurally fixed (a 4-byte GRE header
+            plus a 20-byte outer IPv4 header); WireGuard, OpenVPN, and IPsec's figures here are
+            typical values that shift a little with the specific cipher and auth algorithm chosen.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Sizing a tunnel interface's MTU correctly instead of leaving it at a plain 1500 that
+            doesn't account for what the tunnel itself consumes, or comparing tunnel types when
+            overhead efficiency actually matters -- a satellite or already-constrained link feels
+            every one of these bytes far more than a fast wired one does.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Stacking tunnels and only budgeting for one layer of overhead -- IPsec inside GRE, or a
+            VPN tunnel already running over a PPPoE link with its own 8-byte header, each add their
+            own cost on top of the last. The other common one: forgetting overhead entirely and
+            leaving the tunnel interface at the physical link's own MTU, which silently forces
+            fragmentation (or a PMTUD black hole) the moment a full-size packet actually needs to
+            cross it.
+          </p>
+        }
+        relatedReading={
+          <p>
+            See what a too-large effective MTU actually does to a packet in the{' '}
+            <Link to="/tools/mtu-calculator" className="text-accent hover:underline">
+              MTU calculator
+            </Link>
+            .
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

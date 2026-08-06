@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { BinaryBreakdown } from './BinaryBreakdown'
@@ -348,6 +350,54 @@ export function SubnetCalculator() {
           <p className="text-sm text-danger">{vlsmCalc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            Equal split extends the base network's prefix length by however many bits it takes to
+            reach the requested new prefix -- each extra bit doubles the subnet count and halves the
+            hosts each one holds. VLSM (variable-length subnet masking) instead sizes each subnet to
+            just fit what it actually asked for, allocating the largest request first so the biggest
+            blocks land while the base network still has room for them -- do it in any other order
+            and a large block can fail to fit later, even though the total address count was never
+            actually a problem.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Equal split when every subnet genuinely needs about the same size -- four identical
+            branch offices, for instance. VLSM when they don't: a 50-host sales VLAN next to a
+            10-host guest network under equal split would force both onto the sales VLAN's larger
+            size, wasting most of the guest network's addresses that VLSM would instead hand back to
+            the base block for something else.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            "Hosts needed" means usable hosts, not the subnet's total address count -- every subnet
+            loses its first address to the network ID and its last to the broadcast address (the two
+            exceptions are /31 point-to-point links and /32 host routes, which have neither, per RFC
+            3021). A request for exactly 62 hosts needs a /26 (64 addresses, 62 usable), not a /26
+            sized to exactly 62 -- there's no such thing as a non-power-of-two subnet. The other
+            classic mistake is sizing a subnet to today's host count with zero room to grow, which
+            forces a renumber the moment it fills up.
+          </p>
+        }
+        relatedReading={
+          <p>
+            Once you have a subnet's CIDR, the{' '}
+            <Link to="/tools/cidr-calculator" className="text-accent hover:underline">
+              CIDR calculator
+            </Link>{' '}
+            breaks down its network address, broadcast address, and usable range on its own; the{' '}
+            <Link to="/tools/wildcard-mask-calculator" className="text-accent hover:underline">
+              wildcard mask calculator
+            </Link>{' '}
+            covers the inverted-mask math ACLs and OSPF network statements expect instead of a
+            subnet mask.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

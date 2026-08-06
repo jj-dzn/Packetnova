@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { GuidedMode, type GuidedStep } from '../GuidedMode'
 import { Input } from '../../../components/ui/Input'
@@ -441,6 +443,47 @@ export function BgpBestPathSelector() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            A strict, ordered elimination chain -- weight, then local preference, then locally
+            originated, then AS path length, and on down the list this tool's trace table shows.
+            Every step only runs while more than one candidate is still tied from the step before
+            it; the moment a step actually narrows the field to one, that's the winner and nothing
+            further down the list ever gets checked.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Working out which of several candidate paths a router actually installs -- especially in
+            a multi-homed setup with more than one upstream provider, where it's easy to expect a
+            decision on path length or MED that's actually being made several steps earlier by local
+            preference or weight instead.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Weight is Cisco-proprietary and purely local -- it's never carried in any BGP update, so
+            setting it high on your own router can't influence how a neighbor or upstream provider
+            picks between paths, only how your own router picks among the paths it already has. MED
+            has a narrower scope than people expect too: it's only ever compared between paths
+            learned from the <em>same</em> neighboring AS, so two candidates from different
+            providers can't be decided by MED at all, no matter how different their MED values are
+            -- this tool's "Neighbor AS" field is what that comparison actually keys off of.
+          </p>
+        }
+        relatedReading={
+          <p>
+            The{' '}
+            <Link to="/visualizers/bgp-best-path-selection" className="text-accent hover:underline">
+              BGP best-path visualizer
+            </Link>{' '}
+            walks the same chain against a fixed example if you want to see it without building your
+            own candidates first.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

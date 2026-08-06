@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ReferencePageLayout } from '../ReferencePageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { RfcFootnote } from '../RfcFootnote'
 import { Pill } from '../../../components/ui/Pill'
 import { DataTable } from '../../../components/ui/DataTable'
@@ -53,6 +54,27 @@ export function DhcpOptionsReference() {
         rows={dhcpOptions}
       />
       <RfcFootnote>Defined in RFC 2132, except option 150 (Cisco-proprietary).</RfcFootnote>
+      <ToolEducation
+        howItWorks={
+          <p>
+            DHCP options ride along inside the same DORA exchange that hands out an address -- each
+            one is a tagged field a server can include in its offer, and a client either understands
+            a given option number or ignores it entirely. There's no negotiation; the server sends
+            what it's configured to send, whether or not the requesting client knows what to do with
+            it.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Setting option 66 (a single boot-server hostname or IP, standard RFC 2132) when a phone
+            actually expects option 150 (Cisco-proprietary, a list of one or more TFTP server IPs)
+            -- or the reverse. Which one a device reads depends on its vendor and firmware, not on
+            which one seems more standard. Get it wrong and the symptom is subtle: the phone gets a
+            lease and boots normally, it just never finds its config file, with nothing about the
+            DHCP exchange itself looking broken.
+          </p>
+        }
+      />
     </ReferencePageLayout>
   )
 }

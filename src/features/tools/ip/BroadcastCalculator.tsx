@@ -1,4 +1,6 @@
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { BroadcastBitFlip } from './BroadcastBitFlip'
 import { Aside } from '../Aside'
@@ -98,6 +100,44 @@ export function BroadcastCalculator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            The broadcast address is the network address with every host bit forced to 1 -- the
+            highest address the subnet can hold. Mechanically that's the network address OR'd with
+            the wildcard mask (the subnet mask's bitwise inverse), which is exactly the three-step
+            math the guided walkthrough above shows.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Working out the top of a subnet's address range, or double-checking that a host address
+            you're about to assign isn't actually the broadcast address for its subnet -- a
+            genuinely easy off-by-one to make by hand on anything other than a /24.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Directed broadcasts used to be a real attack vector -- a Smurf attack forged a victim's
+            source address and sent an ICMP echo to a network's directed broadcast, and every host
+            on that subnet flooded the victim with replies at once. RFC 2644 (BCP 34) is why every
+            router since has shipped with directed-broadcast forwarding disabled by default; "just
+            send it to the broadcast address" hasn't reliably crossed a router boundary since. It
+            still works fine for its actual purpose -- local delivery on the originating subnet.
+          </p>
+        }
+        relatedReading={
+          <p>
+            The{' '}
+            <Link to="/tools/network-address-calculator" className="text-accent hover:underline">
+              network address calculator
+            </Link>{' '}
+            is the same math at the other end of the subnet -- every host bit forced to 0 instead of
+            1.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

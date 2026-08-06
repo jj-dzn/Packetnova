@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { BitFieldDiagram } from '../BitFieldDiagram'
 import { FrameFieldStrip } from '../FrameFieldStrip'
@@ -181,6 +183,45 @@ export function Dot1qExplorer() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            An 802.1Q tag is 4 bytes total: a fixed 2-byte TPID (always 0x8100, the signal to every
+            switch and NIC that a tag follows) plus a 2-byte TCI packed with three fields -- PCP (3
+            bits, priority), DEI (1 bit, drop-eligible), and VLAN ID (12 bits). Building the TCI is
+            just shifting each field into its own bit range and OR-ing them together, which is what
+            the walkthrough above does step by step.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Working out exactly what bits a trunk port is putting on the wire for a given VLAN and
+            priority, or decoding a tag seen in a packet capture back into its PCP/DEI/VLAN ID
+            parts.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            VLAN ID 0 and 4095 both fit in the 12-bit field this tool accepts, but neither is an
+            ordinary VLAN -- 0 means "priority-tagged, no VLAN membership" (the frame carries real
+            PCP/DEI info but is treated as belonging to the port's native VLAN instead of any
+            specific one), and 4095 is reserved by the 802.1Q spec and must never appear on the
+            wire. This tool computes a tag for either value without complaint since both are
+            structurally valid 12-bit numbers -- treat a real 0 or 4095 you see in a capture as a
+            signal something's off, not a normal VLAN tag.
+          </p>
+        }
+        relatedReading={
+          <p>
+            The{' '}
+            <Link to="/tools/vlan-calculator" className="text-accent hover:underline">
+              VLAN calculator
+            </Link>{' '}
+            checks a VLAN ID's own validity and range classification on its own.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }

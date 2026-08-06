@@ -1,4 +1,6 @@
+import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
+import { ToolEducation } from '../ToolEducation'
 import { ResultRow } from '../ResultRow'
 import { BinaryBreakdown } from './BinaryBreakdown'
 import { AddressSpaceBar } from './AddressSpaceBar'
@@ -108,6 +110,44 @@ export function NetworkAddressCalculator() {
           <p className="text-sm text-danger">{calc.error}</p>
         )
       }
-    />
+    >
+      <ToolEducation
+        howItWorks={
+          <p>
+            The network address is the IP ANDed with its subnet mask -- every network bit stays
+            exactly as it was, every host bit gets forced to 0. It's the subnet's own identifier,
+            the thing a routing table entry or an OSPF <code className="font-mono">network</code>{' '}
+            statement actually refers to, not an address any host can use.
+          </p>
+        }
+        whenToUseThis={
+          <p>
+            Working out which subnet a given host address belongs to, or getting the exact,
+            canonical form of a network for a route table entry, ACL, or summarization statement.
+          </p>
+        }
+        commonMistakes={
+          <p>
+            Assuming the network address always ends in <code className="font-mono">.0</code> --
+            true for a /24, but a /27 network address can end in .0, .32, .64, .96, and so on;
+            anything other than a byte-aligned prefix breaks the "ends in zero" habit. The other
+            common mix-up is treating the network address as if it were the gateway -- it isn't a
+            usable host address at all (see the classification below for exactly why), and "first
+            usable address is the gateway" is a common convention on this site's tools, not a
+            protocol rule every network actually follows.
+          </p>
+        }
+        relatedReading={
+          <p>
+            The{' '}
+            <Link to="/tools/broadcast-calculator" className="text-accent hover:underline">
+              broadcast calculator
+            </Link>{' '}
+            is this same math at the opposite end of the subnet -- every host bit forced to 1
+            instead of 0.
+          </p>
+        }
+      />
+    </ToolPageLayout>
   )
 }
