@@ -6,6 +6,7 @@ import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { useDiagramExport } from '../../hooks/useDiagramExport'
 import { useIsScenarioEmbed } from '../scenarios/ScenarioEmbedContext'
+import { PathContextBanner } from '../paths/PathContextBanner'
 
 interface VisualizerPageLayoutProps {
   category: string
@@ -40,6 +41,7 @@ export function VisualizerPageLayout({
         <p className="mt-2 max-w-2xl text-fg-muted">{description}</p>
         {related && <RelatedLinks links={related} />}
       </div>
+      {!embedded && <PathContextBanner />}
       {!embedded && (
         <div className="mb-2 flex justify-end">
           <ExportButton exportAs={exportAs} pending={pending} />

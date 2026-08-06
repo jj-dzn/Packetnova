@@ -4,11 +4,8 @@ import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
 import { competencyPaths } from '../../content/reference/paths'
 import { resolvePathStep } from '../../lib/content/resolvePathStep'
+import { pathStepKey as stepKey } from '../../lib/content/pathStepKey'
 import { usePathProgress } from '../../hooks/usePathProgress'
-
-function stepKey(step: { type: string; slug: string }): string {
-  return `${step.type}:${step.slug}`
-}
 
 // Only renders once a path has been started but not finished -- a
 // first-time visitor, and anyone who's completed every path they started,

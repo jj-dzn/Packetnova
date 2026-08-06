@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router'
 import { Input } from '../components/ui/Input'
 import { PreviewCard } from '../components/ui/PreviewCard'
-import { searchIndex } from '../lib/search/searchIndex'
+import { searchRanked } from '../lib/search/rankResults'
 
 export function SearchPage() {
   const [searchParams] = useSearchParams()
@@ -19,7 +19,7 @@ function SearchResults({ committedQuery }: { committedQuery: string }) {
   const [query, setQuery] = useState(committedQuery)
 
   const trimmedQuery = query.trim()
-  const results = trimmedQuery ? searchIndex.search(trimmedQuery).map((result) => result.item) : []
+  const results = trimmedQuery ? searchRanked(trimmedQuery) : []
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault()

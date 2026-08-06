@@ -8,6 +8,7 @@ import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { useRecordVisit } from '../../hooks/useRecentlyViewed'
 import { useIsScenarioEmbed } from '../scenarios/ScenarioEmbedContext'
 import { reportMascotMood } from '../../lib/mascotMood'
+import { PathContextBanner } from '../paths/PathContextBanner'
 
 interface ToolPageLayoutBaseProps {
   category: string
@@ -69,6 +70,7 @@ export function ToolPageLayout(props: ToolPageLayoutProps) {
         <p className="mt-2 max-w-2xl text-fg-muted">{description}</p>
         {related && <RelatedLinks links={related} />}
       </div>
+      {!embedded && <PathContextBanner />}
       {props.fullWidth !== undefined ? (
         <div className="rounded-lg border border-border bg-surface p-6">{props.fullWidth}</div>
       ) : (

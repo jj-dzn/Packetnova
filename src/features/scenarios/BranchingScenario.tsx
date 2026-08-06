@@ -7,6 +7,7 @@ import { countWrongTurns, formatElapsedTime } from '../../lib/scenarios/branchin
 import { reportMascotMood } from '../../lib/mascotMood'
 import { ScenarioEmbedContext } from './ScenarioEmbedContext'
 import { ChallengeResultCard } from './ChallengeResultCard'
+import { PathContextBanner } from '../paths/PathContextBanner'
 
 export interface BranchingScenarioNode {
   id: string
@@ -113,6 +114,8 @@ export function BranchingScenario({
         <h1 className="mt-3 text-2xl font-semibold">{title}</h1>
         <div className="mt-3 flex flex-col gap-3 text-fg-muted">{setup}</div>
       </div>
+
+      <PathContextBanner />
 
       {!challengeActive && isAtStart && (
         <div className="mb-8 flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface p-4">

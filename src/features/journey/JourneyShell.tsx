@@ -6,6 +6,7 @@ import { JourneyMap } from './JourneyMap'
 import { JourneyGuide } from './JourneyGuide'
 import { ScenarioEmbedContext } from '../scenarios/ScenarioEmbedContext'
 import { useStepPlayer } from '../../hooks/useStepPlayer'
+import { PathContextBanner } from '../paths/PathContextBanner'
 
 export interface JourneyStage {
   id: string
@@ -57,6 +58,8 @@ export function JourneyShell({
         <h1 className="mt-2 text-2xl font-semibold">{title}</h1>
         <p className="mt-2 text-fg-muted">{description}</p>
       </div>
+
+      <PathContextBanner />
 
       <div className="lg:grid lg:grid-cols-[220px_1fr] lg:items-start lg:gap-8">
         <JourneyMap stages={stages} currentIndex={player.step} onJump={player.goTo} />

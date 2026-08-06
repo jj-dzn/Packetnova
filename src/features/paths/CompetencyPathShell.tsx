@@ -5,16 +5,13 @@ import { Button } from '../../components/ui/Button'
 import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { resolvePathStep } from '../../lib/content/resolvePathStep'
+import { pathStepKey as stepKey } from '../../lib/content/pathStepKey'
 import { usePathProgress } from '../../hooks/usePathProgress'
 import { reportMascotMood } from '../../lib/mascotMood'
 import { competencyPaths, otherPaths, type PathStep } from '../../content/reference/paths'
 
 interface CompetencyPathShellProps {
   slug: string
-}
-
-function stepKey(step: PathStep): string {
-  return `${step.type}:${step.slug}`
 }
 
 // The shared engine every named competency path runs on -- resolves each

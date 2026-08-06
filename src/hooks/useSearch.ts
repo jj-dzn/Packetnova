@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { searchIndex, type SearchItem } from '../lib/search/searchIndex'
+import type { SearchItem } from '../lib/search/searchIndex'
+import { searchRanked } from '../lib/search/rankResults'
 
 export function useSearch() {
   const [query, setQuery] = useState('')
@@ -7,7 +8,7 @@ export function useSearch() {
   const results = useMemo<SearchItem[]>(() => {
     const trimmed = query.trim()
     if (!trimmed) return []
-    return searchIndex.search(trimmed).map((result) => result.item)
+    return searchRanked(trimmed)
   }, [query])
 
   return { query, setQuery, results }

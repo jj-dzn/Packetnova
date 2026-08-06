@@ -3,6 +3,7 @@ import { Badge } from '../../components/ui/Badge'
 import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { ScenarioEmbedContext } from './ScenarioEmbedContext'
+import { PathContextBanner } from '../paths/PathContextBanner'
 
 interface ScenarioPageLayoutProps {
   category: string
@@ -34,6 +35,8 @@ export function ScenarioPageLayout({
         <h1 className="mt-3 text-2xl font-semibold">{title}</h1>
         <div className="mt-3 flex flex-col gap-3 text-fg-muted">{setup}</div>
       </div>
+
+      <PathContextBanner />
 
       <ScenarioEmbedContext.Provider value={true}>
         <div className="flex flex-col gap-12">{children}</div>
