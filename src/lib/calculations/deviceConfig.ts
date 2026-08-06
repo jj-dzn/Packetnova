@@ -227,3 +227,130 @@ export function buildStaticRouteConfig(input: StaticRouteConfigInput): ConfigRes
       : [`hostname ${input.hostname}`, '!', routeLine]
   return { ok: true, result: { config: lines.join('\n') } }
 }
+
+export interface AclConfigInput {
+  vendor: ConfigVendor
+  hostname: string
+  aclName: string
+  action: 'permit' | 'deny'
+  sourceNetwork: string
+  sourcePrefixLength: number
+}
+
+function buildAclLines(vendor: ConfigVendor, input: AclConfigInput, wildcard: string): string[] {
+  const { aclName, action, sourceNetwork, sourcePrefixLength } = input
+  const cidr = `${sourceNetwork}/${sourcePrefixLength}`
+  switch (vendor) {
+    case 'ios':
+      return [
+        `ip access-list extended ${aclName}`,
+        ` ${action} ip ${sourceNetwork} ${wildcard} any`,
+      ]
+    case 'nxos':
+      return [`ip access-list ${aclName}`, `  10 ${action} ip ${cidr} any`]
+    case 'eos':
+      return [`ip access-list ${aclName}`, `   10 ${action} ip ${cidr} any`]
+    case 'junos':
+      return [
+        `set firewall filter ${aclName} term allow-source from source-address ${cidr}`,
+        `set firewall filter ${aclName} term allow-source then ${action === 'permit' ? 'accept' : 'discard'}`,
+      ]
+    case 'mikrotik':
+      return [
+        `/ip firewall filter add chain=forward action=${action === 'permit' ? 'accept' : 'drop'} src-address=${cidr} comment="${aclName}"`,
+      ]
+    case 'pfsense':
+      return [
+        `# pfSense host: ${input.hostname} -- Firewall > Rules:`,
+        `# Action: ${action === 'permit' ? 'Pass' : 'Block'}, Source: ${cidr}, Description: "${aclName}"`,
+        '#',
+        '# Equivalent pf syntax (reference only -- pfSense manages pf.conf itself):',
+        `${action === 'permit' ? 'pass' : 'block'} in from ${cidr} to any`,
+      ]
+  }
+}
+
+export function buildAclConfig(input: AclConfigInput): ConfigResult {
+  const error = validateHost('source', input.sourceNetwork, input.sourcePrefixLength)
+  if (error) return { ok: false, error }
+  if (!input.aclName.trim()) return { ok: false, error: 'Enter an ACL name.' }
+  if (!input.hostname.trim()) return { ok: false, error: 'Enter a hostname.' }
+
+  const mask = prefixLengthToSubnetMask(input.sourcePrefixLength).value
+  const wildcard = ipv4ToString(~mask >>> 0)
+  const aclLines = buildAclLines(input.vendor, input, wildcard)
+
+  if (input.vendor === 'pfsense') {
+    return { ok: true, result: { config: aclLines.join('\n') } }
+  }
+
+  const lines =
+    input.vendor === 'junos'
+      ? [`set system host-name ${input.hostname}`, ...aclLines]
+      : [`hostname ${input.hostname}`, '!', ...aclLines]
+  return { ok: true, result: { config: lines.join('\n') } }
+}
+
+export interface VlanDatabaseEntry {
+  id: number
+  name: string
+}
+
+export interface VlanDatabaseConfigInput {
+  vendor: ConfigVendor
+  hostname: string
+  vlans: VlanDatabaseEntry[]
+}
+
+function buildVlanDatabaseLines(vendor: ConfigVendor, vlans: VlanDatabaseEntry[]): string[] {
+  switch (vendor) {
+    case 'ios':
+      return vlans.flatMap((v) => [`vlan ${v.id}`, ` name ${v.name}`, '!'])
+    case 'nxos':
+      return vlans.flatMap((v) => [`vlan ${v.id}`, `  name ${v.name}`, '!'])
+    case 'eos':
+      return vlans.flatMap((v) => [`vlan ${v.id}`, `   name ${v.name}`, '!'])
+    case 'junos':
+      return vlans.map((v) => `set vlans ${v.name} vlan-id ${v.id}`)
+    case 'mikrotik':
+      return vlans.map(
+        (v) =>
+          `/interface vlan add name=${v.name} vlan-id=${v.id} interface=${DEFAULT_INTERFACE_NAME.mikrotik}`,
+      )
+    case 'pfsense':
+      return [
+        '# pfSense: Interfaces > Assignments > VLANs, for each:',
+        ...vlans.map(
+          (v) =>
+            `#   parent ${DEFAULT_INTERFACE_NAME.pfsense}, tag ${v.id}, description "${v.name}"`,
+        ),
+      ]
+  }
+}
+
+export function buildVlanDatabaseConfig(input: VlanDatabaseConfigInput): ConfigResult {
+  if (!input.hostname.trim()) return { ok: false, error: 'Enter a hostname.' }
+  if (input.vlans.length === 0) {
+    return { ok: false, error: 'Enter at least one VLAN as id:name, e.g. 10:Voice, 20:Data.' }
+  }
+  for (const vlan of input.vlans) {
+    if (!Number.isInteger(vlan.id) || vlan.id < 1 || vlan.id > 4094) {
+      return { ok: false, error: `VLAN ID ${vlan.id} must be between 1 and 4094.` }
+    }
+    if (!vlan.name.trim()) {
+      return { ok: false, error: `VLAN ${vlan.id} needs a name.` }
+    }
+  }
+
+  const vlanLines = buildVlanDatabaseLines(input.vendor, input.vlans)
+
+  if (input.vendor === 'pfsense') {
+    return { ok: true, result: { config: vlanLines.join('\n') } }
+  }
+
+  const lines =
+    input.vendor === 'junos'
+      ? [`set system host-name ${input.hostname}`, ...vlanLines]
+      : [`hostname ${input.hostname}`, '!', ...vlanLines]
+  return { ok: true, result: { config: lines.join('\n') } }
+}

@@ -2,10 +2,14 @@ import { describe, expect, it } from 'vitest'
 import {
   buildInterfaceConfig,
   buildStaticRouteConfig,
+  buildAclConfig,
+  buildVlanDatabaseConfig,
   CONFIG_VENDORS,
   type ConfigVendor,
   type InterfaceConfigInput,
   type StaticRouteConfigInput,
+  type AclConfigInput,
+  type VlanDatabaseConfigInput,
 } from './deviceConfig'
 
 const BASE_INTERFACE: Omit<InterfaceConfigInput, 'vendor'> = {
@@ -20,6 +24,22 @@ const BASE_ROUTE: Omit<StaticRouteConfigInput, 'vendor'> = {
   destinationNetwork: '172.16.0.0',
   destinationPrefixLength: 16,
   nextHop: '10.0.12.254',
+}
+
+const BASE_ACL: Omit<AclConfigInput, 'vendor'> = {
+  hostname: 'R1',
+  aclName: 'BLOCK_GUEST',
+  action: 'deny',
+  sourceNetwork: '10.0.20.0',
+  sourcePrefixLength: 24,
+}
+
+const BASE_VLAN_DB: Omit<VlanDatabaseConfigInput, 'vendor'> = {
+  hostname: 'R1',
+  vlans: [
+    { id: 10, name: 'Voice' },
+    { id: 20, name: 'Data' },
+  ],
 }
 
 describe('buildInterfaceConfig', () => {
@@ -179,6 +199,144 @@ describe('buildStaticRouteConfig', () => {
   it('produces a route config for every supported vendor', () => {
     for (const vendor of CONFIG_VENDORS as ConfigVendor[]) {
       const result = buildStaticRouteConfig({ ...BASE_ROUTE, vendor })
+      expect(result.ok, `vendor ${vendor} should succeed`).toBe(true)
+    }
+  })
+})
+
+describe('buildAclConfig', () => {
+  it('produces a wildcard-mask ACL entry for IOS', () => {
+    const result = buildAclConfig({ ...BASE_ACL, vendor: 'ios' })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.result.config).toContain('ip access-list extended BLOCK_GUEST')
+      expect(result.result.config).toContain('deny ip 10.0.20.0 0.0.0.255 any')
+    }
+  })
+
+  it('produces CIDR-notation ACL entries for NX-OS and EOS', () => {
+    const nxos = buildAclConfig({ ...BASE_ACL, vendor: 'nxos' })
+    expect(nxos.ok && nxos.result.config).toContain('10 deny ip 10.0.20.0/24 any')
+    const eos = buildAclConfig({ ...BASE_ACL, vendor: 'eos' })
+    expect(eos.ok && eos.result.config).toContain('10 deny ip 10.0.20.0/24 any')
+  })
+
+  it('emits a Junos firewall filter term', () => {
+    const result = buildAclConfig({ ...BASE_ACL, vendor: 'junos' })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.result.config).toContain(
+        'set firewall filter BLOCK_GUEST term allow-source from source-address 10.0.20.0/24',
+      )
+      expect(result.result.config).toContain(
+        'set firewall filter BLOCK_GUEST term allow-source then discard',
+      )
+    }
+  })
+
+  it('maps permit/deny to accept/drop for MikroTik', () => {
+    const deny = buildAclConfig({ ...BASE_ACL, vendor: 'mikrotik' })
+    expect(deny.ok && deny.result.config).toContain('action=drop src-address=10.0.20.0/24')
+    const permit = buildAclConfig({ ...BASE_ACL, vendor: 'mikrotik', action: 'permit' })
+    expect(permit.ok && permit.result.config).toContain('action=accept src-address=10.0.20.0/24')
+  })
+
+  it('emits pfSense GUI guidance plus real pf syntax', () => {
+    const result = buildAclConfig({ ...BASE_ACL, vendor: 'pfsense' })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.result.config).toContain('Action: Block')
+      expect(result.result.config).toContain('block in from 10.0.20.0/24 to any')
+    }
+  })
+
+  it('rejects an invalid source network', () => {
+    const result = buildAclConfig({ ...BASE_ACL, vendor: 'ios', sourceNetwork: 'nope' })
+    expect(result.ok).toBe(false)
+  })
+
+  it('rejects a missing ACL name', () => {
+    const result = buildAclConfig({ ...BASE_ACL, vendor: 'ios', aclName: '' })
+    expect(result.ok).toBe(false)
+  })
+
+  it('produces an ACL config for every supported vendor', () => {
+    for (const vendor of CONFIG_VENDORS as ConfigVendor[]) {
+      const result = buildAclConfig({ ...BASE_ACL, vendor })
+      expect(result.ok, `vendor ${vendor} should succeed`).toBe(true)
+    }
+  })
+})
+
+describe('buildVlanDatabaseConfig', () => {
+  it('produces one vlan block per entry for IOS', () => {
+    const result = buildVlanDatabaseConfig({ ...BASE_VLAN_DB, vendor: 'ios' })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.result.config).toContain('vlan 10')
+      expect(result.result.config).toContain(' name Voice')
+      expect(result.result.config).toContain('vlan 20')
+      expect(result.result.config).toContain(' name Data')
+    }
+  })
+
+  it('emits Junos set-style vlan lines', () => {
+    const result = buildVlanDatabaseConfig({ ...BASE_VLAN_DB, vendor: 'junos' })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.result.config).toContain('set vlans Voice vlan-id 10')
+      expect(result.result.config).toContain('set vlans Data vlan-id 20')
+    }
+  })
+
+  it('emits one MikroTik interface vlan command per entry', () => {
+    const result = buildVlanDatabaseConfig({ ...BASE_VLAN_DB, vendor: 'mikrotik' })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.result.config).toContain(
+        '/interface vlan add name=Voice vlan-id=10 interface=ether1',
+      )
+      expect(result.result.config).toContain(
+        '/interface vlan add name=Data vlan-id=20 interface=ether1',
+      )
+    }
+  })
+
+  it('emits pfSense GUI guidance for every vlan', () => {
+    const result = buildVlanDatabaseConfig({ ...BASE_VLAN_DB, vendor: 'pfsense' })
+    expect(result.ok).toBe(true)
+    if (result.ok) {
+      expect(result.result.config).toContain('parent em0, tag 10, description "Voice"')
+      expect(result.result.config).toContain('parent em0, tag 20, description "Data"')
+    }
+  })
+
+  it('rejects an empty vlan list', () => {
+    const result = buildVlanDatabaseConfig({ ...BASE_VLAN_DB, vendor: 'ios', vlans: [] })
+    expect(result.ok).toBe(false)
+  })
+
+  it('rejects an out-of-range vlan id', () => {
+    const result = buildVlanDatabaseConfig({
+      ...BASE_VLAN_DB,
+      vendor: 'ios',
+      vlans: [{ id: 5000, name: 'Bad' }],
+    })
+    expect(result.ok).toBe(false)
+  })
+
+  it('rejects a vlan with no name', () => {
+    const result = buildVlanDatabaseConfig({
+      ...BASE_VLAN_DB,
+      vendor: 'ios',
+      vlans: [{ id: 10, name: '' }],
+    })
+    expect(result.ok).toBe(false)
+  })
+
+  it('produces a vlan database config for every supported vendor', () => {
+    for (const vendor of CONFIG_VENDORS as ConfigVendor[]) {
+      const result = buildVlanDatabaseConfig({ ...BASE_VLAN_DB, vendor })
       expect(result.ok, `vendor ${vendor} should succeed`).toBe(true)
     }
   })
