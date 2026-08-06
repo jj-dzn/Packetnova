@@ -1,6 +1,7 @@
 import { Hero } from './home/Hero'
 import { ContinueWhereYouLeftOff } from './home/ContinueWhereYouLeftOff'
 import { ContinuePathTeaser } from './home/ContinuePathTeaser'
+import { FlagshipShowcase } from './home/FlagshipShowcase'
 import { PopularTools } from './home/PopularTools'
 import { FeaturedVisualizers } from './home/FeaturedVisualizers'
 import { WhyPacketNova } from './home/WhyPacketNova'
@@ -29,6 +30,7 @@ export function HomePage() {
       <Hero />
       <ContinueWhereYouLeftOff />
       <ContinuePathTeaser />
+      <FlagshipShowcase />
       <LabsTeaser />
       <PopularTools />
       <FeaturedVisualizers />
