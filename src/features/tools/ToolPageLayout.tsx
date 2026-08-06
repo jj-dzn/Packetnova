@@ -70,7 +70,7 @@ export function ToolPageLayout(props: ToolPageLayoutProps) {
                 category={category}
                 getSummary={() => resultRef.current?.innerText ?? ''}
               />
-              <BookmarkButton item={{ href: pathname, title, category }} />
+              <BookmarkButton item={{ href: pathname, title, category, description }} />
             </div>
           )}
         </div>

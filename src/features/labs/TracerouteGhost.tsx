@@ -88,7 +88,7 @@ export function TracerouteGhost() {
   return (
     <div className="py-12">
       <div className="mb-8">
-        <Badge tone="accent">Labs</Badge>
+        <Badge tone="accent">Fun Labs</Badge>
         <h1 className="mt-3 text-2xl font-semibold">Traceroute ghost</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           A ghost travels hop by hop toward its destination, getting more tired the higher the

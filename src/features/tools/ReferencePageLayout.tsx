@@ -36,7 +36,7 @@ export function ReferencePageLayout({
       <div className="mb-8">
         <div className="flex items-center justify-between gap-3">
           <Badge tone="accent">{category}</Badge>
-          {!embedded && <BookmarkButton item={{ href: pathname, title, category }} />}
+          {!embedded && <BookmarkButton item={{ href: pathname, title, category, description }} />}
         </div>
         <Heading
           className={embedded ? 'mt-3 text-lg font-semibold' : 'mt-3 text-2xl font-semibold'}

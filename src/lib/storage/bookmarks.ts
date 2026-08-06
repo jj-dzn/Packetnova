@@ -2,6 +2,10 @@ export interface BookmarkedItem {
   href: string
   title: string
   category: string
+  /** Optional -- older bookmarks saved before this field existed won't have
+   * one. Lets the bookmarked view show the same description the tool's own
+   * page does, instead of a bare title. */
+  description?: string
 }
 
 const STORAGE_KEY = 'packetnova:bookmarks'

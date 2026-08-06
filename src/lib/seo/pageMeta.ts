@@ -40,7 +40,7 @@ const STATIC_PAGES: Record<string, PageMeta> = {
     description: "Search PacketNova's tools, visualizers, and scenarios.",
   },
   '/labs': {
-    title: `Labs - ${SITE_TITLE}`,
+    title: `Fun Labs - ${SITE_TITLE}`,
     description: 'A small, playful corner of PacketNova -- built for fun, not diagnostics.',
   },
   '/labs/ping-pet': {

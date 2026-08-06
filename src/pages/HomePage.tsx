@@ -1,11 +1,11 @@
 import { Hero } from './home/Hero'
-import { ContinueWhereYouLeftOff } from './home/ContinueWhereYouLeftOff'
+import { LabsTeaser } from './home/LabsTeaser'
 import { ContinuePathTeaser } from './home/ContinuePathTeaser'
+import { BookmarksTeaser } from './home/BookmarksTeaser'
 import { FlagshipShowcase } from './home/FlagshipShowcase'
 import { PopularTools } from './home/PopularTools'
 import { FeaturedVisualizers } from './home/FeaturedVisualizers'
 import { WhyPacketNova } from './home/WhyPacketNova'
-import { LabsTeaser } from './home/LabsTeaser'
 import { StructuredData } from '../components/seo/StructuredData'
 import { SITE_URL } from '../lib/seo/pageMeta'
 
@@ -28,10 +28,10 @@ export function HomePage() {
     <div className="flex flex-col divide-y divide-border">
       <StructuredData data={WEBSITE_SCHEMA} />
       <Hero />
-      <ContinueWhereYouLeftOff />
-      <ContinuePathTeaser />
-      <FlagshipShowcase />
       <LabsTeaser />
+      <ContinuePathTeaser />
+      <BookmarksTeaser />
+      <FlagshipShowcase />
       <PopularTools />
       <FeaturedVisualizers />
       <WhyPacketNova />

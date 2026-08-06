@@ -64,7 +64,7 @@ export function PacketSnake() {
   return (
     <div className="py-12">
       <div className="mb-8">
-        <Badge tone="accent">Labs</Badge>
+        <Badge tone="accent">Fun Labs</Badge>
         <h1 className="mt-3 text-2xl font-semibold">Packet snake</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           Classic Snake, reskinned as a data stream eating loose packets. Running into yourself ends

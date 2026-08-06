@@ -79,7 +79,7 @@ export function LabsPage() {
     <div className="flex flex-col gap-8 py-16">
       <div className="text-center">
         <Badge tone="accent">Just for fun</Badge>
-        <h1 className="mt-4 text-2xl font-semibold">Labs</h1>
+        <h1 className="mt-4 text-2xl font-semibold">Fun Labs</h1>
         <p className="mx-auto mt-2 max-w-xl text-fg-muted">
           A small, playful corner of PacketNova -- built for fun, not diagnostics.
         </p>
@@ -89,7 +89,7 @@ export function LabsPage() {
         {labs.map((lab) => (
           <PreviewCard
             key={lab.href}
-            category="Labs"
+            category="Fun Labs"
             title={lab.title}
             description={lab.description}
             href={lab.href}

@@ -54,7 +54,7 @@ export function PingPetDuel() {
   return (
     <div className="py-12">
       <div className="mb-8">
-        <Badge tone="accent">Labs</Badge>
+        <Badge tone="accent">Fun Labs</Badge>
         <h1 className="mt-3 text-2xl font-semibold">Ping pet duel</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           Two pets, two hosts, one latency duel. Whichever round trip comes back faster wins.

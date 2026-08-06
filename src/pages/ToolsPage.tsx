@@ -1,11 +1,9 @@
-import { useState } from 'react'
-import { Link } from 'react-router'
 import { Badge } from '../components/ui/Badge'
-import { Card } from '../components/ui/Card'
 import { PreviewCard } from '../components/ui/PreviewCard'
 import { Pill } from '../components/ui/Pill'
 import { toolCategories } from '../content/reference/tools'
 import { useBookmarks } from '../hooks/useBookmarks'
+import { useUrlState } from '../hooks/useUrlState'
 
 const totalTools = toolCategories.reduce((count, category) => count + category.tools.length, 0)
 const liveTools = toolCategories.reduce(
@@ -17,7 +15,9 @@ const allLive = liveTools === totalTools
 const BOOKMARKED_FILTER = '__bookmarked__'
 
 export function ToolsPage() {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [categoryParam, setCategoryParam] = useUrlState('category', '')
+  const activeCategory = categoryParam || null
+  const setActiveCategory = (next: string | null) => setCategoryParam(next ?? '')
   const { bookmarks } = useBookmarks()
   const showBookmarked = activeCategory === BOOKMARKED_FILTER
   const visibleCategories =
@@ -67,12 +67,14 @@ export function ToolsPage() {
             </p>
           ) : (
             bookmarks.map((item) => (
-              <Link key={item.href} to={item.href} className="block">
-                <Card interactive tilt className="flex h-full flex-col gap-3">
-                  <Badge tone="accent">{item.category}</Badge>
-                  <h3 className="font-medium">{item.title}</h3>
-                </Card>
-              </Link>
+              <PreviewCard
+                key={item.href}
+                category={item.category}
+                title={item.title}
+                description={item.description ?? ''}
+                href={item.href}
+                comingSoon={false}
+              />
             ))
           )}
         </div>

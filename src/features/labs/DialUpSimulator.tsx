@@ -49,7 +49,7 @@ export function DialUpSimulator() {
   return (
     <div className="py-12">
       <div className="mb-8">
-        <Badge tone="accent">Labs</Badge>
+        <Badge tone="accent">Fun Labs</Badge>
         <h1 className="mt-3 text-2xl font-semibold">Dial-up simulator</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           Relive the screech of a 56k modem connecting to the internet. Turn your volume up.

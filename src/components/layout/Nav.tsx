@@ -16,7 +16,7 @@ const navLinks = [
   { to: '/scenarios', label: 'Scenarios' },
   { to: '/journey', label: 'Journey' },
   { to: '/paths', label: 'Paths' },
-  { to: '/labs', label: 'Labs' },
+  { to: '/labs', label: 'Fun Labs' },
   { to: '/notebook', label: 'Notebook' },
 ]
 
@@ -70,7 +70,7 @@ export function Nav() {
               key={link.to}
               to={link.to}
               className={({ isActive }) =>
-                `text-sm font-medium transition-colors ${
+                `whitespace-nowrap text-sm font-medium transition-colors ${
                   isActive ? 'text-accent' : 'text-fg-muted hover:text-fg'
                 }`
               }

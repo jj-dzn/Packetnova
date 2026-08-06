@@ -91,7 +91,7 @@ export function PingPet() {
   return (
     <div className="py-12">
       <div className="mb-8">
-        <Badge tone="accent">Labs</Badge>
+        <Badge tone="accent">Fun Labs</Badge>
         <h1 className="mt-3 text-2xl font-semibold">Ping pet</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           A small creature whose mood tracks the round-trip time to a host you pick. Not a real

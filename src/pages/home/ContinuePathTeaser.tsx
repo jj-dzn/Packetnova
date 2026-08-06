@@ -9,8 +9,8 @@ import { usePathProgress } from '../../hooks/usePathProgress'
 
 // Only renders once a path has been started but not finished -- a
 // first-time visitor, and anyone who's completed every path they started,
-// see nothing here rather than an empty or "get started" placeholder,
-// matching ContinueWhereYouLeftOff's same restraint.
+// see nothing here rather than an empty or "get started" placeholder --
+// same restraint as BookmarksTeaser below it.
 export function ContinuePathTeaser() {
   const { progress } = usePathProgress()
 

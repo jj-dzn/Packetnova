@@ -22,14 +22,14 @@ export function LabsTeaser() {
         <PingPetCreature status="fast" className="h-24 w-24 shrink-0" />
         <div className="relative flex-1">
           <Badge tone="accent">Just for fun</Badge>
-          <h2 className="mt-2 text-lg font-semibold">Meet the PacketNova Labs corner</h2>
+          <h2 className="mt-2 text-lg font-semibold">Meet PacketNova's Fun Labs</h2>
           <p className="mt-1 text-sm text-fg-muted">
-            A ping pet whose mood follows live latency to a host you pick, a retro hacking terminal,
-            and more playful extras to come.
+            Not a real lab -- a ping pet whose mood follows live latency to a host you pick, a retro
+            hacking terminal, and more playful extras to come.
           </p>
         </div>
         <span className="relative whitespace-nowrap text-sm font-medium text-accent group-hover:underline">
-          Visit Labs -&gt;
+          Visit Fun Labs -&gt;
         </span>
       </Link>
     </section>

@@ -56,7 +56,7 @@ export function PacketRunner() {
   return (
     <div className="py-12">
       <div className="mb-8">
-        <Badge tone="accent">Labs</Badge>
+        <Badge tone="accent">Fun Labs</Badge>
         <h1 className="mt-3 text-2xl font-semibold">Packet runner</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           Guide a packet through routers, firewalls, and congestion zones. Firewalls end the run,

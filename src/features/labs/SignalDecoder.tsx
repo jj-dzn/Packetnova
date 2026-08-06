@@ -27,7 +27,7 @@ export function SignalDecoder() {
   return (
     <div className="py-12">
       <div className="mb-8">
-        <Badge tone="accent">Labs</Badge>
+        <Badge tone="accent">Fun Labs</Badge>
         <h1 className="mt-3 text-2xl font-semibold">Signal decoder</h1>
         <p className="mt-2 max-w-2xl text-fg-muted">
           Watch any text ripple through Morse, binary, hex, and Base64, and back again. Pure
