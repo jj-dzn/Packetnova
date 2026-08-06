@@ -335,7 +335,7 @@ export function TopologyBuilder() {
     <ToolPageLayout
       category="Utilities"
       title="Topology canvas"
-      description="Build a network topology by hand -- place devices, draw links between them. Saves automatically in this browser, no account needed."
+      description="Build a network topology by hand -- place devices, draw links between them, export as PNG/SVG. Saves automatically in this browser, no account needed."
       related={[{ to: '/tools/device-config-generator', label: 'Device config generator' }]}
       fullWidth={
         <div className="flex flex-col gap-4">

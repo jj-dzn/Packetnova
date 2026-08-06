@@ -39,7 +39,8 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'IP range calculator',
-        description: 'Convert between IP ranges and CIDR notation instantly.',
+        description:
+          'Convert a start and end IP address into the minimal set of CIDR blocks that cover it exactly.',
         slug: 'ip-range-calculator',
       },
       {
@@ -71,7 +72,8 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'MTU calculator',
-        description: "Find the right MTU for a link and see what happens when packets don't fit.",
+        description:
+          "Find the right MTU for a link and see what happens when a given payload doesn't fit.",
         slug: 'mtu-calculator',
       },
       {
@@ -86,7 +88,8 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'Latency calculator',
-        description: 'Estimate one-way and round-trip latency across a given distance and medium.',
+        description:
+          'Estimate one-way and round-trip propagation delay across a given distance and medium.',
         slug: 'latency-calculator',
       },
       {
@@ -127,7 +130,8 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'Metric comparison tool',
-        description: 'Compare routing metrics across protocols on equal footing.',
+        description:
+          "See why an OSPF cost of 10 and an EIGRP metric of 10 aren't comparable -- and how each protocol actually calculates its own.",
         slug: 'metric-comparison-tool',
       },
     ],
@@ -138,12 +142,13 @@ export const toolCategories: ToolCategory[] = [
     tools: [
       {
         name: 'VLAN calculator',
-        description: 'Work out VLAN ranges, trunking math, and tagging details.',
+        description: "Check a VLAN ID's validity, range classification, and hex representation.",
         slug: 'vlan-calculator',
       },
       {
         name: '802.1Q tag explorer',
-        description: 'Break down an 802.1Q tag into its TPID, PCP, DEI, and VLAN ID fields.',
+        description:
+          'Build an 802.1Q tag from its PCP, DEI, and VLAN ID fields and see the resulting TCI.',
         slug: '802-1q-tag-explorer',
       },
       {
@@ -189,12 +194,12 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'DNS record reference',
-        description: "Look up every DNS record type and what it's used for.",
+        description: "Look up every common DNS record type and what it's used for.",
         slug: 'dns-record-reference',
       },
       {
         name: 'HTTP status reference',
-        description: 'Look up any HTTP status code and what it means.',
+        description: 'Look up any common HTTP status code and what it means.',
         slug: 'http-status-reference',
       },
       {
@@ -220,7 +225,7 @@ export const toolCategories: ToolCategory[] = [
       },
       {
         name: 'Hash verifier',
-        description: 'Check a file or string against an expected hash.',
+        description: 'Check a string against an expected hash, computed entirely in your browser.',
         slug: 'hash-verifier',
       },
       {
@@ -281,13 +286,14 @@ export const toolCategories: ToolCategory[] = [
         slug: 'epoch-converter',
       },
       {
-        name: 'Binary/decimal/hex converter',
-        description: 'Convert numbers between binary, decimal, and hexadecimal.',
+        name: 'Binary/octal/decimal/hex converter',
+        description: 'Convert numbers between binary, octal, decimal, and hexadecimal.',
         slug: 'binary-decimal-hex-converter',
       },
       {
         name: 'ASCII converter',
-        description: 'Convert between text, ASCII codes, and binary.',
+        description:
+          'Convert between text, character codes, and binary -- full Unicode, not just 7-bit ASCII.',
         slug: 'ascii-converter',
       },
       {

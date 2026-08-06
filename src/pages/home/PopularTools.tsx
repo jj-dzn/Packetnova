@@ -16,7 +16,8 @@ const tools = [
   },
   {
     title: 'IP range calculator',
-    description: 'Convert between IP ranges and CIDR notation instantly.',
+    description:
+      'Convert a start and end IP address into the minimal set of CIDR blocks that cover it exactly.',
     href: '/tools/ip-range-calculator',
   },
   {

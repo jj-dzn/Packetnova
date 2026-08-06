@@ -24,7 +24,7 @@ export function BaseConverterTool() {
   return (
     <ToolPageLayout
       category="Utilities"
-      title="Binary / decimal / hex converter"
+      title="Binary / octal / decimal / hex converter"
       description="Convert numbers between binary, octal, decimal, and hexadecimal."
       status={calc.ok ? 'ok' : 'error'}
       input={

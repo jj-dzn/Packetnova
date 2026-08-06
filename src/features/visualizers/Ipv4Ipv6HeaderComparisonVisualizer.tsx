@@ -87,7 +87,7 @@ export function Ipv4Ipv6HeaderComparisonVisualizer() {
     <VisualizerPageLayout
       category="Comparison"
       title="IPv4 vs IPv6 header"
-      description="The same packet header, redesigned: what got removed, renamed, and added between IPv4 and IPv6."
+      description="The same packet header, redesigned -- what got removed, renamed, and added between IPv4 and IPv6."
       related={[
         { to: '/tools/ip-header-explorer', label: 'IP header explorer' },
         { to: '/tools/ipv6-calculator', label: 'IPv6 calculator' },
