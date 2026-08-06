@@ -1,4 +1,5 @@
-import { networkAddress, parseCIDR, parseIPv4 } from '../validation/ip'
+import { parseIPv4 } from '../validation/ip'
+import { matchRouteAgainstDestination } from './routeMatching'
 import type { CalculationResult } from './result'
 
 export interface RouteEntry {
@@ -31,17 +32,9 @@ export function simulateLpm(
 
   const matches: LpmMatch[] = []
   for (const route of routes) {
-    const parsed = parseCIDR(route.cidr)
-    if (!parsed) {
-      return { ok: false, error: `"${route.cidr}" is not a valid CIDR block.` }
-    }
-    const routeNetwork = networkAddress(parsed.ip, parsed.prefixLength).value
-    const destinationInRoute = networkAddress(destination, parsed.prefixLength).value
-    matches.push({
-      ...route,
-      prefixLength: parsed.prefixLength,
-      matches: destinationInRoute === routeNetwork,
-    })
+    const matched = matchRouteAgainstDestination(destination, route)
+    if (!matched.ok) return matched
+    matches.push(matched.match)
   }
 
   const winner = matches

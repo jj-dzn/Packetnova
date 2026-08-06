@@ -39,6 +39,28 @@ describe('selectBgpBestPath', () => {
     expect(result.result.decidedByStep).toBe('Highest weight')
   })
 
+  it('highest local preference wins once weight is tied', () => {
+    const result = selectBgpBestPath([
+      makeCandidate('A', { localPreference: 100 }),
+      makeCandidate('B', { localPreference: 200 }),
+    ])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.winnerId).toBe('B')
+    expect(result.result.decidedByStep).toBe('Highest local preference')
+  })
+
+  it('a locally originated route wins once weight and local preference are tied', () => {
+    const result = selectBgpBestPath([
+      makeCandidate('A', { locallyOriginated: false }),
+      makeCandidate('B', { locallyOriginated: true }),
+    ])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.winnerId).toBe('B')
+    expect(result.result.decidedByStep).toBe('Locally originated')
+  })
+
   it('shortest AS path wins once weight and local preference are tied', () => {
     const result = selectBgpBestPath([
       makeCandidate('A', { asPathLength: 3 }),
@@ -48,6 +70,17 @@ describe('selectBgpBestPath', () => {
     if (!result.ok) return
     expect(result.result.winnerId).toBe('B')
     expect(result.result.decidedByStep).toBe('Shortest AS path')
+  })
+
+  it('lowest origin type wins once AS path length is tied', () => {
+    const result = selectBgpBestPath([
+      makeCandidate('A', { origin: 'incomplete' }),
+      makeCandidate('B', { origin: 'igp' }),
+    ])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.winnerId).toBe('B')
+    expect(result.result.decidedByStep).toBe('Lowest origin type')
   })
 
   it('lowest MED wins once earlier criteria are tied', () => {
@@ -106,6 +139,28 @@ describe('selectBgpBestPath', () => {
     expect(result.result.decidedByStep).toBe('eBGP over iBGP')
   })
 
+  it('lowest IGP metric to next hop wins once the eBGP/iBGP session type is tied', () => {
+    const result = selectBgpBestPath([
+      makeCandidate('A', { igpMetricToNextHop: 20 }),
+      makeCandidate('B', { igpMetricToNextHop: 5 }),
+    ])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.winnerId).toBe('B')
+    expect(result.result.decidedByStep).toBe('Lowest IGP metric to next hop')
+  })
+
+  it('the oldest route wins once IGP metric is tied', () => {
+    const result = selectBgpBestPath([
+      makeCandidate('A', { routeAgeSeconds: 50 }),
+      makeCandidate('B', { routeAgeSeconds: 500 }),
+    ])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.winnerId).toBe('B')
+    expect(result.result.decidedByStep).toBe('Oldest route')
+  })
+
   it('falls all the way through to the lowest router ID when everything else ties', () => {
     const result = selectBgpBestPath([
       makeCandidate('A', { routerId: '5.5.5.5' }),
@@ -127,6 +182,17 @@ describe('selectBgpBestPath', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
     expect(result.result.winnerId).toBe('B')
+  })
+
+  it('falls all the way through to the lowest neighbor IP when even router ID ties', () => {
+    const result = selectBgpBestPath([
+      makeCandidate('A', { neighborIp: '10.0.0.5' }),
+      makeCandidate('B', { neighborIp: '10.0.0.2' }),
+    ])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.winnerId).toBe('B')
+    expect(result.result.decidedByStep).toBe('Lowest neighbor IP')
   })
 
   it('rejects duplicate candidate names', () => {

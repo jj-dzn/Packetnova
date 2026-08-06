@@ -1,5 +1,6 @@
 import {
   broadcastAddress,
+  invertMask,
   ipv4ToString,
   networkAddress,
   parseCIDR,
@@ -34,7 +35,7 @@ export function calculateCidr(input: string): CalculationResult<CidrResult> {
 
   const { ip, prefixLength } = parsed
   const mask = prefixLengthToSubnetMask(prefixLength)
-  const wildcard = ~mask.value >>> 0
+  const wildcard = invertMask(mask)
   const network = networkAddress(ip, prefixLength)
   const broadcast = broadcastAddress(ip, prefixLength)
   const range = usableHostRange(ip, prefixLength)
@@ -46,7 +47,7 @@ export function calculateCidr(input: string): CalculationResult<CidrResult> {
       ipValue: ip.value,
       prefixLength,
       subnetMask: ipv4ToString(mask.value),
-      wildcardMask: ipv4ToString(wildcard),
+      wildcardMask: ipv4ToString(wildcard.value),
       networkAddress: ipv4ToString(network.value),
       broadcastAddress: ipv4ToString(broadcast.value),
       firstUsable: range ? ipv4ToString(range.first.value) : null,

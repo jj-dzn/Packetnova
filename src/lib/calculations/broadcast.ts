@@ -1,5 +1,6 @@
 import {
   broadcastAddress,
+  invertMask,
   ipv4ToString,
   networkAddress,
   parseCIDR,
@@ -25,7 +26,7 @@ export function calculateBroadcast(input: string): CalculationResult<BroadcastRe
 
   const { ip, prefixLength } = parsed
   const mask = prefixLengthToSubnetMask(prefixLength)
-  const wildcard = ~mask.value >>> 0
+  const wildcard = invertMask(mask)
   const broadcast = broadcastAddress(ip, prefixLength)
 
   return {
@@ -34,7 +35,7 @@ export function calculateBroadcast(input: string): CalculationResult<BroadcastRe
       ip: ipv4ToString(ip.value),
       prefixLength,
       subnetMask: ipv4ToString(mask.value),
-      wildcardMask: ipv4ToString(wildcard),
+      wildcardMask: ipv4ToString(wildcard.value),
       networkAddress: ipv4ToString(networkAddress(ip, prefixLength).value),
       broadcastAddress: ipv4ToString(broadcast.value),
       broadcastAddressValue: broadcast.value,

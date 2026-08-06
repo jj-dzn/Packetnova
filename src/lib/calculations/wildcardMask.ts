@@ -1,4 +1,5 @@
 import {
+  invertMask,
   ipv4ToString,
   parseIPv4,
   prefixLengthToSubnetMask,
@@ -29,7 +30,7 @@ export function calculateWildcardMask(input: string): CalculationResult<Wildcard
       return { ok: false, error: 'Prefix length must be between 0 and 32.' }
     }
     const mask = prefixLengthToSubnetMask(prefixLength)
-    const wildcardValue = ~mask.value >>> 0
+    const wildcardValue = invertMask(mask).value
     return {
       ok: true,
       result: {
@@ -52,7 +53,7 @@ export function calculateWildcardMask(input: string): CalculationResult<Wildcard
     return { ok: false, error: `"${trimmed}" is not a valid contiguous subnet mask.` }
   }
 
-  const wildcardValue = ~parsedMask.value >>> 0
+  const wildcardValue = invertMask(parsedMask).value
   return {
     ok: true,
     result: {

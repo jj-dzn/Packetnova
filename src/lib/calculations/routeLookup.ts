@@ -1,4 +1,5 @@
-import { networkAddress, parseCIDR, parseIPv4 } from '../validation/ip'
+import { parseIPv4 } from '../validation/ip'
+import { matchRouteAgainstDestination } from './routeMatching'
 import type { CalculationResult } from './result'
 
 export interface RouteLookupEntry {
@@ -39,20 +40,12 @@ export function simulateRouteLookup(
 
   const matches: RouteLookupMatch[] = []
   for (const route of routes) {
-    const parsed = parseCIDR(route.cidr)
-    if (!parsed) {
-      return { ok: false, error: `"${route.cidr}" is not a valid CIDR block.` }
-    }
+    const matched = matchRouteAgainstDestination(destination, route)
+    if (!matched.ok) return matched
     if (!Number.isFinite(route.administrativeDistance) || route.administrativeDistance < 0) {
       return { ok: false, error: `"${route.label}" needs a valid administrative distance.` }
     }
-    const routeNetwork = networkAddress(parsed.ip, parsed.prefixLength).value
-    const destinationInRoute = networkAddress(destination, parsed.prefixLength).value
-    matches.push({
-      ...route,
-      prefixLength: parsed.prefixLength,
-      matches: destinationInRoute === routeNetwork,
-    })
+    matches.push(matched.match)
   }
 
   const matching = matches.filter((match) => match.matches)

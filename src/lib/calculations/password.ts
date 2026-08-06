@@ -33,11 +33,30 @@ export function generatePassword(options: PasswordOptions): CalculationResult<st
     return { ok: false, error: 'Length must be a whole number between 1 and 256.' }
   }
 
-  const randomValues = new Uint32Array(options.length)
-  crypto.getRandomValues(randomValues)
-  const password = Array.from(randomValues, (value) => charset[value % charset.length]).join('')
+  // value % charset.length is biased low whenever 2^32 isn't an exact
+  // multiple of charset.length (true for nearly every real charset size),
+  // so the low end of the charset would get drawn marginally more often
+  // than the high end. Rejecting any draw at or past the largest multiple
+  // of charset.length that fits in a uint32 makes every character equally
+  // likely, at the cost of occasionally throwing a draw away and trying
+  // again.
+  const charsetSize = charset.length
+  const rejectionThreshold = Math.floor(0x100000000 / charsetSize) * charsetSize
 
-  return { ok: true, result: password }
+  const chars: string[] = []
+  const buffer = new Uint32Array(64)
+  let bufferIndex = buffer.length
+  while (chars.length < options.length) {
+    if (bufferIndex >= buffer.length) {
+      crypto.getRandomValues(buffer)
+      bufferIndex = 0
+    }
+    const value = buffer[bufferIndex++]!
+    if (value >= rejectionThreshold) continue
+    chars.push(charset[value % charsetSize]!)
+  }
+
+  return { ok: true, result: chars.join('') }
 }
 
 /**

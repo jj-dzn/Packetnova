@@ -48,6 +48,17 @@ describe('calculateIpv6Subnets', () => {
     expect(result.result.baseCidr).toBe('2001:db8::/32')
   })
 
+  it('masks only the host bits within a group when the base prefix falls mid-group', () => {
+    // /32 above only ever needs to zero whole 16-bit groups. A /36 splits
+    // partway through the third group instead: 0xf123's top nibble (0xf,
+    // bits 95-92) is still network, the low 12 bits (0x123) are host and
+    // must be zeroed -- the rest of the group, not the whole group.
+    const result = calculateIpv6Subnets('2001:0db8:f123::/36', 40)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.baseCidr).toBe('2001:db8:f000::/36')
+  })
+
   it('rejects a new prefix that is not longer than the base', () => {
     const result = calculateIpv6Subnets('2001:db8::/32', 32)
     expect(result.ok).toBe(false)

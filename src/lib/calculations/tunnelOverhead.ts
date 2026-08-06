@@ -1,3 +1,4 @@
+import { computeEffectiveMtu } from './effectiveMtu'
 import type { CalculationResult } from './result'
 
 export interface TunnelOverheadResult {
@@ -11,17 +12,17 @@ export function calculateTunnelOverhead(
   linkMtu: number,
   overheadBytes: number,
 ): CalculationResult<TunnelOverheadResult> {
-  if (!Number.isFinite(linkMtu) || linkMtu <= 0) {
-    return { ok: false, error: 'Enter a link MTU greater than 0.' }
-  }
-  if (!Number.isFinite(overheadBytes) || overheadBytes < 0) {
-    return { ok: false, error: 'Overhead must be 0 or greater.' }
-  }
-
-  const effectiveMtu = linkMtu - overheadBytes
-  if (effectiveMtu <= 0) {
+  const effective = computeEffectiveMtu(linkMtu, overheadBytes)
+  if (!effective.ok) {
+    if (effective.reason === 'link-mtu') {
+      return { ok: false, error: 'Enter a link MTU greater than 0.' }
+    }
+    if (effective.reason === 'overhead') {
+      return { ok: false, error: 'Overhead must be 0 or greater.' }
+    }
     return { ok: false, error: 'Overhead is greater than or equal to the link MTU.' }
   }
+  const effectiveMtu = effective.effectiveMtu
 
   return {
     ok: true,

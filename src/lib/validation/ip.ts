@@ -90,10 +90,18 @@ export function networkAddress(ip: ParsedIPv4, prefixLength: number): ParsedIPv4
   return parsedIPv4FromValue(ip.value & mask.value)
 }
 
+// The bitwise complement of a subnet mask -- every 1 becomes a 0 and every
+// 0 becomes a 1. Takes the mask itself rather than a prefix length so it
+// works equally whether the mask came from a prefix length or was parsed
+// directly from user input.
+export function invertMask(mask: ParsedIPv4): ParsedIPv4 {
+  return parsedIPv4FromValue(~mask.value >>> 0)
+}
+
 export function broadcastAddress(ip: ParsedIPv4, prefixLength: number): ParsedIPv4 {
   const mask = prefixLengthToSubnetMask(prefixLength)
-  const wildcard = ~mask.value >>> 0
-  return parsedIPv4FromValue(ip.value | wildcard)
+  const wildcard = invertMask(mask)
+  return parsedIPv4FromValue(ip.value | wildcard.value)
 }
 
 export function totalAddresses(prefixLength: number): number {

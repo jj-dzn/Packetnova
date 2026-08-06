@@ -1,4 +1,4 @@
-import { parseIPv4, prefixLengthToSubnetMask, ipv4ToString } from '../validation/ip'
+import { parseIPv4, prefixLengthToSubnetMask, invertMask, ipv4ToString } from '../validation/ip'
 
 export type ConfigVendor = 'ios' | 'nxos' | 'junos' | 'eos' | 'mikrotik' | 'pfsense'
 
@@ -276,8 +276,8 @@ export function buildAclConfig(input: AclConfigInput): ConfigResult {
   if (!input.aclName.trim()) return { ok: false, error: 'Enter an ACL name.' }
   if (!input.hostname.trim()) return { ok: false, error: 'Enter a hostname.' }
 
-  const mask = prefixLengthToSubnetMask(input.sourcePrefixLength).value
-  const wildcard = ipv4ToString(~mask >>> 0)
+  const mask = prefixLengthToSubnetMask(input.sourcePrefixLength)
+  const wildcard = ipv4ToString(invertMask(mask).value)
   const aclLines = buildAclLines(input.vendor, input, wildcard)
 
   if (input.vendor === 'pfsense') {

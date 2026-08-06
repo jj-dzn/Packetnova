@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { calculatePasswordEntropyBits, estimateCrackTime, generatePassword } from './password'
 
 const allSets = { uppercase: true, lowercase: true, digits: true, symbols: true }
@@ -43,6 +43,36 @@ describe('generatePassword', () => {
     expect(first.ok && second.ok).toBe(true)
     if (!first.ok || !second.ok) return
     expect(first.result).not.toBe(second.result)
+  })
+
+  it('discards a biased draw instead of using it (rejection sampling)', () => {
+    // For a 10-character digit charset, the top 6 values of the uint32
+    // range (0xfffffffa-0xffffffff) are biased -- 0xffffffff among them --
+    // and must be thrown away rather than mapped via %. If the generator
+    // used naive modulo instead, this would still "work" but silently
+    // favor low digits; asserting the exact output instead of just "no
+    // crash" is what actually catches that regression.
+    const spy = vi.spyOn(crypto, 'getRandomValues').mockImplementation((<T extends ArrayBufferView>(
+      array: T,
+    ) => {
+      const view = array as unknown as Uint32Array
+      view[0] = 0xffffffff
+      for (let i = 1; i < view.length; i++) view[i] = 5
+      return array
+    }) as typeof crypto.getRandomValues)
+
+    const result = generatePassword({
+      length: 1,
+      uppercase: false,
+      lowercase: false,
+      digits: true,
+      symbols: false,
+    })
+    spy.mockRestore()
+
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result).toBe('5')
   })
 
   it('rejects a request with no character set selected', () => {
