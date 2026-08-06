@@ -1,6 +1,8 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useLocation } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
+import { PinToNotebookButton } from '../../components/ui/PinToNotebookButton'
 import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { countWrongTurns, formatElapsedTime } from '../../lib/scenarios/branchingScoring'
@@ -51,6 +53,8 @@ export function BranchingScenario({
   rootId,
 }: BranchingScenarioProps) {
   const breadcrumbSchema = useBreadcrumbSchema('Scenarios', '/scenarios', title)
+  const { pathname } = useLocation()
+  const nodeBoxRef = useRef<HTMLDivElement>(null)
   const [currentId, setCurrentId] = useState(rootId)
   const [previousId, setPreviousId] = useState<string | null>(null)
   const [visitLog, setVisitLog] = useState<string[]>([rootId])
@@ -139,6 +143,7 @@ export function BranchingScenario({
 
       <div className="flex flex-col gap-5">
         <div
+          ref={nodeBoxRef}
           className={`rounded-lg border p-6 ${
             isWrongTurn
               ? 'border-danger/40 bg-danger/5'
@@ -186,9 +191,17 @@ export function BranchingScenario({
 
         {isResolved && (
           <div className="flex flex-col gap-4">
-            <Button variant="secondary" onClick={restart} className="self-start">
-              Try again from the start
-            </Button>
+            <div className="flex flex-wrap items-center gap-3">
+              <Button variant="secondary" onClick={restart}>
+                Try again from the start
+              </Button>
+              <PinToNotebookButton
+                href={pathname}
+                title={title}
+                category={category}
+                getSummary={() => nodeBoxRef.current?.innerText ?? ''}
+              />
+            </div>
             {challengeActive && (
               <ChallengeResultCard
                 scenarioTitle={title}

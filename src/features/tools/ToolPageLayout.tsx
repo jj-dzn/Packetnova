@@ -1,8 +1,9 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { useLocation } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { RelatedLinks, type RelatedLink } from '../../components/ui/RelatedLinks'
 import { BookmarkButton } from '../../components/ui/BookmarkButton'
+import { PinToNotebookButton } from '../../components/ui/PinToNotebookButton'
 import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { useRecordVisit } from '../../hooks/useRecentlyViewed'
@@ -47,6 +48,7 @@ export function ToolPageLayout(props: ToolPageLayoutProps) {
   const embedded = useIsScenarioEmbed()
   const Heading = embedded ? 'h3' : 'h1'
   const { pathname } = useLocation()
+  const resultRef = useRef<HTMLDivElement>(null)
 
   useRecordVisit(embedded ? null : { href: pathname, title, category })
 
@@ -60,7 +62,17 @@ export function ToolPageLayout(props: ToolPageLayoutProps) {
       <div className="mb-8">
         <div className="flex items-center justify-between gap-3">
           <Badge tone="accent">{category}</Badge>
-          {!embedded && <BookmarkButton item={{ href: pathname, title, category }} />}
+          {!embedded && (
+            <div className="flex items-center gap-2">
+              <PinToNotebookButton
+                href={pathname}
+                title={title}
+                category={category}
+                getSummary={() => resultRef.current?.innerText ?? ''}
+              />
+              <BookmarkButton item={{ href: pathname, title, category }} />
+            </div>
+          )}
         </div>
         <Heading
           className={embedded ? 'mt-3 text-lg font-semibold' : 'mt-3 text-2xl font-semibold'}
@@ -72,11 +84,15 @@ export function ToolPageLayout(props: ToolPageLayoutProps) {
       </div>
       {!embedded && <PathContextBanner />}
       {props.fullWidth !== undefined ? (
-        <div className="rounded-lg border border-border bg-surface p-6">{props.fullWidth}</div>
+        <div ref={resultRef} className="rounded-lg border border-border bg-surface p-6">
+          {props.fullWidth}
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded-lg border border-border bg-surface p-6">{props.input}</div>
-          <div className="rounded-lg border border-border bg-surface p-6">{props.result}</div>
+          <div ref={resultRef} className="rounded-lg border border-border bg-surface p-6">
+            {props.result}
+          </div>
         </div>
       )}
       {children}

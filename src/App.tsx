@@ -8,6 +8,7 @@ import { ToolsPage } from './pages/ToolsPage'
 import { VisualizersPage } from './pages/VisualizersPage'
 import { ScenariosPage } from './pages/ScenariosPage'
 import { PathsPage } from './pages/PathsPage'
+import { NotebookPage } from './pages/NotebookPage'
 import { SearchPage } from './pages/SearchPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { LabsPage } from './pages/LabsPage'
@@ -540,6 +541,7 @@ function App() {
             />
             <Route path="/scenarios" element={<ScenariosPage />} />
             <Route path="/paths" element={<PathsPage />} />
+            <Route path="/notebook" element={<NotebookPage />} />
             <Route path="/paths/subnetting-fluency" element={<SubnettingFluencyPathPage />} />
             <Route path="/paths/bgp-path-selection" element={<BgpPathSelectionPathPage />} />
             <Route path="/paths/vpn-troubleshooting" element={<VpnTroubleshootingPathPage />} />

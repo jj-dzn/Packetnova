@@ -31,6 +31,7 @@ const staticPaths = [
   '/visualizers',
   '/scenarios',
   '/paths',
+  '/notebook',
   '/about',
   '/journey',
   '/journey/nat',

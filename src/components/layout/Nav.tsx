@@ -17,6 +17,7 @@ const navLinks = [
   { to: '/journey', label: 'Journey' },
   { to: '/paths', label: 'Paths' },
   { to: '/labs', label: 'Labs' },
+  { to: '/notebook', label: 'Notebook' },
 ]
 
 function MenuIcon({ open }: { open: boolean }) {

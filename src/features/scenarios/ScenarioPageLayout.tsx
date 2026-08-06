@@ -1,6 +1,8 @@
-import type { ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
+import { useLocation } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { StructuredData } from '../../components/seo/StructuredData'
+import { PinToNotebookButton } from '../../components/ui/PinToNotebookButton'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { ScenarioEmbedContext } from './ScenarioEmbedContext'
 import { PathContextBanner } from '../paths/PathContextBanner'
@@ -26,6 +28,8 @@ export function ScenarioPageLayout({
   children,
 }: ScenarioPageLayoutProps) {
   const breadcrumbSchema = useBreadcrumbSchema('Scenarios', '/scenarios', title)
+  const { pathname } = useLocation()
+  const resolutionRef = useRef<HTMLDivElement>(null)
 
   return (
     <div className="py-12">
@@ -43,8 +47,18 @@ export function ScenarioPageLayout({
       </ScenarioEmbedContext.Provider>
 
       <div className="mt-12 rounded-lg border border-success/30 bg-success/5 p-6">
-        <p className="text-sm font-semibold text-success">What actually fixed it</p>
-        <div className="mt-2 flex flex-col gap-2 text-sm text-fg-muted">{resolution}</div>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-semibold text-success">What actually fixed it</p>
+          <PinToNotebookButton
+            href={pathname}
+            title={title}
+            category={category}
+            getSummary={() => resolutionRef.current?.innerText ?? ''}
+          />
+        </div>
+        <div ref={resolutionRef} className="mt-2 flex flex-col gap-2 text-sm text-fg-muted">
+          {resolution}
+        </div>
       </div>
     </div>
   )
