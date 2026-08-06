@@ -4,6 +4,9 @@ import { PreviewCard } from '../../components/ui/PreviewCard'
 import { Card } from '../../components/ui/Card'
 import { Badge } from '../../components/ui/Badge'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
+import { visualizers } from '../../content/reference/visualizers'
+
+const OTHER_VISUALIZER_COUNT = visualizers.length - 1
 
 export function FeaturedVisualizers() {
   const { ref, revealed } = useScrollReveal<HTMLElement>()
@@ -28,11 +31,10 @@ export function FeaturedVisualizers() {
           comingSoon={false}
         />
         <Link to="/visualizers" className="block">
-          <Card interactive tilt className="flex h-full flex-col items-start justify-center gap-2">
-            <Badge tone="accent">9 more</Badge>
-            <p className="text-sm text-fg-muted">
-              TLS handshake, packet encapsulation, and more on the way.
-            </p>
+          <Card interactive tilt className="flex h-full flex-col gap-3">
+            <Badge tone="accent">{OTHER_VISUALIZER_COUNT} more</Badge>
+            <h3 className="font-medium">See the rest of the visualizers</h3>
+            <p className="text-sm text-fg-muted">TLS handshake, packet encapsulation, and more.</p>
           </Card>
         </Link>
       </div>

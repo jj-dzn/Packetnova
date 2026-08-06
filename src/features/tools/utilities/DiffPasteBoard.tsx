@@ -19,8 +19,11 @@ type Side = 'left' | 'right'
 
 // Both layers share these exact values so the invisible text in the
 // textarea lines up, character for character, with the visible colored
-// duplicate rendered right underneath it.
-const PANE_HEIGHT = 'h-[28rem]'
+// duplicate rendered right underneath it. Shorter on small screens -- the
+// full 28rem height was mostly empty box for the default short example,
+// and on a phone-sized viewport two of them ate nearly two full screens of
+// scrolling before reaching anything else on the page.
+const PANE_HEIGHT = 'h-64 sm:h-80 md:h-[28rem]'
 const LINE_HEIGHT_PX = 20
 const GUTTER_WIDTH_PX = 40
 const BASE_PADDING_PX = 12

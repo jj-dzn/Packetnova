@@ -68,7 +68,7 @@ export function ToolPageLayout(props: ToolPageLayoutProps) {
                 href={pathname}
                 title={title}
                 category={category}
-                getSummary={() => resultRef.current?.innerText ?? ''}
+                getSummaryElement={() => resultRef.current}
               />
               <BookmarkButton item={{ href: pathname, title, category, description }} />
             </div>
@@ -88,7 +88,7 @@ export function ToolPageLayout(props: ToolPageLayoutProps) {
           {props.fullWidth}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
           <div className="rounded-lg border border-border bg-surface p-6">{props.input}</div>
           <div ref={resultRef} className="rounded-lg border border-border bg-surface p-6">
             {props.result}

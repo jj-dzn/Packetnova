@@ -51,7 +51,7 @@ export function VisualizerPageLayout({
             href={pathname}
             title={title}
             category={category}
-            getSummary={() => ref.current?.innerText ?? ''}
+            getSummaryElement={() => ref.current}
           />
           <ExportButton exportAs={exportAs} pending={pending} />
         </div>

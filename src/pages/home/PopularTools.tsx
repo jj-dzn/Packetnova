@@ -30,6 +30,12 @@ const tools = [
     description: 'Find the network address for any IP, and what kind of address it is.',
     href: '/tools/network-address-calculator',
   },
+  {
+    title: 'IPv6 calculator',
+    description:
+      'Expand, compress, and inspect IPv6 addresses and prefixes -- and split a block into subnets.',
+    href: '/tools/ipv6-calculator',
+  },
 ]
 
 const liveToolCount = toolCategories.reduce(

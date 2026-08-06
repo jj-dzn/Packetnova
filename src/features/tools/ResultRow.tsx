@@ -19,7 +19,7 @@ export function ResultRow({ label, value, loading = false }: ResultRowProps) {
           <Skeleton className="h-4 w-32" />
         ) : (
           <>
-            <span className="min-w-0 break-all text-right font-mono text-sm">{value}</span>
+            <span className="min-w-0 break-words text-right font-mono text-sm">{value}</span>
             <CopyButton value={value} label={label} />
           </>
         )}

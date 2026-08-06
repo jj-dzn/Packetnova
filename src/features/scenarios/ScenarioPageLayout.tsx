@@ -53,7 +53,7 @@ export function ScenarioPageLayout({
             href={pathname}
             title={title}
             category={category}
-            getSummary={() => resolutionRef.current?.innerText ?? ''}
+            getSummaryElement={() => resolutionRef.current}
           />
         </div>
         <div ref={resolutionRef} className="mt-2 flex flex-col gap-2 text-sm text-fg-muted">

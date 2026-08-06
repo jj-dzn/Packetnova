@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useNotebook } from '../../hooks/useNotebook'
+import { extractSummaryText } from '../../lib/notebook/extractSummaryText'
 
 interface PinToNotebookButtonProps {
   href: string
   title: string
   category: string
-  /** Called at click time, not render time, so the captured text always
+  /** Called at click time, not render time, so the captured element always
    * reflects whatever's currently on screen instead of a stale closure. */
-  getSummary: () => string
+  getSummaryElement: () => HTMLElement | null
   className?: string
 }
 
@@ -39,14 +40,15 @@ export function PinToNotebookButton({
   href,
   title,
   category,
-  getSummary,
+  getSummaryElement,
   className = '',
 }: PinToNotebookButtonProps) {
   const { pin } = useNotebook()
   const [justPinned, setJustPinned] = useState(false)
 
   function handlePin() {
-    const summary = getSummary().trim()
+    const element = getSummaryElement()
+    const summary = element ? extractSummaryText(element).trim() : ''
     if (!summary) return
     pin({ href, title, category, summary })
     setJustPinned(true)

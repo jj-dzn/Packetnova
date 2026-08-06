@@ -199,7 +199,7 @@ export function BranchingScenario({
                 href={pathname}
                 title={title}
                 category={category}
-                getSummary={() => nodeBoxRef.current?.innerText ?? ''}
+                getSummaryElement={() => nodeBoxRef.current}
               />
             </div>
             {challengeActive && (
