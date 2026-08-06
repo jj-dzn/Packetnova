@@ -21,6 +21,7 @@ export function BandwidthEstimator() {
       category="VPN"
       title="Bandwidth estimator"
       description="Estimate real-world throughput after protocol and tunnel overhead."
+      status={calc.ok ? 'ok' : 'error'}
       input={
         <div className="flex flex-col gap-4">
           <div>

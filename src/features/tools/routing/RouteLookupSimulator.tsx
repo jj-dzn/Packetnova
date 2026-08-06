@@ -161,6 +161,7 @@ export function RouteLookupSimulator() {
       category="Routing"
       title="Route lookup simulator"
       description="Step through how a router picks the next hop: longest prefix match first, administrative distance only as a tiebreaker."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         {
           to: '/tools/administrative-distance-reference',

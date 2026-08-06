@@ -63,6 +63,7 @@ export function HashVerifier() {
       category="Security"
       title="Hash verifier"
       description="Check a string against an expected hash -- computed entirely in your browser."
+      status={error ? 'error' : computed ? 'ok' : undefined}
       related={[{ to: '/tools/hash-generator', label: 'Hash generator' }]}
       input={
         <div className="flex flex-col gap-4">

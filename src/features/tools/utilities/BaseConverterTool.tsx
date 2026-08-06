@@ -26,6 +26,7 @@ export function BaseConverterTool() {
       category="Utilities"
       title="Binary / decimal / hex converter"
       description="Convert numbers between binary, octal, decimal, and hexadecimal."
+      status={calc.ok ? 'ok' : 'error'}
       input={
         <div className="flex flex-col gap-4">
           <div>

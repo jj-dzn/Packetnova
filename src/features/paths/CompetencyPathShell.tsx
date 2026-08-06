@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
@@ -5,6 +6,7 @@ import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { resolvePathStep } from '../../lib/content/resolvePathStep'
 import { usePathProgress } from '../../hooks/usePathProgress'
+import { reportMascotMood } from '../../lib/mascotMood'
 import { competencyPaths, otherPaths, type PathStep } from '../../content/reference/paths'
 
 interface CompetencyPathShellProps {
@@ -25,10 +27,8 @@ export function CompetencyPathShell({ slug }: CompetencyPathShellProps) {
   const breadcrumbSchema = useBreadcrumbSchema('Paths', '/paths', path?.title ?? 'Path')
   const { progress, toggle } = usePathProgress()
 
-  if (!path) return null
-
-  const completed = new Set(progress[path.slug] ?? [])
-  const resolvedSteps = path.steps
+  const completed = new Set(path ? (progress[path.slug] ?? []) : [])
+  const resolvedSteps = (path?.steps ?? [])
     .map((step) => ({ step, resolved: resolvePathStep(step) }))
     .filter((entry): entry is { step: PathStep; resolved: NonNullable<typeof entry.resolved> } =>
       Boolean(entry.resolved),
@@ -36,6 +36,15 @@ export function CompetencyPathShell({ slug }: CompetencyPathShellProps) {
   const completedCount = resolvedSteps.filter(({ step }) => completed.has(stepKey(step))).length
   const nextIndex = resolvedSteps.findIndex(({ step }) => !completed.has(stepKey(step)))
   const isDone = resolvedSteps.length > 0 && nextIndex === -1
+
+  // Finishing every step is a real achievement the progress store already
+  // tracks -- worth a "fast" mascot reaction the moment the last box gets
+  // checked, not just a silent badge.
+  useEffect(() => {
+    if (isDone) reportMascotMood('fast')
+  }, [isDone])
+
+  if (!path) return null
 
   return (
     <div className="py-12">

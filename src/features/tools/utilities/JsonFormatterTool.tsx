@@ -42,6 +42,7 @@ export function JsonFormatterTool() {
       category="Utilities"
       title="JSON formatter"
       description="Format, validate, and minify JSON -- or explore it as a syntax-highlighted, foldable tree."
+      status={(mode === 'tree' ? treeResult?.ok : result?.ok) ? 'ok' : 'error'}
       related={[
         { to: '/tools/yaml-formatter', label: 'YAML formatter' },
         { to: '/tools/xml-formatter', label: 'XML formatter' },

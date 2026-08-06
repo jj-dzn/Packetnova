@@ -78,6 +78,7 @@ export function Dot1qExplorer() {
       category="Switching"
       title="802.1Q tag explorer"
       description="Build an 802.1Q tag from its PCP, DEI, and VLAN ID fields and see the resulting TCI and full tag."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/vlan-calculator', label: 'VLAN calculator' },
         { to: '/scenarios/vlan-misconfiguration', label: 'Scenario: VLAN misconfiguration' },

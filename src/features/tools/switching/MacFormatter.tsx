@@ -18,6 +18,7 @@ export function MacFormatter() {
       category="Switching"
       title="MAC formatter"
       description="Convert a MAC address between colon, hyphen, and Cisco dotted-quad notation."
+      status={calc.ok ? 'ok' : 'error'}
       related={[{ to: '/tools/mac-address-lookup', label: 'MAC address lookup' }]}
       input={
         <div>

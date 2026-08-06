@@ -131,6 +131,7 @@ export function CertificateViewer() {
       category="Security"
       title="Certificate viewer"
       description="Inspect an X.509 certificate's fields, SANs, and validity dates -- parsed entirely client-side, nothing uploaded. Paste a full chain (leaf, intermediates, root) to inspect each one."
+      status={selected.ok ? 'ok' : 'error'}
       input={
         <div>
           <label htmlFor="cert-input" className="text-sm font-medium">

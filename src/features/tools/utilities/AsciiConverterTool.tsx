@@ -16,6 +16,7 @@ export function AsciiConverterTool() {
       category="Utilities"
       title="ASCII converter"
       description="Convert between text, character codes, and binary -- supports the full Unicode range, not just 7-bit ASCII, so accented letters, symbols, and emoji convert correctly too."
+      status={(mode === 'textToCodes' ? forward?.ok : backward?.ok) ? 'ok' : 'error'}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

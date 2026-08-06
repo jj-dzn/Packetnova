@@ -43,6 +43,7 @@ export function BroadcastCalculator() {
       category="IP"
       title="Broadcast calculator"
       description="Find the broadcast address for any IP and subnet mask, and see the broadcast domain in binary."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/cidr-calculator', label: 'CIDR calculator' },
         { to: '/tools/subnet-calculator', label: 'Subnet calculator' },

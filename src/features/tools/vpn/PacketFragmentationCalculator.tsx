@@ -17,6 +17,7 @@ export function PacketFragmentationCalculator() {
       category="VPN"
       title="Packet fragmentation calculator"
       description="See when and how an IPv4 packet gets fragmented for a given path MTU."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/mtu-calculator', label: 'MTU calculator' },
         { to: '/tools/mss-calculator', label: 'MSS calculator' },

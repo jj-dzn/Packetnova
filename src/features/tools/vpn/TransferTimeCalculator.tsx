@@ -48,6 +48,7 @@ export function TransferTimeCalculator() {
       category="VPN"
       title="Transfer time calculator"
       description="Estimate how long a file transfer will take at a given bandwidth."
+      status={calc.ok ? 'ok' : 'error'}
       input={
         <div className="flex flex-col gap-4">
           <div>

@@ -62,6 +62,7 @@ export function MssCalculator() {
       category="VPN"
       title="MSS calculator"
       description="Work out the maximum TCP segment size for a given MTU and header overhead."
+      status={calc.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/mtu-calculator', label: 'MTU calculator' },
         { to: '/tools/packet-fragmentation-calculator', label: 'Packet fragmentation calculator' },

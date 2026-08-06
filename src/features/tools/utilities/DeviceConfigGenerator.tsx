@@ -106,6 +106,7 @@ export function DeviceConfigGenerator() {
       category="Utilities"
       title="Device config generator"
       description="Generate a real, vendor-specific interface or static-route config from the same math the rest of the site already does -- pick a vendor, fill in the fields, copy or download."
+      status={result.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/topology-canvas', label: 'Topology canvas' },
         { to: '/tools/vlan-calculator', label: 'VLAN calculator' },

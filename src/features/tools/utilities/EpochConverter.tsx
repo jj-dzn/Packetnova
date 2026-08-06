@@ -19,6 +19,7 @@ export function EpochConverter() {
       category="Utilities"
       title="Epoch converter"
       description="Convert between Unix epoch time and human-readable dates. Epoch time is just a count of seconds elapsed since midnight UTC on January 1, 1970 -- no timezone, no calendar, just one number that keeps increasing, which is why so many logs and APIs use it instead of a formatted date."
+      status={calc.ok ? 'ok' : 'error'}
       input={
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">

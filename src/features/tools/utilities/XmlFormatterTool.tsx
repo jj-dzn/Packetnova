@@ -20,6 +20,7 @@ export function XmlFormatterTool() {
       category="Utilities"
       title="XML formatter"
       description="Format and validate XML."
+      status={result.ok ? 'ok' : 'error'}
       related={[
         { to: '/tools/json-formatter', label: 'JSON formatter' },
         { to: '/tools/yaml-formatter', label: 'YAML formatter' },

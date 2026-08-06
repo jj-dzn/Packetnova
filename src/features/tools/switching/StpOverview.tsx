@@ -123,6 +123,7 @@ export function StpOverview() {
         category="Switching"
         title="STP overview"
         description="Spanning Tree Protocol elects a root bridge by lowest Bridge ID -- priority first, MAC address as the tiebreaker -- then blocks any port that would form a loop to it."
+        status={calc.ok ? 'ok' : 'error'}
         related={[
           { to: '/visualizers/stp-vs-rstp-convergence', label: 'Compare: STP vs RSTP convergence' },
         ]}

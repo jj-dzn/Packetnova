@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button'
 import { StructuredData } from '../../components/seo/StructuredData'
 import { useBreadcrumbSchema } from '../../lib/seo/useBreadcrumbSchema'
 import { countWrongTurns, formatElapsedTime } from '../../lib/scenarios/branchingScoring'
+import { reportMascotMood } from '../../lib/mascotMood'
 import { ScenarioEmbedContext } from './ScenarioEmbedContext'
 import { ChallengeResultCard } from './ChallengeResultCard'
 
@@ -67,6 +68,15 @@ export function BranchingScenario({
     const interval = setInterval(() => setElapsedMs(Date.now() - startTime), TICK_MS)
     return () => clearInterval(interval)
   }, [challengeActive, isResolved, startTime])
+
+  // A clean challenge clear (zero wrong turns) is a real achievement the
+  // engine already computes -- worth a "fast" mascot reaction, distinct
+  // from just finishing with a mistake or two along the way.
+  useEffect(() => {
+    if (challengeActive && isResolved) {
+      reportMascotMood(wrongTurns === 0 ? 'fast' : 'medium')
+    }
+  }, [challengeActive, isResolved, wrongTurns])
 
   function startChallenge() {
     setChallengeActive(true)

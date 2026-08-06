@@ -59,6 +59,7 @@ export function LpmSimulator() {
       category="Routing"
       title="Longest prefix match simulator"
       description="See which route wins when multiple entries in a routing table overlap the same destination."
+      status={calc.ok ? 'ok' : 'error'}
       related={[{ to: '/scenarios/subnetting-mistake', label: 'Scenario: Subnetting mistake' }]}
       input={
         <div className="flex flex-col gap-4">

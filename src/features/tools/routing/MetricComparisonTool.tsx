@@ -30,6 +30,7 @@ export function MetricComparisonTool() {
         category="Routing"
         title="Metric comparison tool"
         description="Routing metrics aren't directly comparable across protocols: an OSPF cost of 10 and an EIGRP composite metric of 10 don't mean anything relative to each other -- they're not even the same unit. This covers how each protocol calculates its own metric, plus a quick OSPF cost calculator below."
+        status={calc.ok && eigrpCalc.ok ? 'ok' : 'error'}
         input={
           <div className="flex flex-col gap-4">
             <div>

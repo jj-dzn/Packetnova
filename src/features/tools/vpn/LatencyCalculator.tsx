@@ -64,6 +64,7 @@ export function LatencyCalculator() {
       category="VPN"
       title="Latency calculator"
       description="Estimate one-way and round-trip propagation delay across a given distance and medium."
+      status={calc.ok ? 'ok' : 'error'}
       related={[{ to: '/labs/ping-pet', label: 'Labs: watch a pet react to live latency' }]}
       input={
         <div className="flex flex-col gap-4">
