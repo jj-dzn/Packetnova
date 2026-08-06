@@ -3,6 +3,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { PingPetCreature, type PetStatus } from './PingPetCreature'
+import { DuelResultCard } from './DuelResultCard'
 import {
   classifyLatency,
   measureLatency,
@@ -85,6 +86,18 @@ export function PingPetDuel() {
             {running ? 'Dueling...' : 'Start duel'}
           </Button>
         </div>
+
+        {winner && (
+          <DuelResultCard
+            leftLabel="Player 1"
+            leftHost={left.target.host}
+            leftMs={left.latencyMs}
+            rightLabel="Player 2"
+            rightHost={right.target.host}
+            rightMs={right.latencyMs}
+            winner={winner}
+          />
+        )}
       </Card>
     </div>
   )

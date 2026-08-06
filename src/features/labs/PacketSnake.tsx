@@ -3,6 +3,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { DirectionPad } from './DirectionPad'
+import { SnakeResultCard } from './SnakeResultCard'
 import {
   createInitialState,
   isOppositeDirection,
@@ -112,6 +113,8 @@ export function PacketSnake() {
         </div>
 
         <DirectionPad onPress={changeDirection} disabled={state.gameOver} />
+
+        {state.gameOver && <SnakeResultCard score={state.score} />}
       </Card>
     </div>
   )
