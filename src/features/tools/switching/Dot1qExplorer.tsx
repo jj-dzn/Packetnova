@@ -159,7 +159,7 @@ export function Dot1qExplorer() {
                       detail: `TPID 0x8100 + this TCI (0x${calc.result.tciHex})`,
                       highlighted: true,
                     },
-                    { label: 'EtherType', bytes: 3, detail: 'identifies the payload protocol' },
+                    { label: 'EtherType', bytes: 2, detail: 'identifies the payload protocol' },
                     {
                       label: 'Payload',
                       bytes: 18,

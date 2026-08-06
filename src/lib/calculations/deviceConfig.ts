@@ -88,7 +88,7 @@ function buildIosLikeInterfaceConfig(
   const lines: string[] = [`hostname ${hostname}`, commentChar]
   lines.push(`interface ${targetInterface}`)
   if (description) lines.push(`${indent}description ${description}`)
-  if (vendor === 'eos' && !vlanId) lines.push(`${indent}no switchport`)
+  if ((vendor === 'eos' || vendor === 'nxos') && !vlanId) lines.push(`${indent}no switchport`)
   if (encapsulationLine) lines.push(encapsulationLine)
   lines.push(addressLine)
   if (mtu) lines.push(`${indent}mtu ${mtu}`)

@@ -12,6 +12,15 @@ function base64UrlDecode(input: string): string {
   return atob(padded + '='.repeat(padLength))
 }
 
+// A forged/malformed token can carry an exp/iat far outside the range
+// Date can represent (+-8,640,000,000,000ms from epoch) -- toISOString()
+// throws RangeError rather than returning an invalid-but-usable value, so
+// this has to be checked before formatting instead of just try/caught.
+function unixSecondsToIsoString(seconds: number): string | null {
+  const date = new Date(seconds * 1000)
+  return Number.isNaN(date.getTime()) ? null : date.toISOString()
+}
+
 export function decodeJwt(token: string): CalculationResult<JwtDecoded> {
   const parts = token.trim().split('.')
   if (parts.length !== 3) {
@@ -69,8 +78,8 @@ export function inspectJwt(token: string): CalculationResult<JwtInspection> {
     result: {
       algorithm,
       tokenType: typeof header.typ === 'string' ? header.typ : null,
-      issuedAt: iat !== null ? new Date(iat * 1000).toISOString() : null,
-      expiresAt: exp !== null ? new Date(exp * 1000).toISOString() : null,
+      issuedAt: iat !== null ? unixSecondsToIsoString(iat) : null,
+      expiresAt: exp !== null ? unixSecondsToIsoString(exp) : null,
       isExpired: exp !== null ? Date.now() > exp * 1000 : null,
       subject: typeof payload.sub === 'string' ? payload.sub : null,
       issuer: typeof payload.iss === 'string' ? payload.iss : null,

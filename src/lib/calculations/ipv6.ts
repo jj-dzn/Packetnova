@@ -87,7 +87,7 @@ function classify(values: number[]): string {
   // Well-known NAT64 prefix (RFC 6052) -- a NAT64 gateway synthesizes
   // addresses in this /96 to represent IPv4-only destinations to
   // IPv6-only clients, embedding the IPv4 address in the last 32 bits.
-  if (values.slice(0, 4).every((v, i) => v === [0x0064, 0xff9b, 0, 0][i]))
+  if (values.slice(0, 6).every((v, i) => v === [0x0064, 0xff9b, 0, 0, 0, 0][i]))
     return 'NAT64 well-known prefix (RFC 6052)'
   // 6to4 (RFC 3056): the next 32 bits after the fixed 2002::/16 prefix
   // encode the tunnel endpoint's own public IPv4 address.

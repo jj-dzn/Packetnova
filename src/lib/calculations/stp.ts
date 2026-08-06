@@ -160,16 +160,25 @@ export function computeStpPortRoles(
     })
   }
 
-  // A bridge can have more than one link that ties for its cheapest path --
-  // only the first one found (by link order) is the actual root port; any
-  // further "root"-looking port on the same bridge blocks instead.
-  const seenRootPort = new Set<string>()
+  // A bridge can have more than one link that ties for its cheapest path to
+  // root -- 802.1D breaks that tie by the lowest bridge ID on the other end
+  // of the link (same "lower id wins" convention already used for the
+  // per-segment designated-port tie-break above), not by whichever port
+  // happened to come first in the input.
+  const rootPortsByBridge = new Map<string, StpPort[]>()
   for (const port of ports) {
     if (port.role !== 'root') continue
-    if (seenRootPort.has(port.bridgeId)) {
-      port.role = 'blocked'
-    } else {
-      seenRootPort.add(port.bridgeId)
+    const existing = rootPortsByBridge.get(port.bridgeId)
+    if (existing) existing.push(port)
+    else rootPortsByBridge.set(port.bridgeId, [port])
+  }
+  for (const candidates of rootPortsByBridge.values()) {
+    if (candidates.length <= 1) continue
+    const lowestNeighborId = candidates.reduce((a, b) =>
+      a.neighborId < b.neighborId ? a : b,
+    ).neighborId
+    for (const port of candidates) {
+      if (port.neighborId !== lowestNeighborId) port.role = 'blocked'
     }
   }
 

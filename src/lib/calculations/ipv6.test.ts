@@ -85,6 +85,14 @@ describe('analyzeIPv6', () => {
     if (calc.ok) expect(calc.result.addressType).toBe('NAT64 well-known prefix (RFC 6052)')
   })
 
+  it('does not misclassify an address with a nonzero group 4 as NAT64', () => {
+    // Shares the first four groups with the /96 well-known prefix but has a
+    // nonzero 5th group, so it falls outside 64:ff9b::/96 entirely.
+    const calc = analyzeIPv6('64:ff9b:0:0:1234:0:c000:221')
+    expect(calc.ok).toBe(true)
+    if (calc.ok) expect(calc.result.addressType).not.toBe('NAT64 well-known prefix (RFC 6052)')
+  })
+
   it('classifies a 6to4 address', () => {
     // 2002:c000:0204:: -- 192.0.2.4 encoded in the next 32 bits after 2002::/16.
     const calc = analyzeIPv6('2002:c000:204::1')

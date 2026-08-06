@@ -102,4 +102,26 @@ describe('inspectJwt', () => {
     if (!result.ok) return
     expect(result.result.isUnsigned).toBe(true)
   })
+
+  it('does not throw on an exp claim far outside the representable date range', () => {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+    const payload = btoa(JSON.stringify({ exp: 999999999999999 }))
+    const token = `${header}.${payload}.signature`
+    expect(() => inspectJwt(token)).not.toThrow()
+    const result = inspectJwt(token)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.expiresAt).toBeNull()
+  })
+
+  it('does not throw on an iat claim far outside the representable date range', () => {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+    const payload = btoa(JSON.stringify({ iat: -999999999999999 }))
+    const token = `${header}.${payload}.signature`
+    expect(() => inspectJwt(token)).not.toThrow()
+    const result = inspectJwt(token)
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.issuedAt).toBeNull()
+  })
 })

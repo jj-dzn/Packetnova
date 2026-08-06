@@ -15,6 +15,7 @@ function makeCandidate(id: string, overrides: Partial<BgpCandidate> = {}): BgpCa
     routeAgeSeconds: 100,
     routerId: '1.1.1.1',
     neighborIp: '10.0.0.1',
+    neighborAsNumber: 65001,
     ...overrides,
   }
 }
@@ -58,6 +59,40 @@ describe('selectBgpBestPath', () => {
     if (!result.ok) return
     expect(result.result.winnerId).toBe('B')
     expect(result.result.decidedByStep).toBe('Lowest MED')
+  })
+
+  it('MED does not decide between candidates from different neighboring AS numbers', () => {
+    // Real BGP only compares MED between paths from the same neighboring AS
+    // (RFC 4271 9.1.2.2) -- these two are tied on everything before MED but
+    // come from different AS numbers, so MED must not decide between them;
+    // the tie should fall through to the next real differentiator instead.
+    const result = selectBgpBestPath([
+      makeCandidate('A', { med: 50, neighborAsNumber: 65001, isEbgp: false }),
+      makeCandidate('B', { med: 20, neighborAsNumber: 65002, isEbgp: true }),
+    ])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.winnerId).toBe('B')
+    expect(result.result.decidedByStep).toBe('eBGP over iBGP')
+  })
+
+  it('MED does decide between candidates that share the same neighboring AS', () => {
+    const result = selectBgpBestPath([
+      makeCandidate('A', { med: 50, neighborAsNumber: 65001 }),
+      makeCandidate('B', { med: 20, neighborAsNumber: 65001 }),
+    ])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.result.winnerId).toBe('B')
+    expect(result.result.decidedByStep).toBe('Lowest MED')
+  })
+
+  it('rejects a candidate with an invalid neighboring AS number', () => {
+    const result = selectBgpBestPath([
+      makeCandidate('A', { neighborAsNumber: 0 }),
+      makeCandidate('B'),
+    ])
+    expect(result.ok).toBe(false)
   })
 
   it('eBGP is preferred over iBGP once earlier criteria are tied', () => {

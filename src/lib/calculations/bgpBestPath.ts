@@ -16,6 +16,12 @@ export interface BgpCandidate {
   routeAgeSeconds: number
   routerId: string
   neighborIp: string
+  /** The AS this path was learned from -- MED is only meaningfully
+   * comparable between paths sharing the same neighboring AS (RFC 4271
+   * 9.1.2.2), so this determines which candidates the MED step actually
+   * compares against each other. This simulator doesn't model
+   * "always-compare-med". */
+  neighborAsNumber: number
 }
 
 export interface BgpStepTrace {
@@ -40,6 +46,29 @@ function narrow(
   const values = candidates.map(keyFn)
   const best = preferLower ? Math.min(...values) : Math.max(...values)
   const next = candidates.filter((candidate) => keyFn(candidate) === best)
+  return { candidates: next, trace: { step, remaining: next.map((candidate) => candidate.id) } }
+}
+
+// MED is only compared between candidates learned from the same
+// neighboring AS -- so this narrows independently within each
+// neighbor-AS group, then keeps every group's own lowest-MED
+// survivor(s), rather than picking one lowest MED across all candidates
+// regardless of which AS they came from.
+function narrowMed(
+  candidates: BgpCandidate[],
+  step: string,
+): { candidates: BgpCandidate[]; trace: BgpStepTrace } {
+  const groups = new Map<number, BgpCandidate[]>()
+  for (const candidate of candidates) {
+    const group = groups.get(candidate.neighborAsNumber) ?? []
+    group.push(candidate)
+    groups.set(candidate.neighborAsNumber, group)
+  }
+  const next: BgpCandidate[] = []
+  for (const group of groups.values()) {
+    const lowestMed = Math.min(...group.map((c) => c.med))
+    next.push(...group.filter((c) => c.med === lowestMed))
+  }
   return { candidates: next, trace: { step, remaining: next.map((candidate) => candidate.id) } }
 }
 
@@ -77,6 +106,9 @@ export function selectBgpBestPath(candidates: BgpCandidate[]): CalculationResult
     if (!parseIPv4(candidate.neighborIp)) {
       return { ok: false, error: `"${candidate.neighborIp}" is not a valid neighbor IP.` }
     }
+    if (!Number.isInteger(candidate.neighborAsNumber) || candidate.neighborAsNumber < 1) {
+      return { ok: false, error: `"${candidate.id}" needs a neighboring AS number of 1 or higher.` }
+    }
   }
 
   if (candidates.length === 1) {
@@ -92,7 +124,10 @@ export function selectBgpBestPath(candidates: BgpCandidate[]): CalculationResult
 
   for (const [step, keyFn, preferLower] of STEPS) {
     if (remaining.length <= 1) break
-    const narrowed = narrow(remaining, step, keyFn, preferLower)
+    const narrowed =
+      step === 'Lowest MED'
+        ? narrowMed(remaining, step)
+        : narrow(remaining, step, keyFn, preferLower)
     trace.push(narrowed.trace)
     if (narrowed.candidates.length < remaining.length) decidedByStep = step
     remaining = narrowed.candidates

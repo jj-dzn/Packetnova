@@ -129,6 +129,7 @@ const DEFAULT_CANDIDATES: BgpCandidate[] = [
     routeAgeSeconds: 100,
     routerId: '1.1.1.1',
     neighborIp: '10.0.0.1',
+    neighborAsNumber: 65001,
   },
   {
     id: 'Path B',
@@ -143,6 +144,7 @@ const DEFAULT_CANDIDATES: BgpCandidate[] = [
     routeAgeSeconds: 100,
     routerId: '2.2.2.2',
     neighborIp: '10.0.0.2',
+    neighborAsNumber: 65002,
   },
 ]
 
@@ -197,6 +199,7 @@ export function BgpBestPathSelector() {
         id: `Path ${String.fromCharCode(65 + current.length)}`,
         routerId: '3.3.3.3',
         neighborIp: '10.0.0.3',
+        neighborAsNumber: 65000 + current.length + 1,
       },
     ])
   }
@@ -341,6 +344,14 @@ export function BgpBestPathSelector() {
                         <Input
                           value={candidate.neighborIp}
                           onChange={(e) => updateCandidate(index, { neighborIp: e.target.value })}
+                        />
+                      </Field>
+                      <Field label="Neighbor AS">
+                        <Input
+                          value={candidate.neighborAsNumber}
+                          onChange={(e) =>
+                            updateCandidate(index, { neighborAsNumber: Number(e.target.value) })
+                          }
                         />
                       </Field>
                     </>

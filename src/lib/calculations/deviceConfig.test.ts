@@ -59,6 +59,7 @@ describe('buildInterfaceConfig', () => {
     expect(nxos.ok && nxos.result.config).toContain('ip address 10.0.12.1/24')
     expect(eos.ok && eos.result.config).toContain('ip address 10.0.12.1/24')
     expect(eos.ok && eos.result.config).toContain('no switchport')
+    expect(nxos.ok && nxos.result.config).toContain('no switchport')
   })
 
   it('adds a dot1Q subinterface when a VLAN ID is given', () => {
