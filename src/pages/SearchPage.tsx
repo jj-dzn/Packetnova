@@ -9,7 +9,7 @@ export function SearchPage() {
   const committedQuery = searchParams.get('q') ?? ''
 
   // Keyed on the URL's query so navigating here again with a new ?q= (e.g.
-  // from the nav SearchBar while already on this page) resets local state
+  // resubmitting the form while already on this page) resets local state
   // cleanly, without syncing state from an effect.
   return <SearchResults key={committedQuery} committedQuery={committedQuery} />
 }

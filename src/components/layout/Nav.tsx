@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router'
-import { SearchBar } from '../ui/SearchBar'
 import { Mascot } from '../ui/Mascot'
 import { useDarkMode } from '../../hooks/useDarkMode'
 import { useColorblindMode } from '../../hooks/useColorblindMode'
@@ -69,6 +68,45 @@ function ColorblindIcon({ active }: { active: boolean }) {
   )
 }
 
+function SearchIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M17 17l-3.8-3.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// A single trigger for the one search experience the site has -- clicking
+// or tapping this opens the exact same Cmd/Ctrl+K command palette, instead
+// of maintaining a second, separate inline-dropdown search box that behaved
+// differently from the keyboard shortcut.
+function SearchTrigger({ className = '', onOpen }: { className?: string; onOpen?: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        onOpen?.()
+        openCommandPalette()
+      }}
+      aria-label="Open search (Cmd/Ctrl+K)"
+      className={`flex items-center justify-between gap-2 rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg-subtle transition-colors hover:border-accent/40 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
+    >
+      <span className="flex items-center gap-2">
+        <SearchIcon />
+        Search tools...
+      </span>
+      {/* No keyboard shortcut on a touch device -- this only ever renders
+          wide enough to be reached at the lg breakpoint, well above where
+          the mobile menu (md and below) shows its own instance. */}
+      <span className="hidden shrink-0 items-center gap-1 text-xs lg:flex">
+        <kbd className="font-sans">{isMac ? '⌘' : 'Ctrl'}</kbd>
+        <kbd className="font-sans">K</kbd>
+      </span>
+    </button>
+  )
+}
+
 function MenuIcon({ open }: { open: boolean }) {
   return (
     <svg
@@ -130,16 +168,7 @@ export function Nav() {
         </nav>
 
         <div className="hidden flex-wrap items-center justify-end gap-3 md:flex">
-          <SearchBar className="w-48 lg:w-64" />
-          <button
-            type="button"
-            onClick={openCommandPalette}
-            aria-label="Open command palette"
-            className="hidden items-center gap-1.5 rounded-md border border-border px-2.5 py-2 text-xs text-fg-subtle transition-colors hover:border-accent/40 hover:text-fg lg:flex"
-          >
-            <kbd className="font-sans">{isMac ? '⌘' : 'Ctrl'}</kbd>
-            <kbd className="font-sans">K</kbd>
-          </button>
+          <SearchTrigger className="w-40 lg:w-64" />
           <button
             type="button"
             onClick={toggleColorblind}
@@ -178,7 +207,7 @@ export function Nav() {
 
       {mobileOpen && (
         <nav className="flex flex-col gap-3 border-t border-border px-4 py-3 md:hidden">
-          <SearchBar onNavigate={() => setMobileOpen(false)} />
+          <SearchTrigger className="w-full" onOpen={() => setMobileOpen(false)} />
           <div className="flex flex-col gap-1">
             {navLinks.map((link) => (
               <NavLink

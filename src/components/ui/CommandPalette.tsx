@@ -13,10 +13,11 @@ interface PaletteRow {
   href: string
 }
 
-// Global Cmd/Ctrl+K palette -- fuzzy search over the same index the Nav's
-// SearchBar uses, plus a shape classifier (detectIntent) that recognizes a
-// pasted IP, CIDR, MAC, or JWT and offers to jump straight to the tool
-// that handles it, pre-filled, ahead of the regular search results.
+// Global Cmd/Ctrl+K palette -- the site's one search experience (the Nav's
+// search box just opens this), fuzzy search plus a shape classifier
+// (detectIntent) that recognizes a pasted IP, CIDR, MAC, or JWT and offers
+// to jump straight to the tool that handles it, pre-filled, ahead of the
+// regular search results.
 //
 // Split into this persistent shell (owns isOpen + the global listeners)
 // and CommandPaletteContent below, which only exists while open -- so the
