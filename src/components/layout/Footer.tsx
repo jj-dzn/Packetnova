@@ -36,7 +36,7 @@ export function Footer() {
           <a
             href="https://github.com/jj-dzn/Packetnova"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="hover:text-fg"
           >
             GitHub

@@ -8,6 +8,8 @@ import { testRegex, type RegexMatch, type RegexResult } from '../../../lib/calcu
 import { explainPattern } from '../../../lib/calculations/regexExplainer'
 import type { CalculationResult } from '../../../lib/calculations/result'
 import { useUrlState } from '../../../hooks/useUrlState'
+import { shellQuote } from '../../../lib/calculations/shellQuote'
+import { pythonStringLiteral } from '../../../lib/calculations/pythonQuote'
 
 const DEBOUNCE_MS = 150
 const EVAL_TIMEOUT_MS = 750
@@ -35,9 +37,9 @@ function buildRegexExports(pattern: string, flags: string): { label: string; cod
     { label: 'JavaScript', code: `/${pattern}/${flags}` },
     {
       label: 'Python',
-      code: `re.compile(r"${toPythonNamedGroups(pattern)}"${pyFlagsArg})`,
+      code: `re.compile(${pythonStringLiteral(toPythonNamedGroups(pattern))}${pyFlagsArg})`,
     },
-    { label: 'grep (PCRE)', code: `grep ${grepFlags} '${pattern}' file.txt` },
+    { label: 'grep (PCRE)', code: `grep ${grepFlags} ${shellQuote(pattern)} file.txt` },
   ]
 }
 

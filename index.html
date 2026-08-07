@@ -29,39 +29,25 @@
       content="PacketNova - free, client-side networking toolkit: calculators, protocol explorers, and interactive visualizers."
     />
     <title>PacketNova - Networking tools built for engineers</title>
-    <script>
-      // Single Page Apps for GitHub Pages -- https://github.com/rafgraph/spa-github-pages
-      ;(function (l) {
-        if (l.search[1] === '/') {
-          var decoded = l.search
-            .slice(1)
-            .split('&')
-            .map(function (s) {
-              return s.replace(/~and~/g, '&')
-            })
-            .join('?')
-          window.history.replaceState(null, '', l.pathname.slice(0, -1) + decoded + l.hash)
-        }
-      })(window.location)
-    </script>
-    <script>
-      ;(function () {
-        try {
-          var stored = localStorage.getItem('packetnova-theme')
-          var isDark = stored === 'light' ? false : true
-          document.documentElement.classList.toggle('dark', isDark)
-        } catch (e) {
-          document.documentElement.classList.add('dark')
-        }
-        try {
-          var colorblind = localStorage.getItem('packetnova-colorblind') === 'true'
-          document.documentElement.classList.toggle('colorblind', colorblind)
-        } catch (e) {
-          // No stored preference and no way to read one -- leave the
-          // default (non-colorblind) palette in place.
-        }
-      })()
-    </script>
+    <!--
+      script-src has no 'unsafe-inline': bootstrap.js is a same-origin
+      external file specifically so this can stay strict. connect-src's
+      extra hosts are the PingPet lab's real latency-check fetches
+      (src/lib/labs/pingPet.ts's PING_TARGETS) -- update both together if
+      that list ever changes. style-src needs 'unsafe-inline' because the
+      app sets many dynamic inline style="" attributes (progress bars,
+      positioned diagram elements) computed at render time, which can't be
+      pre-hashed; CSS injection is a far lower-severity risk than script
+      injection, which is what script-src is actually guarding against.
+      No frame-ancestors here -- browsers ignore it entirely when set via
+      <meta> (HTTP-header-only directive), and GitHub Pages doesn't let
+      this static site set real response headers at all.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflare.com https://google.com https://github.com https://wikipedia.org; object-src 'none'; base-uri 'self'; form-action 'self'"
+    />
+    <script src="/bootstrap.js"></script>
   </head>
   <body>
     <div id="root"></div>

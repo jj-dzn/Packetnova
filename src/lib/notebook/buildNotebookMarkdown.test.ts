@@ -45,4 +45,17 @@ describe('buildNotebookMarkdown', () => {
     expect(md.startsWith('# PacketNova notebook')).toBe(true)
     expect(md.trim().length).toBeGreaterThan(0)
   })
+
+  it('widens the fence so a summary containing a code block of its own cannot break out early', () => {
+    const entryWithFence: NotebookEntry = {
+      ...ENTRY_A,
+      summary: 'Result:\n```\nnot actually the end\n```\nmore text after',
+    }
+    const md = buildNotebookMarkdown([entryWithFence])
+    // The fence must be longer than the longest backtick run already in
+    // the content -- otherwise the embedded ``` would close the block
+    // early and "more text after" would spill out as loose Markdown
+    // instead of staying inside the fenced summary.
+    expect(md).toContain('````\nResult:\n```\nnot actually the end\n```\nmore text after\n````')
+  })
 })

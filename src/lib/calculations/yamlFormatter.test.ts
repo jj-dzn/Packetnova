@@ -18,6 +18,27 @@ describe('formatYaml', () => {
     const result = formatYaml('a: [1, 2\nb: broken')
     expect(result.ok).toBe(false)
   })
+
+  it('rejects a billion-laughs-style anchor/alias expansion instead of hanging', () => {
+    // Each level aliases the previous one 10 times -- 6 levels is 10^6
+    // logical leaf nodes (plus every intermediate array), all from a
+    // few hundred bytes of source. js-yaml's own load() resolves this
+    // cheaply (shared references, not copies); it's re-serializing the
+    // fully expanded form that would be the actual hang.
+    const bomb = [
+      'a: &a [1,1,1,1,1,1,1,1,1,1]',
+      'b: &b [*a,*a,*a,*a,*a,*a,*a,*a,*a,*a]',
+      'c: &c [*b,*b,*b,*b,*b,*b,*b,*b,*b,*b]',
+      'd: &d [*c,*c,*c,*c,*c,*c,*c,*c,*c,*c]',
+      'e: &e [*d,*d,*d,*d,*d,*d,*d,*d,*d,*d]',
+      'f: [*e,*e,*e,*e,*e,*e,*e,*e,*e,*e]',
+    ].join('\n')
+    const start = performance.now()
+    const result = formatYaml(bomb)
+    const elapsedMs = performance.now() - start
+    expect(result.ok).toBe(false)
+    expect(elapsedMs).toBeLessThan(1000)
+  })
 })
 
 describe('convertYamlToJson', () => {
@@ -31,6 +52,22 @@ describe('convertYamlToJson', () => {
 
   it('rejects invalid YAML', () => {
     expect(convertYamlToJson('a: [1, 2\nb: broken').ok).toBe(false)
+  })
+
+  it('rejects a billion-laughs-style anchor/alias expansion instead of hanging', () => {
+    const bomb = [
+      'a: &a [1,1,1,1,1,1,1,1,1,1]',
+      'b: &b [*a,*a,*a,*a,*a,*a,*a,*a,*a,*a]',
+      'c: &c [*b,*b,*b,*b,*b,*b,*b,*b,*b,*b]',
+      'd: &d [*c,*c,*c,*c,*c,*c,*c,*c,*c,*c]',
+      'e: &e [*d,*d,*d,*d,*d,*d,*d,*d,*d,*d]',
+      'f: [*e,*e,*e,*e,*e,*e,*e,*e,*e,*e]',
+    ].join('\n')
+    const start = performance.now()
+    const result = convertYamlToJson(bomb)
+    const elapsedMs = performance.now() - start
+    expect(result.ok).toBe(false)
+    expect(elapsedMs).toBeLessThan(1000)
   })
 })
 
