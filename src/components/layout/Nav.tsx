@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router'
-import { Button } from '../ui/Button'
 import { SearchBar } from '../ui/SearchBar'
 import { Mascot } from '../ui/Mascot'
 import { useDarkMode } from '../../hooks/useDarkMode'
@@ -19,6 +18,56 @@ const navLinks = [
   { to: '/labs', label: 'Fun Labs' },
   { to: '/notebook', label: 'Notebook' },
 ]
+
+function ThemeIcon({ theme }: { theme: 'dark' | 'light' }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+      className="group-hover:motion-safe:animate-pn-icon-pop"
+    >
+      {theme === 'dark' ? (
+        <g stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+          <circle cx="10" cy="10" r="3.4" />
+          <path d="M10 2.2v2M10 15.8v2M2.2 10h2M15.8 10h2M4.6 4.6l1.4 1.4M14 14l1.4 1.4M4.6 15.4l1.4-1.4M14 6l1.4-1.4" />
+        </g>
+      ) : (
+        <path
+          d="M17 12.1A6.8 6.8 0 0 1 7.9 3a6.8 6.8 0 1 0 9.1 9.1Z"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
+    </svg>
+  )
+}
+
+function ColorblindIcon({ active }: { active: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 20 20"
+      fill="none"
+      aria-hidden="true"
+      className="group-hover:motion-safe:animate-pn-icon-pop"
+    >
+      <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M10 3a7 7 0 0 1 0 14Z"
+        fill={active ? 'currentColor' : 'none'}
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
@@ -91,17 +140,29 @@ export function Nav() {
             <kbd className="font-sans">{isMac ? '⌘' : 'Ctrl'}</kbd>
             <kbd className="font-sans">K</kbd>
           </button>
-          <Button
-            variant="secondary"
+          <button
+            type="button"
             onClick={toggleColorblind}
             aria-pressed={colorblind}
             aria-label="Toggle colorblind-safe colors"
+            title={colorblind ? 'Switch to standard colors' : 'Switch to colorblind-safe colors'}
+            className={`group inline-flex items-center justify-center rounded-md border p-2 transition-colors ${
+              colorblind
+                ? 'border-accent/40 text-accent'
+                : 'border-border text-fg-subtle hover:border-accent/40 hover:text-fg'
+            }`}
           >
-            {colorblind ? 'Standard colors' : 'Colorblind-safe'}
-          </Button>
-          <Button variant="secondary" onClick={toggleTheme} aria-label="Toggle color theme">
-            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
-          </Button>
+            <ColorblindIcon active={colorblind} />
+          </button>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label="Toggle color theme"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="group inline-flex items-center justify-center rounded-md border border-border p-2 text-fg-subtle transition-colors hover:border-accent/40 hover:text-fg"
+          >
+            <ThemeIcon theme={theme} />
+          </button>
         </div>
 
         <button
