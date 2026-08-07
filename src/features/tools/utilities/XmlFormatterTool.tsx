@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
 import { CopyableTextarea } from '../CopyableTextarea'
@@ -13,7 +13,10 @@ export function XmlFormatterTool() {
   )
   const [showCli, setShowCli] = useState(false)
 
-  const result = formatXml(input)
+  // formatXml walks the parsed DOM tree recursively -- not worth
+  // redoing on every render for reasons unrelated to the input itself
+  // (e.g. the CLI-snippet toggle) on a large pasted document.
+  const result = useMemo(() => formatXml(input), [input])
 
   return (
     <ToolPageLayout

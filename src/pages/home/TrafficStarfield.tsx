@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 import { Link } from 'react-router'
 import { toolCategories } from '../../content/reference/tools'
 import { visualizers } from '../../content/reference/visualizers'
@@ -137,11 +137,28 @@ function proximityBoost(x: number, y: number, pointer: { x: number; y: number; a
 interface TrafficStarfieldProps {
   minimal?: boolean
   starCount?: number
+  /** An element (the hero's own heading/paragraph/CTA-button column) that
+   * hotspot links must be kept clear of -- measured live via
+   * getBoundingClientRect() rather than guessed as a fixed percentage of
+   * the canvas, since the column's real footprint shifts with viewport
+   * width, button wrapping, and font rendering. A fixed-percentage
+   * keep-out band was tried first and still let a hotspot land within
+   * WCAG's minimum safe tap spacing of a CTA button on some viewport
+   * sizes (caught by a real Lighthouse accessibility audit, not just
+   * eyeballing one layout). */
+  keepClearRef?: RefObject<HTMLElement | null>
 }
+
+// A generous margin: the WCAG target-size minimum itself is ~24px, but
+// leaving real breathing room (rather than shaving as close to the limit
+// as possible) is what actually reads as "clearly a separate thing to
+// click" rather than "technically compliant."
+const KEEP_CLEAR_MARGIN_PX = 28
 
 export function TrafficStarfield({
   minimal = false,
   starCount = STAR_COUNT,
+  keepClearRef,
 }: TrafficStarfieldProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [nodeLinks, setNodeLinks] = useState<Node[]>([])
@@ -220,6 +237,53 @@ export function TrafficStarfield({
       }, delay)
     }
 
+    // Canvas-local coordinates (matching where nodes actually get placed),
+    // not viewport coordinates -- getBoundingClientRect() is
+    // viewport-relative, so the canvas's own offset has to be subtracted
+    // out first.
+    function getKeepOutRect() {
+      const el = keepClearRef?.current
+      if (!el) return null
+      const canvasRect = canvas!.getBoundingClientRect()
+      const elRect = el.getBoundingClientRect()
+      return {
+        left: elRect.left - canvasRect.left - KEEP_CLEAR_MARGIN_PX,
+        right: elRect.right - canvasRect.left + KEEP_CLEAR_MARGIN_PX,
+        top: elRect.top - canvasRect.top - KEEP_CLEAR_MARGIN_PX,
+        bottom: elRect.bottom - canvasRect.top + KEEP_CLEAR_MARGIN_PX,
+      }
+    }
+
+    function isInsideKeepOut(
+      x: number,
+      y: number,
+      rect: { left: number; right: number; top: number; bottom: number } | null,
+    ): boolean {
+      if (!rect) return false
+      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+    }
+
+    // Reject-and-retry against the real, measured keep-out rect rather
+    // than a fixed percentage band -- a few dozen attempts is effectively
+    // free, and unlike a guessed band it can't drift out of sync with
+    // whatever the hero's actual content column happens to be doing at a
+    // given viewport width.
+    const MAX_PLACEMENT_ATTEMPTS = 40
+    function pickNodePosition(keepOut: ReturnType<typeof getKeepOutRect>): {
+      x: number
+      y: number
+    } {
+      for (let attempt = 0; attempt < MAX_PLACEMENT_ATTEMPTS; attempt++) {
+        const x = Math.random() * width * 0.8 + width * 0.1
+        const y = Math.random() * height * 0.7 + height * 0.15
+        if (!isInsideKeepOut(x, y, keepOut)) return { x, y }
+      }
+      // Every attempt landed inside the keep-out zone (a very cramped
+      // viewport) -- fall back to the far edge, which is never part of
+      // the centered content column.
+      return { x: width * (Math.random() < 0.5 ? 0.04 : 0.96), y: height * 0.1 }
+    }
+
     function seed() {
       stars = Array.from({ length: Math.round(starCount * densityMultiplier) }, () => ({
         x: Math.random() * width,
@@ -236,9 +300,9 @@ export function TrafficStarfield({
         return
       }
       const destinations = pickRandomUnique(DESTINATIONS, NODE_COUNT)
+      const keepOut = getKeepOutRect()
       nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
-        x: Math.random() * width * 0.8 + width * 0.1,
-        y: Math.random() * height * 0.7 + height * 0.15,
+        ...pickNodePosition(keepOut),
         name: destinations[i]?.name ?? 'PacketNova',
         href: destinations[i]?.href ?? '/tools',
       }))
@@ -471,7 +535,7 @@ export function TrafficStarfield({
       window.removeEventListener('pointermove', handlePointerMove)
       document.removeEventListener('pointerleave', handlePointerLeaveWindow)
     }
-  }, [minimal, starCount])
+  }, [minimal, starCount, keepClearRef])
 
   function handleNodeEnter(index: number) {
     userHoverRef.current = true

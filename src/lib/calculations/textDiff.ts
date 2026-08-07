@@ -182,7 +182,19 @@ export function computeOverlayLines(
   before: string,
   after: string,
 ): { beforeLines: OverlayLine[]; afterLines: OverlayLine[] } {
-  const aligned = buildAlignedDiffRows(before, after)
+  return alignedRowsToOverlayLines(buildAlignedDiffRows(before, after))
+}
+
+// Split out from computeOverlayLines so a caller that already has an
+// aligned-rows result (from calling buildAlignedDiffRows for its own
+// purposes, e.g. the summary line) can reuse it here instead of running
+// the same Myers diff + alignment pass a second time on identical input --
+// a real, measurable cost on every keystroke for a tool built specifically
+// around large pasted text.
+export function alignedRowsToOverlayLines(aligned: CalculationResult<AlignedDiffRow[]>): {
+  beforeLines: OverlayLine[]
+  afterLines: OverlayLine[]
+} {
   if (!aligned.ok) return { beforeLines: [], afterLines: [] }
 
   const beforeLines: OverlayLine[] = []

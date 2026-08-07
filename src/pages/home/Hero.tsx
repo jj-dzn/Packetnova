@@ -33,6 +33,7 @@ function useScrollSignal(sectionRef: RefObject<HTMLElement | null>) {
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   useScrollSignal(sectionRef)
 
   return (
@@ -51,7 +52,7 @@ export function Hero() {
         className="pointer-events-none absolute right-1/4 top-1/3 h-64 w-64 rounded-full bg-accent-alt/20 blur-3xl transition-opacity duration-300"
         style={{ opacity: 'var(--pn-signal, 1)' }}
       />
-      <TrafficStarfield />
+      <TrafficStarfield keepClearRef={contentRef} />
 
       {/* pointer-events-none here for the same reason TrafficStarfield's own
           wrapper needs it: this div is `relative` (positioned), so without
@@ -59,25 +60,33 @@ export function Hero() {
           through to -- any starfield node that happens to land underneath
           them. The two real links opt back into pointer-events-auto. */}
       <div className="relative pointer-events-none flex flex-col items-center gap-6">
-        <Badge tone="accent">Free & client-side -- no account needed</Badge>
-        <h1 className="text-2xl font-semibold">PacketNova</h1>
-        <p className="max-w-xl text-fg-muted">
-          Networking tools built for engineers. Calculators, protocol explorers, and interactive
-          visualizers -- all running in your browser, all free.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <Link to="/journey" className="pointer-events-auto">
-            <Button>Follow a packet's journey</Button>
-          </Link>
-          <Link to="/tools" className="pointer-events-auto">
-            <Button variant="secondary">Browse tools</Button>
-          </Link>
-          <Link to="/visualizers" className="pointer-events-auto">
-            <Button variant="secondary">Explore visualizers</Button>
-          </Link>
-        </div>
-        <div className="flex w-full justify-center px-4">
-          <HeroLiveDemo />
+        {/* Everything with a real link/button in it -- heading through the
+            live demo's own "open the full calculator" link -- wrapped
+            together as what contentRef measures for TrafficStarfield's
+            keep-out zone. HeroStatusLine is left out of it: it's plain
+            text, nothing in it is clickable, so there's nothing there for
+            a hotspot to crowd. */}
+        <div ref={contentRef} className="flex flex-col items-center gap-6">
+          <Badge tone="accent">Free & client-side -- no account needed</Badge>
+          <h1 className="text-2xl font-semibold">PacketNova</h1>
+          <p className="max-w-xl text-fg-muted">
+            Networking tools built for engineers. Calculators, protocol explorers, and interactive
+            visualizers -- all running in your browser, all free.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link to="/journey" className="pointer-events-auto">
+              <Button>Follow a packet's journey</Button>
+            </Link>
+            <Link to="/tools" className="pointer-events-auto">
+              <Button variant="secondary">Browse tools</Button>
+            </Link>
+            <Link to="/visualizers" className="pointer-events-auto">
+              <Button variant="secondary">Explore visualizers</Button>
+            </Link>
+          </div>
+          <div className="flex w-full justify-center px-4">
+            <HeroLiveDemo />
+          </div>
         </div>
         <div className="transition-opacity duration-300" style={{ opacity: 'var(--pn-signal, 1)' }}>
           <HeroStatusLine />

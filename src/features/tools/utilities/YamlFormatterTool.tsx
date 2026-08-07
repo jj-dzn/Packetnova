@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
@@ -38,12 +38,14 @@ export function YamlFormatterTool() {
     setMode(next)
   }
 
-  const result =
-    mode === 'format'
-      ? formatYaml(yamlInput)
-      : mode === 'yaml-to-json'
-        ? convertYamlToJson(yamlInput)
-        : convertJsonToYaml(jsonInput)
+  // js-yaml's load/dump on a large pasted document is real work -- not
+  // worth repeating on every render for reasons unrelated to the input
+  // itself (e.g. the CLI-snippet toggle).
+  const result = useMemo(() => {
+    if (mode === 'format') return formatYaml(yamlInput)
+    if (mode === 'yaml-to-json') return convertYamlToJson(yamlInput)
+    return convertJsonToYaml(jsonInput)
+  }, [mode, yamlInput, jsonInput])
 
   const isJsonInput = mode === 'json-to-yaml'
 

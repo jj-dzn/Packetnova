@@ -3,16 +3,34 @@ import { BrowserRouter, Routes, Route } from 'react-router'
 import { PageShell } from './components/layout/PageShell'
 import { RouteLoadingFallback } from './components/layout/RouteLoadingFallback'
 import { RouteErrorBoundary } from './components/layout/RouteErrorBoundary'
+// HomePage stays eager -- it's the single most common landing page, and
+// the whole point of a route being lazy is trading a Suspense flash for a
+// smaller shared bundle, which isn't a good trade for the page most
+// visitors land on first. Every other top-level listing page here used to
+// be eager too, unlike every individual tool/visualizer/scenario page
+// (already lazy) -- that meant every visitor downloaded all of Tools,
+// Visualizers, Scenarios, Paths, Notebook, Search, About, Labs, and
+// NotFound's code on first load regardless of which one they actually
+// wanted, showing up as real "unused JavaScript" in the main bundle on a
+// Lighthouse audit of the homepage.
 import { HomePage } from './pages/HomePage'
-import { AboutPage } from './pages/AboutPage'
-import { ToolsPage } from './pages/ToolsPage'
-import { VisualizersPage } from './pages/VisualizersPage'
-import { ScenariosPage } from './pages/ScenariosPage'
-import { PathsPage } from './pages/PathsPage'
-import { NotebookPage } from './pages/NotebookPage'
-import { SearchPage } from './pages/SearchPage'
-import { NotFoundPage } from './pages/NotFoundPage'
-import { LabsPage } from './pages/LabsPage'
+const AboutPage = lazy(() => import('./pages/AboutPage').then((m) => ({ default: m.AboutPage })))
+const ToolsPage = lazy(() => import('./pages/ToolsPage').then((m) => ({ default: m.ToolsPage })))
+const VisualizersPage = lazy(() =>
+  import('./pages/VisualizersPage').then((m) => ({ default: m.VisualizersPage })),
+)
+const ScenariosPage = lazy(() =>
+  import('./pages/ScenariosPage').then((m) => ({ default: m.ScenariosPage })),
+)
+const PathsPage = lazy(() => import('./pages/PathsPage').then((m) => ({ default: m.PathsPage })))
+const NotebookPage = lazy(() =>
+  import('./pages/NotebookPage').then((m) => ({ default: m.NotebookPage })),
+)
+const SearchPage = lazy(() => import('./pages/SearchPage').then((m) => ({ default: m.SearchPage })))
+const NotFoundPage = lazy(() =>
+  import('./pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
+)
+const LabsPage = lazy(() => import('./pages/LabsPage').then((m) => ({ default: m.LabsPage })))
 
 // Every individual tool/visualizer/lab page is lazy-loaded -- there are ~70
 // of them, each only needed one at a time, and statically importing all of

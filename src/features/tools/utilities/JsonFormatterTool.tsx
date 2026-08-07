@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { ToolPageLayout } from '../ToolPageLayout'
 import { ToolEducation } from '../ToolEducation'
@@ -34,8 +34,12 @@ export function JsonFormatterTool() {
   )
   const [showCli, setShowCli] = useState(false)
 
-  const result = mode === 'tree' ? null : formatJson(input, mode)
-  const treeResult = mode === 'tree' ? parseForTree(input) : null
+  // Re-parsing/re-formatting on every keystroke is fine for a short
+  // snippet, but a large pasted JSON payload makes this a real cost worth
+  // not repeating on every render for reasons unrelated to the input
+  // itself (e.g. the CLI-snippet toggle).
+  const result = useMemo(() => (mode === 'tree' ? null : formatJson(input, mode)), [input, mode])
+  const treeResult = useMemo(() => (mode === 'tree' ? parseForTree(input) : null), [input, mode])
 
   return (
     <ToolPageLayout

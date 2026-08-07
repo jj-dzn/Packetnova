@@ -201,6 +201,23 @@ export function TopologyBuilder() {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ nodes, links }))
   }, [nodes, links])
 
+  // Kept current via their own effects rather than the listener effect's
+  // dependency array -- deleteSelected reads selectedId/nodes directly,
+  // and while dragging a node, handleSvgPointerMove calls setNodes on
+  // every native pointermove event, which previously meant the listener
+  // effect's cleanup+setup (removeEventListener/addEventListener) ran
+  // dozens of times a second during the single most interactive action
+  // this tool has, purely to keep a listener that only actually needs the
+  // *current* values at the moment a key is pressed, not at attach time.
+  const selectedIdRef = useRef(selectedId)
+  useEffect(() => {
+    selectedIdRef.current = selectedId
+  }, [selectedId])
+  const deleteSelectedRef = useRef(deleteSelected)
+  useEffect(() => {
+    deleteSelectedRef.current = deleteSelected
+  })
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       const target = event.target as HTMLElement
@@ -209,15 +226,14 @@ export function TopologyBuilder() {
         setMode('move')
         setPlacingKind(null)
         setLinkStart(null)
-      } else if ((event.key === 'Delete' || event.key === 'Backspace') && selectedId) {
+      } else if ((event.key === 'Delete' || event.key === 'Backspace') && selectedIdRef.current) {
         event.preventDefault()
-        deleteSelected()
+        deleteSelectedRef.current()
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId, nodes, links])
+  }, [])
 
   function defaultLabel(kind: DeviceIconKind): string {
     const niceName = DEVICE_KINDS.find((d) => d.kind === kind)?.label ?? kind

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useMemo, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router'
 import { Input } from '../components/ui/Input'
 import { PreviewCard } from '../components/ui/PreviewCard'
@@ -19,7 +19,10 @@ function SearchResults({ committedQuery }: { committedQuery: string }) {
   const [query, setQuery] = useState(committedQuery)
 
   const trimmedQuery = query.trim()
-  const results = trimmedQuery ? searchRanked(trimmedQuery) : []
+  // Matches NavSearch's own memoization of the identical searchRanked()
+  // call -- this page previously re-ran the fuzzy search on every
+  // keystroke while typing, unguarded.
+  const results = useMemo(() => (trimmedQuery ? searchRanked(trimmedQuery) : []), [trimmedQuery])
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault()

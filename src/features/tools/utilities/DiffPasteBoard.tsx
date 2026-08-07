@@ -1,8 +1,8 @@
-import { useRef, type RefObject, type UIEvent } from 'react'
+import { useMemo, useRef, type RefObject, type UIEvent } from 'react'
 import { CopyButton } from '../../../components/ui/CopyButton'
 import {
+  alignedRowsToOverlayLines,
   buildAlignedDiffRows,
-  computeOverlayLines,
   diffLineWords,
   summarizeAlignedRows,
   type OverlayLine,
@@ -172,9 +172,13 @@ export function DiffPasteBoard({
   const rightOverlayRef = useRef<HTMLDivElement>(null)
   const syncingPanes = useRef(false)
 
-  const aligned = buildAlignedDiffRows(before, after)
+  // Computed once and reused for both the summary counts and the overlay
+  // lines below -- these used to each call buildAlignedDiffRows
+  // independently, running the same Myers diff + alignment pass twice on
+  // identical input on every keystroke.
+  const aligned = useMemo(() => buildAlignedDiffRows(before, after), [before, after])
   const summary = aligned.ok ? summarizeAlignedRows(aligned.result) : null
-  const { beforeLines, afterLines } = computeOverlayLines(before, after)
+  const { beforeLines, afterLines } = useMemo(() => alignedRowsToOverlayLines(aligned), [aligned])
 
   function handleLeftScroll(event: UIEvent<HTMLTextAreaElement>) {
     const { scrollTop, scrollLeft } = event.currentTarget
