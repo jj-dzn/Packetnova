@@ -143,6 +143,23 @@ describe('buildInterfaceConfig', () => {
     expect(result.ok).toBe(false)
   })
 
+  it('rejects a non-numeric VLAN ID instead of silently dropping the tag', () => {
+    const result = buildInterfaceConfig({ ...BASE_INTERFACE, vendor: 'ios', vlanId: Number('abc') })
+    expect(result.ok).toBe(false)
+  })
+
+  it('rejects a non-integer VLAN ID instead of producing a malformed subinterface name', () => {
+    const result = buildInterfaceConfig({ ...BASE_INTERFACE, vendor: 'ios', vlanId: 10.5 })
+    expect(result.ok).toBe(false)
+  })
+
+  it('rejects a negative or absurdly large MTU', () => {
+    expect(buildInterfaceConfig({ ...BASE_INTERFACE, vendor: 'ios', mtu: -100 }).ok).toBe(false)
+    expect(buildInterfaceConfig({ ...BASE_INTERFACE, vendor: 'ios', mtu: 999999999 }).ok).toBe(
+      false,
+    )
+  })
+
   it('produces a config for every supported vendor', () => {
     for (const vendor of CONFIG_VENDORS) {
       const result = buildInterfaceConfig({ ...BASE_INTERFACE, vendor })

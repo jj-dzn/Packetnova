@@ -167,8 +167,17 @@ export function buildInterfaceConfig(input: InterfaceConfigInput): ConfigResult 
   if (error) return { ok: false, error }
   if (!input.interfaceName.trim()) return { ok: false, error: 'Enter an interface name.' }
   if (!input.hostname.trim()) return { ok: false, error: 'Enter a hostname.' }
-  if (input.vlanId !== undefined && (input.vlanId < 1 || input.vlanId > 4094)) {
-    return { ok: false, error: 'VLAN ID must be between 1 and 4094.' }
+  if (
+    input.vlanId !== undefined &&
+    (!Number.isInteger(input.vlanId) || input.vlanId < 1 || input.vlanId > 4094)
+  ) {
+    return { ok: false, error: 'VLAN ID must be a whole number between 1 and 4094.' }
+  }
+  if (
+    input.mtu !== undefined &&
+    (!Number.isInteger(input.mtu) || input.mtu < 68 || input.mtu > 9216)
+  ) {
+    return { ok: false, error: 'MTU must be a whole number between 68 and 9216.' }
   }
 
   const mask = ipv4ToString(prefixLengthToSubnetMask(input.prefixLength).value)

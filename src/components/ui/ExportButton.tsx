@@ -30,7 +30,7 @@ const buttonClass =
 export function ExportButton({ exportAs, pending, className = '' }: ExportButtonProps) {
   return (
     <div className={`flex items-center gap-1.5 ${className}`}>
-      <span className="flex items-center gap-1 text-xs text-fg-subtle">
+      <span data-notebook-chrome="true" className="flex items-center gap-1 text-xs text-fg-subtle">
         <DownloadIcon />
         Export
       </span>

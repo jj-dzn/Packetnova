@@ -8,7 +8,16 @@ const SHORT_RUN_COLLAPSE_THRESHOLD = 4
 // button" -- some tools use a real <button> to show a real data value (a
 // bit-toggle sandbox's individual 1/0 cells), and blanket-excluding all
 // button text would silently drop that data instead of just the chrome.
-const CHROME_BUTTON_WORDS = new Set(['previous', 'next', 'play', 'pause', 'reset', 'png', 'svg'])
+const CHROME_BUTTON_WORDS = new Set([
+  'previous',
+  'next',
+  'play',
+  'pause',
+  'reset',
+  'png',
+  'svg',
+  'export',
+])
 
 function isChromeButtonText(text: string): boolean {
   const lower = text.toLowerCase()
@@ -22,15 +31,17 @@ function isChromeButtonText(text: string): boolean {
 
 // Captures a readable plain-text snapshot of a result panel for the
 // notebook -- plain innerText alone pulls in every interactive control's
-// own label too ("Previous", "PNG", "SVG", "Show guided walkthrough"),
-// which reads as noise next to the actual result. Chrome button text is
-// excluded by exact-line match against each button's own live innerText,
-// rather than cloning the element -- innerText on a detached/unrendered
-// clone isn't reliable across browsers, since it depends on the real
-// layout.
+// own label too ("Previous", "PNG", "SVG", "Show guided walkthrough"), plus
+// non-interactive chrome labels sitting next to them (ExportButton's
+// "Export" caption, marked with data-notebook-chrome since it isn't a
+// button itself), which reads as noise next to the actual result. Chrome
+// text is excluded by exact-line match against each element's own live
+// innerText, rather than cloning the element -- innerText on a
+// detached/unrendered clone isn't reliable across browsers, since it
+// depends on the real layout.
 export function extractSummaryText(element: HTMLElement): string {
   const buttonTexts = new Set(
-    Array.from(element.querySelectorAll('button, [role="button"]'))
+    Array.from(element.querySelectorAll('button, [role="button"], [data-notebook-chrome]'))
       .map((button) => (button as HTMLElement).innerText.trim())
       .filter((text) => text && isChromeButtonText(text)),
   )

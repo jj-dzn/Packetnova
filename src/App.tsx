@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import { PageShell } from './components/layout/PageShell'
 import { RouteLoadingFallback } from './components/layout/RouteLoadingFallback'
+import { RouteErrorBoundary } from './components/layout/RouteErrorBoundary'
 import { HomePage } from './pages/HomePage'
 import { AboutPage } from './pages/AboutPage'
 import { ToolsPage } from './pages/ToolsPage'
@@ -440,156 +441,167 @@ function App() {
   return (
     <BrowserRouter>
       <PageShell>
-        <Suspense fallback={<RouteLoadingFallback />}>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/tools" element={<ToolsPage />} />
-            <Route path="/tools/cidr-calculator" element={<CidrCalculator />} />
-            <Route path="/tools/subnet-calculator" element={<SubnetCalculator />} />
-            <Route path="/tools/ip-range-calculator" element={<IpRangeCalculator />} />
-            <Route path="/tools/broadcast-calculator" element={<BroadcastCalculator />} />
-            <Route
-              path="/tools/network-address-calculator"
-              element={<NetworkAddressCalculator />}
-            />
-            <Route path="/tools/ipv6-calculator" element={<Ipv6Calculator />} />
-            <Route path="/tools/wildcard-mask-calculator" element={<WildcardMaskCalculator />} />
-            <Route path="/tools/route-summarizer" element={<RouteSummarizer />} />
-            <Route path="/tools/mtu-calculator" element={<MtuCalculator />} />
-            <Route path="/tools/mss-calculator" element={<MssCalculator />} />
-            <Route path="/tools/latency-calculator" element={<LatencyCalculator />} />
-            <Route path="/tools/transfer-time-calculator" element={<TransferTimeCalculator />} />
-            <Route path="/tools/bandwidth-estimator" element={<BandwidthEstimator />} />
-            <Route
-              path="/tools/vpn-tunnel-overhead-calculator"
-              element={<TunnelOverheadCalculator />}
-            />
-            <Route
-              path="/tools/packet-fragmentation-calculator"
-              element={<PacketFragmentationCalculator />}
-            />
-            <Route
-              path="/tools/administrative-distance-reference"
-              element={<AdministrativeDistanceReference />}
-            />
-            <Route path="/tools/metric-comparison-tool" element={<MetricComparisonTool />} />
-            <Route path="/tools/longest-prefix-match-simulator" element={<LpmSimulator />} />
-            <Route path="/tools/route-lookup-simulator" element={<RouteLookupSimulator />} />
-            <Route path="/tools/bgp-path-comparison" element={<BgpBestPathSelector />} />
-            <Route path="/tools/vlan-calculator" element={<VlanCalculator />} />
-            <Route path="/tools/802-1q-tag-explorer" element={<Dot1qExplorer />} />
-            <Route path="/tools/mac-address-lookup" element={<MacAddressLookup />} />
-            <Route path="/tools/mac-formatter" element={<MacFormatter />} />
-            <Route path="/tools/stp-overview" element={<StpOverview />} />
-            <Route path="/tools/tcp-header-explorer" element={<TcpHeaderExplorer />} />
-            <Route path="/tools/udp-header-explorer" element={<UdpHeaderExplorer />} />
-            <Route path="/tools/ip-header-explorer" element={<IpHeaderExplorer />} />
-            <Route path="/tools/icmp-explorer" element={<IcmpExplorer />} />
-            <Route path="/tools/dns-record-reference" element={<DnsRecordReference />} />
-            <Route path="/tools/http-status-reference" element={<HttpStatusReference />} />
-            <Route path="/tools/tls-version-explorer" element={<TlsVersionExplorer />} />
-            <Route path="/tools/dhcp-options-reference" element={<DhcpOptionsReference />} />
-            <Route path="/tools/hash-generator" element={<HashGenerator />} />
-            <Route path="/tools/hash-verifier" element={<HashVerifier />} />
-            <Route path="/tools/jwt-decoder" element={<JwtDecoder />} />
-            <Route path="/tools/base64-encode-decode" element={<Base64Tool />} />
-            <Route path="/tools/url-encode-decode" element={<UrlEncodingTool />} />
-            <Route path="/tools/certificate-viewer" element={<CertificateViewer />} />
-            <Route path="/tools/password-generator" element={<PasswordGenerator />} />
-            <Route path="/tools/regex-tester" element={<RegexTester />} />
-            <Route path="/tools/json-formatter" element={<JsonFormatterTool />} />
-            <Route path="/tools/yaml-formatter" element={<YamlFormatterTool />} />
-            <Route path="/tools/xml-formatter" element={<XmlFormatterTool />} />
-            <Route path="/tools/epoch-converter" element={<EpochConverter />} />
-            <Route path="/tools/binary-decimal-hex-converter" element={<BaseConverterTool />} />
-            <Route path="/tools/ascii-converter" element={<AsciiConverterTool />} />
-            <Route path="/tools/text-diff-viewer" element={<TextDiffViewer />} />
-            <Route path="/tools/topology-canvas" element={<TopologyBuilder />} />
-            <Route path="/tools/device-config-generator" element={<DeviceConfigGenerator />} />
-            <Route path="/visualizers" element={<VisualizersPage />} />
-            <Route
-              path="/visualizers/tcp-three-way-handshake"
-              element={<TcpHandshakeVisualizer />}
-            />
-            <Route path="/visualizers/tls-handshake" element={<TlsHandshakeVisualizer />} />
-            <Route path="/visualizers/nat-flow-simulator" element={<NatFlowVisualizer />} />
-            <Route path="/visualizers/vpn-packet-flow" element={<VpnPacketFlowVisualizer />} />
-            <Route
-              path="/visualizers/packet-encapsulation"
-              element={<PacketEncapsulationVisualizer />}
-            />
-            <Route path="/visualizers/osi-model-explorer" element={<OsiModelExplorer />} />
-            <Route path="/visualizers/tcp-ip-stack-explorer" element={<TcpIpStackExplorer />} />
-            <Route path="/visualizers/next-hop-selection" element={<RoutingDecisionVisualizer />} />
-            <Route
-              path="/visualizers/bgp-best-path-selection"
-              element={<BgpBestPathVisualizer />}
-            />
-            <Route path="/visualizers/ospf-spf-animation" element={<OspfSpfVisualizer />} />
-            <Route path="/visualizers/dhcp-dora-sequence" element={<DhcpDoraVisualizer />} />
-            <Route
-              path="/visualizers/tls-1-2-vs-1-3"
-              element={<TlsVersionComparisonVisualizer />}
-            />
-            <Route
-              path="/visualizers/ipv4-vs-ipv6-header"
-              element={<Ipv4Ipv6HeaderComparisonVisualizer />}
-            />
-            <Route
-              path="/visualizers/stp-vs-rstp-convergence"
-              element={<StpRstpComparisonVisualizer />}
-            />
-            <Route path="/scenarios" element={<ScenariosPage />} />
-            <Route path="/paths" element={<PathsPage />} />
-            <Route path="/notebook" element={<NotebookPage />} />
-            <Route path="/paths/subnetting-fluency" element={<SubnettingFluencyPathPage />} />
-            <Route path="/paths/bgp-path-selection" element={<BgpPathSelectionPathPage />} />
-            <Route path="/paths/vpn-troubleshooting" element={<VpnTroubleshootingPathPage />} />
-            <Route
-              path="/paths/vlan-switching-fluency"
-              element={<VlanSwitchingFluencyPathPage />}
-            />
-            <Route path="/paths/security-fundamentals" element={<SecurityFundamentalsPathPage />} />
-            <Route
-              path="/scenarios/site-to-site-vpn-failure"
-              element={<SiteToSiteVpnFailureScenario />}
-            />
-            <Route path="/scenarios/subnetting-mistake" element={<SubnettingMistakeScenario />} />
-            <Route path="/scenarios/routing-black-hole" element={<RoutingBlackHoleScenario />} />
-            <Route path="/scenarios/nat-port-forwarding" element={<NatPortForwardingScenario />} />
-            <Route path="/scenarios/mtu-fragmentation" element={<MtuFragmentationScenario />} />
-            <Route path="/scenarios/bgp-path-selection" element={<BgpPathSelectionScenario />} />
-            <Route
-              path="/scenarios/vlan-misconfiguration"
-              element={<VlanMisconfigurationScenario />}
-            />
-            <Route path="/scenarios/dhcp-lease-failure" element={<DhcpFailureScenario />} />
-            <Route path="/scenarios/switching-loop" element={<SwitchingLoopScenario />} />
-            <Route path="/scenarios/dns-negative-cache" element={<DnsFailureScenario />} />
-            <Route path="/labs" element={<LabsPage />} />
-            <Route path="/labs/ping-pet" element={<PingPet />} />
-            <Route path="/labs/ip-zodiac" element={<IpZodiac />} />
-            <Route path="/labs/handle-generator" element={<HandleGenerator />} />
-            <Route path="/labs/cursed-config" element={<CursedConfigGenerator />} />
-            <Route path="/labs/hacker-typer" element={<HackerTyper />} />
-            <Route path="/labs/dial-up" element={<DialUpSimulator />} />
-            <Route path="/labs/blue-screen" element={<BlueScreenButton />} />
-            <Route path="/labs/traceroute-ghost" element={<TracerouteGhost />} />
-            <Route path="/labs/ping-pet-duel" element={<PingPetDuel />} />
-            <Route path="/labs/signal-decoder" element={<SignalDecoder />} />
-            <Route path="/labs/404-maze" element={<Maze404 />} />
-            <Route path="/labs/packet-snake" element={<PacketSnake />} />
-            <Route path="/labs/packet-runner" element={<PacketRunner />} />
-            <Route path="/terminal" element={<RetroTerminal />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/journey" element={<NetworkJourneyPage />} />
-            <Route path="/journey/nat" element={<NatJourneyPage />} />
-            <Route path="/journey/vpn-tunnel" element={<VpnTunnelJourneyPage />} />
-            <Route path="/journey/bgp-path" element={<BgpPathJourneyPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Suspense>
+        <RouteErrorBoundary>
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/tools" element={<ToolsPage />} />
+              <Route path="/tools/cidr-calculator" element={<CidrCalculator />} />
+              <Route path="/tools/subnet-calculator" element={<SubnetCalculator />} />
+              <Route path="/tools/ip-range-calculator" element={<IpRangeCalculator />} />
+              <Route path="/tools/broadcast-calculator" element={<BroadcastCalculator />} />
+              <Route
+                path="/tools/network-address-calculator"
+                element={<NetworkAddressCalculator />}
+              />
+              <Route path="/tools/ipv6-calculator" element={<Ipv6Calculator />} />
+              <Route path="/tools/wildcard-mask-calculator" element={<WildcardMaskCalculator />} />
+              <Route path="/tools/route-summarizer" element={<RouteSummarizer />} />
+              <Route path="/tools/mtu-calculator" element={<MtuCalculator />} />
+              <Route path="/tools/mss-calculator" element={<MssCalculator />} />
+              <Route path="/tools/latency-calculator" element={<LatencyCalculator />} />
+              <Route path="/tools/transfer-time-calculator" element={<TransferTimeCalculator />} />
+              <Route path="/tools/bandwidth-estimator" element={<BandwidthEstimator />} />
+              <Route
+                path="/tools/vpn-tunnel-overhead-calculator"
+                element={<TunnelOverheadCalculator />}
+              />
+              <Route
+                path="/tools/packet-fragmentation-calculator"
+                element={<PacketFragmentationCalculator />}
+              />
+              <Route
+                path="/tools/administrative-distance-reference"
+                element={<AdministrativeDistanceReference />}
+              />
+              <Route path="/tools/metric-comparison-tool" element={<MetricComparisonTool />} />
+              <Route path="/tools/longest-prefix-match-simulator" element={<LpmSimulator />} />
+              <Route path="/tools/route-lookup-simulator" element={<RouteLookupSimulator />} />
+              <Route path="/tools/bgp-path-comparison" element={<BgpBestPathSelector />} />
+              <Route path="/tools/vlan-calculator" element={<VlanCalculator />} />
+              <Route path="/tools/802-1q-tag-explorer" element={<Dot1qExplorer />} />
+              <Route path="/tools/mac-address-lookup" element={<MacAddressLookup />} />
+              <Route path="/tools/mac-formatter" element={<MacFormatter />} />
+              <Route path="/tools/stp-overview" element={<StpOverview />} />
+              <Route path="/tools/tcp-header-explorer" element={<TcpHeaderExplorer />} />
+              <Route path="/tools/udp-header-explorer" element={<UdpHeaderExplorer />} />
+              <Route path="/tools/ip-header-explorer" element={<IpHeaderExplorer />} />
+              <Route path="/tools/icmp-explorer" element={<IcmpExplorer />} />
+              <Route path="/tools/dns-record-reference" element={<DnsRecordReference />} />
+              <Route path="/tools/http-status-reference" element={<HttpStatusReference />} />
+              <Route path="/tools/tls-version-explorer" element={<TlsVersionExplorer />} />
+              <Route path="/tools/dhcp-options-reference" element={<DhcpOptionsReference />} />
+              <Route path="/tools/hash-generator" element={<HashGenerator />} />
+              <Route path="/tools/hash-verifier" element={<HashVerifier />} />
+              <Route path="/tools/jwt-decoder" element={<JwtDecoder />} />
+              <Route path="/tools/base64-encode-decode" element={<Base64Tool />} />
+              <Route path="/tools/url-encode-decode" element={<UrlEncodingTool />} />
+              <Route path="/tools/certificate-viewer" element={<CertificateViewer />} />
+              <Route path="/tools/password-generator" element={<PasswordGenerator />} />
+              <Route path="/tools/regex-tester" element={<RegexTester />} />
+              <Route path="/tools/json-formatter" element={<JsonFormatterTool />} />
+              <Route path="/tools/yaml-formatter" element={<YamlFormatterTool />} />
+              <Route path="/tools/xml-formatter" element={<XmlFormatterTool />} />
+              <Route path="/tools/epoch-converter" element={<EpochConverter />} />
+              <Route path="/tools/binary-decimal-hex-converter" element={<BaseConverterTool />} />
+              <Route path="/tools/ascii-converter" element={<AsciiConverterTool />} />
+              <Route path="/tools/text-diff-viewer" element={<TextDiffViewer />} />
+              <Route path="/tools/topology-canvas" element={<TopologyBuilder />} />
+              <Route path="/tools/device-config-generator" element={<DeviceConfigGenerator />} />
+              <Route path="/visualizers" element={<VisualizersPage />} />
+              <Route
+                path="/visualizers/tcp-three-way-handshake"
+                element={<TcpHandshakeVisualizer />}
+              />
+              <Route path="/visualizers/tls-handshake" element={<TlsHandshakeVisualizer />} />
+              <Route path="/visualizers/nat-flow-simulator" element={<NatFlowVisualizer />} />
+              <Route path="/visualizers/vpn-packet-flow" element={<VpnPacketFlowVisualizer />} />
+              <Route
+                path="/visualizers/packet-encapsulation"
+                element={<PacketEncapsulationVisualizer />}
+              />
+              <Route path="/visualizers/osi-model-explorer" element={<OsiModelExplorer />} />
+              <Route path="/visualizers/tcp-ip-stack-explorer" element={<TcpIpStackExplorer />} />
+              <Route
+                path="/visualizers/next-hop-selection"
+                element={<RoutingDecisionVisualizer />}
+              />
+              <Route
+                path="/visualizers/bgp-best-path-selection"
+                element={<BgpBestPathVisualizer />}
+              />
+              <Route path="/visualizers/ospf-spf-animation" element={<OspfSpfVisualizer />} />
+              <Route path="/visualizers/dhcp-dora-sequence" element={<DhcpDoraVisualizer />} />
+              <Route
+                path="/visualizers/tls-1-2-vs-1-3"
+                element={<TlsVersionComparisonVisualizer />}
+              />
+              <Route
+                path="/visualizers/ipv4-vs-ipv6-header"
+                element={<Ipv4Ipv6HeaderComparisonVisualizer />}
+              />
+              <Route
+                path="/visualizers/stp-vs-rstp-convergence"
+                element={<StpRstpComparisonVisualizer />}
+              />
+              <Route path="/scenarios" element={<ScenariosPage />} />
+              <Route path="/paths" element={<PathsPage />} />
+              <Route path="/notebook" element={<NotebookPage />} />
+              <Route path="/paths/subnetting-fluency" element={<SubnettingFluencyPathPage />} />
+              <Route path="/paths/bgp-path-selection" element={<BgpPathSelectionPathPage />} />
+              <Route path="/paths/vpn-troubleshooting" element={<VpnTroubleshootingPathPage />} />
+              <Route
+                path="/paths/vlan-switching-fluency"
+                element={<VlanSwitchingFluencyPathPage />}
+              />
+              <Route
+                path="/paths/security-fundamentals"
+                element={<SecurityFundamentalsPathPage />}
+              />
+              <Route
+                path="/scenarios/site-to-site-vpn-failure"
+                element={<SiteToSiteVpnFailureScenario />}
+              />
+              <Route path="/scenarios/subnetting-mistake" element={<SubnettingMistakeScenario />} />
+              <Route path="/scenarios/routing-black-hole" element={<RoutingBlackHoleScenario />} />
+              <Route
+                path="/scenarios/nat-port-forwarding"
+                element={<NatPortForwardingScenario />}
+              />
+              <Route path="/scenarios/mtu-fragmentation" element={<MtuFragmentationScenario />} />
+              <Route path="/scenarios/bgp-path-selection" element={<BgpPathSelectionScenario />} />
+              <Route
+                path="/scenarios/vlan-misconfiguration"
+                element={<VlanMisconfigurationScenario />}
+              />
+              <Route path="/scenarios/dhcp-lease-failure" element={<DhcpFailureScenario />} />
+              <Route path="/scenarios/switching-loop" element={<SwitchingLoopScenario />} />
+              <Route path="/scenarios/dns-negative-cache" element={<DnsFailureScenario />} />
+              <Route path="/labs" element={<LabsPage />} />
+              <Route path="/labs/ping-pet" element={<PingPet />} />
+              <Route path="/labs/ip-zodiac" element={<IpZodiac />} />
+              <Route path="/labs/handle-generator" element={<HandleGenerator />} />
+              <Route path="/labs/cursed-config" element={<CursedConfigGenerator />} />
+              <Route path="/labs/hacker-typer" element={<HackerTyper />} />
+              <Route path="/labs/dial-up" element={<DialUpSimulator />} />
+              <Route path="/labs/blue-screen" element={<BlueScreenButton />} />
+              <Route path="/labs/traceroute-ghost" element={<TracerouteGhost />} />
+              <Route path="/labs/ping-pet-duel" element={<PingPetDuel />} />
+              <Route path="/labs/signal-decoder" element={<SignalDecoder />} />
+              <Route path="/labs/404-maze" element={<Maze404 />} />
+              <Route path="/labs/packet-snake" element={<PacketSnake />} />
+              <Route path="/labs/packet-runner" element={<PacketRunner />} />
+              <Route path="/terminal" element={<RetroTerminal />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/journey" element={<NetworkJourneyPage />} />
+              <Route path="/journey/nat" element={<NatJourneyPage />} />
+              <Route path="/journey/vpn-tunnel" element={<VpnTunnelJourneyPage />} />
+              <Route path="/journey/bgp-path" element={<BgpPathJourneyPage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
+        </RouteErrorBoundary>
       </PageShell>
     </BrowserRouter>
   )

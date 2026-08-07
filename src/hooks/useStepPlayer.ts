@@ -21,31 +21,39 @@ export interface StepPlayer {
 }
 
 export function useStepPlayer(totalSteps: number): StepPlayer {
-  const [step, setStep] = useState(0)
+  const [rawStep, setRawStep] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
   const canAutoPlay = !prefersReducedMotion
 
+  // next()/goTo()/previous() only clamp at the moment they're called -- if
+  // the caller's own step count shrinks out from under an already-advanced
+  // player (e.g. editing a tool's inputs mid-walkthrough drops the guided
+  // step count), nothing else re-clamps the raw state. Clamped again here,
+  // on every render, rather than via an effect -- an effect would still
+  // let one render through with a stale, out-of-range step first.
+  const step = Math.min(rawStep, Math.max(totalSteps - 1, 0))
+
   const isFirst = step === 0
   const isLast = step === totalSteps - 1
 
-  const next = () => setStep((current) => Math.min(current + 1, totalSteps - 1))
+  const next = () => setRawStep((current) => Math.min(current + 1, totalSteps - 1))
   const previous = () => {
     setIsPlaying(false)
-    setStep((current) => Math.max(current - 1, 0))
+    setRawStep((current) => Math.max(current - 1, 0))
   }
   const reset = () => {
     setIsPlaying(false)
-    setStep(0)
+    setRawStep(0)
   }
   const goTo = (index: number) => {
     setIsPlaying(false)
-    setStep(Math.min(Math.max(index, 0), totalSteps - 1))
+    setRawStep(Math.min(Math.max(index, 0), totalSteps - 1))
   }
   const togglePlay = () => {
     if (!canAutoPlay) return
     setIsPlaying((playing) => {
-      if (!playing && step === totalSteps - 1) setStep(0)
+      if (!playing && step === totalSteps - 1) setRawStep(0)
       return !playing
     })
   }
@@ -53,7 +61,7 @@ export function useStepPlayer(totalSteps: number): StepPlayer {
   useEffect(() => {
     if (!isPlaying || !canAutoPlay) return
     const id = window.setInterval(() => {
-      setStep((current) => {
+      setRawStep((current) => {
         if (current >= totalSteps - 1) {
           setIsPlaying(false)
           return current

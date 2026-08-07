@@ -63,7 +63,9 @@ export function HashGenerator() {
       try {
         const buffer =
           mode === 'text'
-            ? new TextEncoder().encode(text).buffer
+            ? text
+              ? new TextEncoder().encode(text).buffer
+              : null
             : file
               ? await file.arrayBuffer()
               : null

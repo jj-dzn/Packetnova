@@ -103,11 +103,11 @@ export function Ipv4Ipv6HeaderComparisonVisualizer() {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <h3 className="mb-2 font-semibold">IPv4 header -- 20 bytes (minimum)</h3>
-          <HeaderByteDiagram fields={ipHeaderFields} />
+          <HeaderByteDiagram fields={ipHeaderFields} exportLabel="ipv4-header-byte-diagram" />
         </div>
         <div>
           <h3 className="mb-2 font-semibold">IPv6 header -- 40 bytes (always)</h3>
-          <HeaderByteDiagram fields={ipv6HeaderFields} />
+          <HeaderByteDiagram fields={ipv6HeaderFields} exportLabel="ipv6-header-byte-diagram" />
         </div>
       </div>
       <div className="mt-8 overflow-x-auto rounded-md border border-border">

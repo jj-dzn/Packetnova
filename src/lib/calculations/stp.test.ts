@@ -54,6 +54,14 @@ describe('electRootBridge', () => {
   it('rejects an empty candidate list', () => {
     expect(electRootBridge([]).ok).toBe(false)
   })
+
+  it('rejects two bridges sharing the same name instead of silently merging them', () => {
+    const result = electRootBridge([
+      { id: 'Switch A', priority: 32768, macAddress: '00:11:22:33:44:55' },
+      { id: 'Switch A', priority: 4096, macAddress: 'aa:bb:cc:dd:ee:ff' },
+    ])
+    expect(result.ok).toBe(false)
+  })
 })
 
 describe('computeStpPortRoles', () => {

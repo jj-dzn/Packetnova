@@ -70,9 +70,16 @@ export function NotebookPage() {
                   Remove
                 </button>
               </div>
-              <pre className="overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs whitespace-pre-wrap">
-                {entry.summary}
-              </pre>
+              <div className="overflow-x-auto rounded-md border border-border bg-bg px-3">
+                {entry.summary.split('\n').map((line, index) => (
+                  <div
+                    key={index}
+                    className="border-b border-border py-1.5 text-sm break-words last:border-b-0"
+                  >
+                    {line}
+                  </div>
+                ))}
+              </div>
             </Card>
           ))}
         </div>

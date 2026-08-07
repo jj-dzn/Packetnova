@@ -80,6 +80,9 @@ export function MetricComparisonTool() {
                   />
                 )}
               </dl>
+              {!eigrpCalc.ok && (
+                <p className="text-xs text-danger">EIGRP composite metric: {eigrpCalc.error}</p>
+              )}
               <div>
                 <p className="mb-2 text-xs font-medium text-fg-muted">
                   This one link's metric under each protocol

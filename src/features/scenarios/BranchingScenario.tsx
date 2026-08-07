@@ -180,7 +180,23 @@ export function BranchingScenario({
               <button
                 key={choice.to}
                 type="button"
-                onClick={() => choose(choice.to)}
+                onClick={() => {
+                  choose(choice.to)
+                  // The tick interval only updates elapsedMs once per
+                  // TICK_MS and stops the moment this choice lands on a
+                  // resolution node -- without one final sync right here,
+                  // the displayed/shared result time is always however
+                  // much of the last full second happened to be left
+                  // over, undercounting the true elapsed time by up to
+                  // TICK_MS.
+                  if (
+                    challengeActive &&
+                    startTime !== null &&
+                    nodes[choice.to]?.outcome === 'resolution'
+                  ) {
+                    setElapsedMs(Date.now() - startTime)
+                  }
+                }}
                 className="rounded-lg border border-border bg-surface p-4 text-left text-sm font-medium transition-colors hover:border-accent/40"
               >
                 {choice.label}

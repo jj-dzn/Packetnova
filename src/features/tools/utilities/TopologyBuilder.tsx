@@ -7,6 +7,8 @@ import { Button } from '../../../components/ui/Button'
 import { ExportButton } from '../../../components/ui/ExportButton'
 import { DeviceIcon, type DeviceIconKind } from '../../diagram/DeviceIcons'
 import { useDiagramExport } from '../../../hooks/useDiagramExport'
+import { parseCIDR, parseIPv4 } from '../../../lib/validation/ip'
+import { analyzeIPv6 } from '../../../lib/calculations/ipv6'
 
 const VIEW_WIDTH = 100
 const VIEW_HEIGHT = 58
@@ -53,30 +55,40 @@ interface ToolQuickLink {
 function buildNodeToolLinks(node: CanvasNode): ToolQuickLink[] {
   const links: ToolQuickLink[] = []
   const address = node.address?.trim()
+  // Quick-links are only worth offering once the text actually looks like
+  // the kind of address each destination tool expects -- otherwise it's a
+  // dead-end link to a tool that can't do anything with what got typed.
+  // Checked per-link against what that specific tool needs (a bare host
+  // vs. a full CIDR), rather than one blanket gate for the whole address,
+  // since e.g. a host with no prefix still has a real IP to look up.
   if (address) {
     const encoded = encodeURIComponent(address)
     if (address.includes(':')) {
-      links.push({ label: 'IPv6 calculator', to: `/tools/ipv6-calculator?addr=${encoded}` })
+      if (analyzeIPv6(address).ok) {
+        links.push({ label: 'IPv6 calculator', to: `/tools/ipv6-calculator?addr=${encoded}` })
+      }
     } else {
-      links.push({ label: 'CIDR calculator', to: `/tools/cidr-calculator?cidr=${encoded}` })
-      links.push({ label: 'Subnet calculator', to: `/tools/subnet-calculator?cidr=${encoded}` })
-      links.push({
-        label: 'Network address calculator',
-        to: `/tools/network-address-calculator?cidr=${encoded}`,
-      })
-      links.push({
-        label: 'Broadcast calculator',
-        to: `/tools/broadcast-calculator?cidr=${encoded}`,
-      })
-      if (node.kind === 'router' || node.kind === 'vpn-gateway') {
-        const host = encodeURIComponent(address.split('/')[0]!)
+      const [host, prefix] = address.split('/')
+      const isValidCidr = Boolean(parseCIDR(address))
+      if (isValidCidr) {
+        links.push({ label: 'CIDR calculator', to: `/tools/cidr-calculator?cidr=${encoded}` })
+        links.push({ label: 'Subnet calculator', to: `/tools/subnet-calculator?cidr=${encoded}` })
         links.push({
-          label: 'Route lookup simulator',
-          to: `/tools/route-lookup-simulator?destination=${host}`,
+          label: 'Network address calculator',
+          to: `/tools/network-address-calculator?cidr=${encoded}`,
+        })
+        links.push({
+          label: 'Broadcast calculator',
+          to: `/tools/broadcast-calculator?cidr=${encoded}`,
         })
       }
-      const [host, prefix] = address.split('/')
-      if (host && prefix) {
+      if ((node.kind === 'router' || node.kind === 'vpn-gateway') && host && parseIPv4(host)) {
+        links.push({
+          label: 'Route lookup simulator',
+          to: `/tools/route-lookup-simulator?destination=${encodeURIComponent(host)}`,
+        })
+      }
+      if (isValidCidr && host && prefix) {
         links.push({
           label: 'Generate device config',
           to: `/tools/device-config-generator?hostname=${encodeURIComponent(node.label)}&addr=${encodeURIComponent(host)}&prefix=${encodeURIComponent(prefix)}`,

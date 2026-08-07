@@ -20,6 +20,11 @@ export function electRootBridge(candidates: BridgeCandidate[]): CalculationResul
     return { ok: false, error: 'Add at least one bridge.' }
   }
 
+  const ids = new Set(candidates.map((c) => c.id))
+  if (ids.size !== candidates.length) {
+    return { ok: false, error: 'Each bridge needs a unique name.' }
+  }
+
   for (const candidate of candidates) {
     if (
       !Number.isInteger(candidate.priority) ||

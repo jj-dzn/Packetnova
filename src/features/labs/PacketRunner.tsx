@@ -145,6 +145,7 @@ export function PacketRunner() {
           <span className="flex items-center gap-1">
             <span className="h-2.5 w-2.5 rounded-sm bg-danger" /> Firewall (game over)
           </span>
+          <span>+1 per tick just for staying alive</span>
         </div>
       </Card>
     </div>

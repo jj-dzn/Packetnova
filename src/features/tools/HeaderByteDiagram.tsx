@@ -13,6 +13,11 @@ interface HeaderByteDiagramProps {
   /** Optional label shown above the diagram, e.g. a byte count or which
    * mode ("live values" vs. "field reference") is currently showing. */
   caption?: string
+  /** Overrides the exported file's base name -- needed wherever more than
+   * one of these diagrams appears on the same page (e.g. an IPv4/IPv6 side
+   * by side comparison), so each one's PNG/SVG download doesn't overwrite
+   * the other's identically-named file. */
+  exportLabel?: string
 }
 
 const ROW_BITS = 32
@@ -30,7 +35,12 @@ function parseBits(size: string): number | null {
 // logic is needed. A field with size "Variable" (e.g. TCP/IP Options) is
 // pulled out and rendered as an open-ended trailer instead of forced into
 // the fixed grid.
-export function HeaderByteDiagram({ fields, values, caption }: HeaderByteDiagramProps) {
+export function HeaderByteDiagram({
+  fields,
+  values,
+  caption,
+  exportLabel,
+}: HeaderByteDiagramProps) {
   const rows: { field: HeaderField; bits: number }[][] = []
   let currentRow: { field: HeaderField; bits: number }[] = []
   let currentRowBits = 0
@@ -52,7 +62,9 @@ export function HeaderByteDiagram({ fields, values, caption }: HeaderByteDiagram
   }
   if (currentRow.length > 0) rows.push(currentRow)
 
-  const { ref, exportAs, pending } = useDiagramExport<HTMLDivElement>('header-byte-diagram')
+  const { ref, exportAs, pending } = useDiagramExport<HTMLDivElement>(
+    exportLabel ?? 'header-byte-diagram',
+  )
 
   return (
     <div className="flex flex-col gap-1">

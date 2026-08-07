@@ -109,6 +109,20 @@ export function selectBgpBestPath(candidates: BgpCandidate[]): CalculationResult
     if (!Number.isInteger(candidate.neighborAsNumber) || candidate.neighborAsNumber < 1) {
       return { ok: false, error: `"${candidate.id}" needs a neighboring AS number of 1 or higher.` }
     }
+    // Every field the tie-break steps key off of has to be a real number --
+    // an unvalidated NaN here (from an empty/non-numeric form field) makes
+    // Math.min/Math.max return NaN, which then matches nothing in narrow()'s
+    // filter and collapses `remaining` to an empty array.
+    if (
+      !Number.isFinite(candidate.weight) ||
+      !Number.isFinite(candidate.localPreference) ||
+      !Number.isFinite(candidate.asPathLength) ||
+      !Number.isFinite(candidate.med) ||
+      !Number.isFinite(candidate.igpMetricToNextHop) ||
+      !Number.isFinite(candidate.routeAgeSeconds)
+    ) {
+      return { ok: false, error: `"${candidate.id}" has a field that isn't a valid number.` }
+    }
   }
 
   if (candidates.length === 1) {

@@ -17,7 +17,11 @@ export function useUrlState(key: string, defaultValue: string): [string, (next: 
   const setValue = useCallback(
     (next: string) => {
       const nextParams = new URLSearchParams(window.location.search)
-      if (next === defaultValue || next === '') {
+      // Only the default value itself gets omitted from the URL -- an
+      // empty string is a real, distinct state (the user is mid-edit,
+      // field cleared) and has to round-trip back out as empty too, not
+      // silently snap back to the default and swallow the next keystroke.
+      if (next === defaultValue) {
         nextParams.delete(key)
       } else {
         nextParams.set(key, next)

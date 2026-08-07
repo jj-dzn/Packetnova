@@ -175,8 +175,8 @@ export function StpOverview() {
                     onChange={(e) => updateLink(index, { from: e.target.value })}
                     className="min-w-[8rem] flex-1"
                   >
-                    {bridges.map((bridge) => (
-                      <option key={bridge.id} value={bridge.id}>
+                    {bridges.map((bridge, bridgeIndex) => (
+                      <option key={bridgeIndex} value={bridge.id}>
                         {bridge.id}
                       </option>
                     ))}
@@ -186,8 +186,8 @@ export function StpOverview() {
                     onChange={(e) => updateLink(index, { to: e.target.value })}
                     className="min-w-[8rem] flex-1"
                   >
-                    {bridges.map((bridge) => (
-                      <option key={bridge.id} value={bridge.id}>
+                    {bridges.map((bridge, bridgeIndex) => (
+                      <option key={bridgeIndex} value={bridge.id}>
                         {bridge.id}
                       </option>
                     ))}
