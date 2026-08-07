@@ -1,12 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router'
 import { Mascot } from '../ui/Mascot'
+import { NavSearch } from '../ui/NavSearch'
 import { useDarkMode } from '../../hooks/useDarkMode'
 import { useColorblindMode } from '../../hooks/useColorblindMode'
 import { useMascotMood } from '../../hooks/useMascotMood'
-import { openCommandPalette } from '../../lib/commandPalette'
 
-const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad|iPod/.test(navigator.userAgent)
+// Below this, the desktop search box (in the hidden-below-md toolbar) isn't
+// rendered at all -- matches the md breakpoint the layout itself switches
+// on, so Cmd/Ctrl+K knows which of the two NavSearch instances to focus.
+const MOBILE_BREAKPOINT_PX = 768
 
 const navLinks = [
   { to: '/tools', label: 'Tools' },
@@ -68,45 +71,6 @@ function ColorblindIcon({ active }: { active: boolean }) {
   )
 }
 
-function SearchIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M17 17l-3.8-3.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-// A single trigger for the one search experience the site has -- clicking
-// or tapping this opens the exact same Cmd/Ctrl+K command palette, instead
-// of maintaining a second, separate inline-dropdown search box that behaved
-// differently from the keyboard shortcut.
-function SearchTrigger({ className = '', onOpen }: { className?: string; onOpen?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        onOpen?.()
-        openCommandPalette()
-      }}
-      aria-label="Open search (Cmd/Ctrl+K)"
-      className={`flex items-center justify-between gap-2 rounded-md border border-border bg-bg px-3 py-2 text-sm text-fg-subtle transition-colors hover:border-accent/40 hover:text-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${className}`}
-    >
-      <span className="flex items-center gap-2">
-        <SearchIcon />
-        Search tools...
-      </span>
-      {/* No keyboard shortcut on a touch device -- this only ever renders
-          wide enough to be reached at the lg breakpoint, well above where
-          the mobile menu (md and below) shows its own instance. */}
-      <span className="hidden shrink-0 items-center gap-1 text-xs lg:flex">
-        <kbd className="font-sans">{isMac ? '⌘' : 'Ctrl'}</kbd>
-        <kbd className="font-sans">K</kbd>
-      </span>
-    </button>
-  )
-}
-
 function MenuIcon({ open }: { open: boolean }) {
   return (
     <svg
@@ -141,6 +105,29 @@ export function Nav() {
   const { colorblind, toggleColorblind } = useColorblindMode()
   const [mobileOpen, setMobileOpen] = useState(false)
   const mood = useMascotMood()
+  const desktopSearchRef = useRef<HTMLInputElement>(null)
+  const mobileSearchRef = useRef<HTMLInputElement>(null)
+
+  // Cmd/Ctrl+K focuses the search box directly instead of opening a
+  // separate popup -- on a narrow viewport that means opening the mobile
+  // menu first (the search box only exists in the DOM once that panel is
+  // open), then focusing it once React has committed the new markup.
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const isShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k'
+      if (!isShortcut) return
+      event.preventDefault()
+      if (window.innerWidth < MOBILE_BREAKPOINT_PX) {
+        setMobileOpen(true)
+        requestAnimationFrame(() => mobileSearchRef.current?.focus())
+      } else {
+        desktopSearchRef.current?.scrollIntoView({ block: 'center' })
+        desktopSearchRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   return (
     <header className="border-b border-border">
@@ -168,7 +155,7 @@ export function Nav() {
         </nav>
 
         <div className="hidden flex-wrap items-center justify-end gap-3 md:flex">
-          <SearchTrigger className="w-40 lg:w-64" />
+          <NavSearch className="w-40 lg:w-64" inputRef={desktopSearchRef} />
           <button
             type="button"
             onClick={toggleColorblind}
@@ -207,7 +194,11 @@ export function Nav() {
 
       {mobileOpen && (
         <nav className="flex flex-col gap-3 border-t border-border px-4 py-3 md:hidden">
-          <SearchTrigger className="w-full" onOpen={() => setMobileOpen(false)} />
+          <NavSearch
+            className="w-full"
+            inputRef={mobileSearchRef}
+            onNavigate={() => setMobileOpen(false)}
+          />
           <div className="flex flex-col gap-1">
             {navLinks.map((link) => (
               <NavLink
