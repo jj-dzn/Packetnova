@@ -117,36 +117,61 @@ function buildJuniperBgpOutput(candidates: BgpCandidate[], result: BgpResult): s
   return lines.join('\n')
 }
 
-const DEFAULT_CANDIDATES: BgpCandidate[] = [
+// The form holds every numeric field as the raw string the user typed,
+// not the parsed number -- a candidate's `weight` input is bound straight
+// to this shape. Parsing (and NaN handling) happens once, at the point
+// candidates actually get calculated with, via parseCandidate() below.
+// Binding the input to a live Number(...) instead would echo a literal
+// "NaN" back into the field the moment a value doesn't parse, overwriting
+// whatever partial/invalid text the user was still in the middle of
+// typing.
+type CandidateInput = {
+  [K in keyof BgpCandidate]: BgpCandidate[K] extends number ? string : BgpCandidate[K]
+}
+
+function parseCandidate(input: CandidateInput): BgpCandidate {
+  return {
+    ...input,
+    weight: Number(input.weight),
+    localPreference: Number(input.localPreference),
+    asPathLength: Number(input.asPathLength),
+    med: Number(input.med),
+    igpMetricToNextHop: Number(input.igpMetricToNextHop),
+    routeAgeSeconds: Number(input.routeAgeSeconds),
+    neighborAsNumber: Number(input.neighborAsNumber),
+  }
+}
+
+const DEFAULT_CANDIDATES: CandidateInput[] = [
   {
     id: 'Path A',
-    weight: 0,
-    localPreference: 100,
+    weight: '0',
+    localPreference: '100',
     locallyOriginated: false,
-    asPathLength: 3,
+    asPathLength: '3',
     origin: 'igp',
-    med: 0,
+    med: '0',
     isEbgp: true,
-    igpMetricToNextHop: 0,
-    routeAgeSeconds: 100,
+    igpMetricToNextHop: '0',
+    routeAgeSeconds: '100',
     routerId: '1.1.1.1',
     neighborIp: '10.0.0.1',
-    neighborAsNumber: 65001,
+    neighborAsNumber: '65001',
   },
   {
     id: 'Path B',
-    weight: 0,
-    localPreference: 100,
+    weight: '0',
+    localPreference: '100',
     locallyOriginated: false,
-    asPathLength: 2,
+    asPathLength: '2',
     origin: 'igp',
-    med: 0,
+    med: '0',
     isEbgp: true,
-    igpMetricToNextHop: 0,
-    routeAgeSeconds: 100,
+    igpMetricToNextHop: '0',
+    routeAgeSeconds: '100',
     routerId: '2.2.2.2',
     neighborIp: '10.0.0.2',
-    neighborAsNumber: 65002,
+    neighborAsNumber: '65002',
   },
 ]
 
@@ -174,18 +199,19 @@ function Field({
 type CliVendor = 'cisco' | 'juniper'
 
 export function BgpBestPathSelector() {
-  const [candidates, setCandidates] = useState<BgpCandidate[]>(DEFAULT_CANDIDATES)
+  const [candidates, setCandidates] = useState<CandidateInput[]>(DEFAULT_CANDIDATES)
   const [showAdvanced, setShowAdvanced] = useState(false)
   const [hoveredStep, setHoveredStep] = useState<string | null>(null)
   const [showCli, setShowCli] = useState(false)
   const [cliVendor, setCliVendor] = useState<CliVendor>('cisco')
 
-  const calc = selectBgpBestPath(candidates)
+  const parsedCandidates = candidates.map(parseCandidate)
+  const calc = selectBgpBestPath(parsedCandidates)
   const hoveredTrace =
     calc.ok && hoveredStep ? calc.result.trace.find((t) => t.step === hoveredStep) : undefined
   const highlightedField = hoveredStep ? STEP_TO_FIELD[hoveredStep] : undefined
 
-  function updateCandidate(index: number, patch: Partial<BgpCandidate>) {
+  function updateCandidate(index: number, patch: Partial<CandidateInput>) {
     setCandidates((current) => current.map((c, i) => (i === index ? { ...c, ...patch } : c)))
   }
 
@@ -201,7 +227,7 @@ export function BgpBestPathSelector() {
         id: `Path ${String.fromCharCode(65 + current.length)}`,
         routerId: '3.3.3.3',
         neighborIp: '10.0.0.3',
-        neighborAsNumber: 65000 + current.length + 1,
+        neighborAsNumber: String(65000 + current.length + 1),
       },
     ])
   }
@@ -253,23 +279,19 @@ export function BgpBestPathSelector() {
                   <Field label="Weight" highlighted={highlightedField === 'Weight'}>
                     <Input
                       value={candidate.weight}
-                      onChange={(e) => updateCandidate(index, { weight: Number(e.target.value) })}
+                      onChange={(e) => updateCandidate(index, { weight: e.target.value })}
                     />
                   </Field>
                   <Field label="Local pref" highlighted={highlightedField === 'Local pref'}>
                     <Input
                       value={candidate.localPreference}
-                      onChange={(e) =>
-                        updateCandidate(index, { localPreference: Number(e.target.value) })
-                      }
+                      onChange={(e) => updateCandidate(index, { localPreference: e.target.value })}
                     />
                   </Field>
                   <Field label="AS path length" highlighted={highlightedField === 'AS path length'}>
                     <Input
                       value={candidate.asPathLength}
-                      onChange={(e) =>
-                        updateCandidate(index, { asPathLength: Number(e.target.value) })
-                      }
+                      onChange={(e) => updateCandidate(index, { asPathLength: e.target.value })}
                     />
                   </Field>
                   <Field label="Origin" highlighted={highlightedField === 'Origin'}>
@@ -287,7 +309,7 @@ export function BgpBestPathSelector() {
                   <Field label="MED" highlighted={highlightedField === 'MED'}>
                     <Input
                       value={candidate.med}
-                      onChange={(e) => updateCandidate(index, { med: Number(e.target.value) })}
+                      onChange={(e) => updateCandidate(index, { med: e.target.value })}
                     />
                   </Field>
                   <Field label="Session" highlighted={highlightedField === 'Session'}>
@@ -305,7 +327,7 @@ export function BgpBestPathSelector() {
                     <Input
                       value={candidate.igpMetricToNextHop}
                       onChange={(e) =>
-                        updateCandidate(index, { igpMetricToNextHop: Number(e.target.value) })
+                        updateCandidate(index, { igpMetricToNextHop: e.target.value })
                       }
                     />
                   </Field>
@@ -332,7 +354,7 @@ export function BgpBestPathSelector() {
                         <Input
                           value={candidate.routeAgeSeconds}
                           onChange={(e) =>
-                            updateCandidate(index, { routeAgeSeconds: Number(e.target.value) })
+                            updateCandidate(index, { routeAgeSeconds: e.target.value })
                           }
                         />
                       </Field>
@@ -352,7 +374,7 @@ export function BgpBestPathSelector() {
                         <Input
                           value={candidate.neighborAsNumber}
                           onChange={(e) =>
-                            updateCandidate(index, { neighborAsNumber: Number(e.target.value) })
+                            updateCandidate(index, { neighborAsNumber: e.target.value })
                           }
                         />
                       </Field>
@@ -376,7 +398,7 @@ export function BgpBestPathSelector() {
             </dl>
             {calc.result.trace.length > 0 && (
               <GuidedMode
-                steps={buildBgpGuidedSteps(candidates, calc.result)}
+                steps={buildBgpGuidedSteps(parsedCandidates, calc.result)}
                 closingNote={
                   <>
                     Order matters more than any single attribute -- a path can lose on every
@@ -433,8 +455,8 @@ export function BgpBestPathSelector() {
               {showCli && (
                 <pre className="mt-3 overflow-x-auto rounded-md border border-border bg-bg p-3 font-mono text-xs">
                   {cliVendor === 'cisco'
-                    ? buildCiscoBgpOutput(candidates, calc.result)
-                    : buildJuniperBgpOutput(candidates, calc.result)}
+                    ? buildCiscoBgpOutput(parsedCandidates, calc.result)
+                    : buildJuniperBgpOutput(parsedCandidates, calc.result)}
                 </pre>
               )}
             </div>

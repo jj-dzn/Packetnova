@@ -1,6 +1,7 @@
-import { useMemo, useRef, useState, type KeyboardEvent, type RefObject } from 'react'
+import { useId, useMemo, useRef, useState, type KeyboardEvent, type RefObject } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { searchIndex, type SearchItem } from '../../lib/search/searchIndex'
+import { searchRanked } from '../../lib/search/rankResults'
+import type { SearchItem } from '../../lib/search/searchIndex'
 import { detectIntent } from '../../lib/search/intentDetection'
 
 const MAX_RESULTS = 7
@@ -44,6 +45,12 @@ export function NavSearch({ className = '', inputRef, onNavigate }: NavSearchPro
   const navigate = useNavigate()
   const localRef = useRef<HTMLInputElement>(null)
   const blurTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  // Each rendered instance (desktop nav, mobile menu) needs its own ids --
+  // aria-controls/aria-activedescendant point at a specific element, and
+  // two instances sharing one id would make both invalid.
+  const instanceId = useId()
+  const listboxId = `${instanceId}-listbox`
+  const optionId = (index: number) => `${instanceId}-option-${index}`
 
   function setRefs(el: HTMLInputElement | null) {
     localRef.current = el
@@ -55,10 +62,7 @@ export function NavSearch({ className = '', inputRef, onNavigate }: NavSearchPro
 
   const allResults = useMemo<SearchItem[]>(() => {
     if (!trimmedQuery) return []
-    return searchIndex
-      .search(trimmedQuery)
-      .map((r) => r.item)
-      .filter((item) => item.href)
+    return searchRanked(trimmedQuery).filter((item) => item.href)
   }, [trimmedQuery])
   const shownResults = allResults.slice(0, MAX_RESULTS)
 
@@ -109,10 +113,15 @@ export function NavSearch({ className = '', inputRef, onNavigate }: NavSearchPro
       const row = rows[selectedIndex]
       if (row) activate(row.href)
     } else if (event.key === 'Escape') {
+      // Close the dropdown but leave focus right where it is -- the
+      // standard combobox convention, and it means the next Tab press
+      // continues naturally from the search box instead of from <body>.
       setIsOpen(false)
-      localRef.current?.blur()
     }
   }
+
+  const isExpanded = isOpen && rows.length > 0
+  const activeOptionId = isExpanded ? optionId(selectedIndex) : undefined
 
   return (
     <div className={`relative ${className}`}>
@@ -121,6 +130,7 @@ export function NavSearch({ className = '', inputRef, onNavigate }: NavSearchPro
         <input
           ref={setRefs}
           type="search"
+          role="combobox"
           value={query}
           onChange={(event) => {
             setQuery(event.target.value)
@@ -131,6 +141,10 @@ export function NavSearch({ className = '', inputRef, onNavigate }: NavSearchPro
           onKeyDown={handleKeyDown}
           placeholder="Search, or paste an IP, CIDR, MAC, or JWT..."
           aria-label="Search tools"
+          aria-expanded={isExpanded}
+          aria-controls={listboxId}
+          aria-autocomplete="list"
+          aria-activedescendant={activeOptionId}
           spellCheck={false}
           className="w-full min-w-0 bg-transparent text-sm text-fg placeholder:text-fg-subtle focus:outline-none"
         />
@@ -143,14 +157,24 @@ export function NavSearch({ className = '', inputRef, onNavigate }: NavSearchPro
       </div>
 
       {isOpen && trimmedQuery && (
-        <div className="absolute z-20 mt-2 w-full min-w-64 rounded-md border border-border bg-surface p-2 shadow-lg">
+        <div
+          id={listboxId}
+          role="listbox"
+          aria-label="Search results"
+          className="absolute z-20 mt-2 w-full min-w-64 rounded-md border border-border bg-surface p-2 shadow-lg"
+        >
           {rows.length === 0 ? (
-            <p className="px-2 py-2 text-sm text-fg-muted">No results for "{trimmedQuery}"</p>
+            <p role="status" className="px-2 py-2 text-sm text-fg-muted">
+              No results for "{trimmedQuery}"
+            </p>
           ) : (
             <>
               {rows.map((row, index) => (
                 <button
                   key={row.key}
+                  id={optionId(index)}
+                  role="option"
+                  aria-selected={index === selectedIndex}
                   type="button"
                   onMouseEnter={() => setSelectedIndex(index)}
                   onClick={() => activate(row.href)}
